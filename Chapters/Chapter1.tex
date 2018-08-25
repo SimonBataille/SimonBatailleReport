@@ -2,7 +2,7 @@
 
 \chapter{Introduction} % Main chapter title
 
-\label{Introduction} % For referencing the chapter elsewhere, use \ref{Introductio}
+\label{Introduction} % For referencing the chapter elsewhere, use \ref{Introduction}
 
 %----------------------------------------------------------------------------------------
 
@@ -13,14 +13,20 @@
 \newcommand{\file}[1]{\texttt{\bfseries#1}}
 \newcommand{\option}[1]{\texttt{\itshape#1}}
 \newcommand{\iBubble}{\textcolor{mdtRed}{\textsc{iBubble}}}
+\newcommand{\rasp}{\textcolor{mdtRed}{\textsc{Raspberry Pi}}}
+\newcommand{\vc}{\textcolor{mdtRed}{\textsc{VideoCore IV 3D GPU}}}
 
 %----------------------------------------------------------------------------------------
 
-\section{\groupname{} \& \iBubble}
+\section{\textsc{Notilo+} \& \textsc{iBubble}}
 
-\footnote{\groupname{} website : \url{https://ibubble.camera/}}\groupname{} is a young and innovative start-up based in Lyon. It was created in 2016 by Nicolas \textsc{Gambini} and Benjamin \textsc{Valtin} and early funded through crowd-funding during the 2016 year.
+\footnote{\groupname{} website: \url{https://ibubble.camera/}}\groupname{} is a young and innovative start-up based in Lyon. It was created in 2016 by Nicolas \textsc{Gambini} and Benjamin \textsc{Valtin} and early funded through crowd-funding during the 2016 year.
 
-Its objective is to develop and sell autonomous and wireless underwater drone called \iBubble.
+Currently about 20 people are working at \groupname{}. The company is divided into two parts: a business and commercial section and a technical section.
+
+This technical section consists of an hardware-oriented team with mechanical and electronics engineers, an embedded sofware team of low-level developers and a vision team that I have joined. This team is composed of Filip the Computer Vision lead and my personnal supervisor, Loic a Computer Vision engineer, Nima a Robotics engineer and Camille a Computer Vision trainee.
+
+The objective of \groupname{} is to develop and sell an \emph{autonomous} and \emph{wireless} underwater drone called \iBubble.
 
 \begin{figure}[h]
 \centering
@@ -28,86 +34,57 @@ Its objective is to develop and sell autonomous and wireless underwater drone ca
 \caption{\iBubble{} drone}
 \end{figure}
 
-The aim of these diving drones is to replace cameraman divers. It is able to follow a diver and captures footage of a diving session without any action from the user. The targeted audience of this product are in particular professional divers, dive centers, free-divers and resorts.
 
-The drone also have a live video feedback feature. In this mode there is a cable link between the drone and the user that enables the video feedback on a smart-phone for example. With the help of a controller the user can explore unknown spots before diving.
+\iBubble{} is designed to replace cameraman divers. It can \emph{autonomously} follow a diver and capture footages from the diving session without any action from the user. The targeted \keyword{BtC} audience are for instance professional divers, diving centers, free-divers or resorts.
 
-There is this consumer market and there is also a business market. The drone can integrate multiple specific features for companies that have real needs in underwater inspection such as dam, harbor or simply ship's hull. With its autonomous feature, it will be able to verify the good shape of a concrete wall for example and provides videos of its inspection.
+A live video feedback is also available on \iBubble. In this mode, a cable link between the drone and the user enables the video feedback on a smartphone and users can explore unknown spots before diving.\\
 
-For now \groupname{} has approximately 15 people from business developers to electronics and computer vision engineers. I joined the Vision team which is composed of a Computer Vision lead, a Computer Vision engineer and a Robotics engineer and Camille a Computer Vision trainee.
+
+In addition to this \keyword{BtC} sector, \iBubble{} is suitable for a large range of \keyword{BtB} applications. Indeed, it can integrate multiple specific features for companies that have real needs in underwater inspection such as dam, harbor or simply ship's hull. Thanks to its \emph{autonomous} ability, it will be able to verify the good shape of a concrete wall for example and provides videos of its inspection.
 
 %----------------------------------------------------------------------------------------
 
 \section{Problematics}
 
-The drone's main feature is to follow autonomously a diver, in order to create a video of the dive. The diver only controls the drone's possible scenarios such as follow me from behind, follow me from side etc. At any time the diver, or someone else is controlling the drone with a joystick. Because of the countless challenges posed by an underwater environment (no GPS, no Wifi etc.), be able to follow a diver autonomously is a real challenged. This is possible with the help of two technologies : acoustic and vision positioning.\par
+As said in the previous section, \iBubble's main feature is to follow \emph{autonomously} a diver to film a video of the diving session. The diver can only choose one of the drone's available scenarii such as \emph{follow me}, \emph{circle me}, \emph{follow me side} etc. At any time the diver, or someone else is controlling the drone with a joystick. Because of the countless difficultis raised by an underwater environment (no GPS, no Wifi etc.), be able to follow a diver \emph{autonomously} is a technical challenge. To achieve this goal, \iBubble{} fits two technologies: \emph{acoustic} and \emph{vision} location.
 
-The diver have a remote control that is an acoustic emitter. It sends ultrasound pulse and the drones detects with its five acoustic receivers. This technology enables the drone to locate approximately the diver. The acoustic positioning system is not perfectly accurate because of the heavily perturbations of the underwater environment. So a second technique is required : vision system.\par
 
-The drones have two cameras: one to record the dive (generally a GoPro camera or any other action camera) and another one to perform the computer vision part. This one is generally a cheaper camera with a low resolution. When the drone is facing the diver it can now detect the position more precisely with the help of multiple algorithms (Machine learning detectors, tracking systems etc.).\par
+\subsection{Acoustic System}
 
-The choice has been made by the company is to used Raspberry Pi\footnote{Website: https://www.raspberrypi.org/} as a central embedded computer for the drone. This single board computer is very cheap and reasonably powerful. Therefore all the vision system will be integrated on this small card. The problematic is to achieve correct quality with a real-time processing on a such device.\par
+The diver is outfitted with a remote control that is an \emph{acoustic} emitter sending ultrasound pulses. \iBubble{} detects those pulses thanks to five \emph{acoustic} receivers and locates approximately the diver. This \emph{acoustic} positioning system is not very accurate because of the heavily perturbated underwater environment. As a consequence a \emph{vision} system is used to locate the diver in parallel.
 
-The vision system is globally composed of two parts: a detector to lock the position of the diver and a tracker to follow him between two frames of the video. The bulk of complexity is in the \gls{optical_flow} for the tracking algorithm and in Forward Propagation of a Convolutional Neural Network for the detector part.\par
 
-These algorithms are well-known and can be parallelize very efficiently. Therefore they are a lot of implementation on the \acrshort{gpu} of these algorithms especially with the growth of Nvidia's CUDA cores on embedded chip (for example Jetson TX2 which is a power-efficient embedded AI computing device) for Internet of Thing\footnote{IoT} or for autonomous vehicle. However, there is no reliable implementation on embedded device such as the Raspberry Pi, which is much less expensive than the CUDA-enabled systems.\par
+\subsection{Vision System}
 
-The Raspberry Pi contains a Video Core \acrshort{gpu} but there is no documentation on how to use it. The constructor of the Video Core IV, Broadcom, has only released a documentation\cite{video_core_doc} on the architecture and the different features of this \acrshort{gpu}. This hardware documentation between released due to the growing popularity of the Raspberry Pi. But there was no official \acrfull{api} released in addition to the documentation. The problematic is then to study and understand these algorithms and implement an optimized version of them on a Raspberry Pi with the help of a homemade \acrshort{api} that use the \acrshort{gpu} to perform some calculation in order to achieve a real time performance and to relieve the \acrfull{cpu}.\par
+\iBubble{} has two cameras at his disposal: one to record the diving session (generally a \emph{GoPro} camera) and another one to capture frames used in the computer vision part. This camera is generally a cheaper camera with a low resolution. When \iBubble{} is opposite the diver it can detect the position more precisely thanks to several algorithms running on the embedded board (Machine learning detectors, tracking systems etc.).
 
-%----------------------------------------------------------------------------------------
+\groupname{} chose \rasp\footnote{Website: https://www.raspberrypi.org/} as the central embedded computer for the drone. This embedded board is very cheap, reasonably powerful and very well-documented with a huge community of developers. Since all the vision system will be integrated on the \rasp{}, the difficulty is to achieve correct quality with a real-time processing on a such device.
 
-\section{Learning \LaTeX{}}
+The vision system is globally composed of two parts: a \emph{detector} to lock the position of the diver and a \emph{tracker} to follow him between two frames of the video. The bulk of complexity is in the computation of the \keyword{optical flow} for the tracking algorithm and in Forward Propagation of a Convolutional Neural Network for the detector part.
 
-\LaTeX{} is not a \textsc{wysiwyg} (What You See is What You Get) program, unlike word processors such as Microsoft Word or Apple's Pages. Instead, a document written for \LaTeX{} is actually a simple, plain text file that contains \emph{no formatting}. You tell \LaTeX{} how you want the formatting in the finished document by writing in simple commands amongst the text, for example, if I want to use \emph{italic text for emphasis}, I write the \verb|\emph{text}| command and put the text I want in italics in between the curly braces. This means that \LaTeX{} is a \enquote{mark-up} language, very much like HTML.
+These algorithms are well-known and can be parallelize very efficiently. Therefore there are a lot of implementations on \keyword{GPU}s of these algorithms especially with the growth of \emph{Nvidia's CUDA cores} on embedded chip (Jetson TX2) for \emph{Internet of Thing} or \emph{autonomous} vehicles. However, there is no reliable implementation on embedded device such as the \rasp{} which is far less expensive than CUDA systems.
 
-\subsection{A (not so short) Introduction to \LaTeX{}}
+\rasp{} is fitted with the \vc{} designed by \emph{Broadcom}. Due to the growing popularity of the \rasp{}, \emph{Broadcom} released an official documentation (e.g. Appendice~\ref{AppendixA}) of the \vc{} architecture, but without any official \keyword{API}.
 
-If you are new to \LaTeX{}, there is a very good eBook -- freely available online as a PDF file -- called, \enquote{The Not So Short Introduction to \LaTeX{}}. The book's title is typically shortened to just \emph{lshort}. You can download the latest version (as it is occasionally updated) from here:
-\url{http://www.ctan.org/tex-archive/info/lshort/english/lshort.pdf}
-
-It is also available in several other languages. Find yours from the list on this page: \url{http://www.ctan.org/tex-archive/info/lshort/}
-
-It is recommended to take a little time out to learn how to use \LaTeX{} by creating several, small `test' documents, or having a close look at several templates on:\\
-\url{http://www.LaTeXTemplates.com}\\
-Making the effort now means you're not stuck learning the system when what you \emph{really} need to be doing is writing your thesis.
-
-\subsection{A Short Math Guide for \LaTeX{}}
-
-If you are writing a technical or mathematical thesis, then you may want to read the document by the AMS (American Mathematical Society) called, \enquote{A Short Math Guide for \LaTeX{}}. It can be found online here:
-\url{http://www.ams.org/tex/amslatex.html}
-under the \enquote{Additional Documentation} section towards the bottom of the page.
-
-\subsection{Common \LaTeX{} Math Symbols}
-There are a multitude of mathematical symbols available for \LaTeX{} and it would take a great effort to learn the commands for them all. The most common ones you are likely to use are shown on this page:
-\url{http://www.sunilpatel.co.uk/latex-type/latex-math-symbols/}
-
-You can use this page as a reference or crib sheet, the symbols are rendered as large, high quality images so you can quickly find the \LaTeX{} command for the symbol you need.
-
-\subsection{\LaTeX{} on a Mac}
-
-The \LaTeX{} distribution is available for many systems including Windows, Linux and Mac OS X. The package for OS X is called MacTeX and it contains all the applications you need -- bundled together and pre-customized -- for a fully working \LaTeX{} environment and work flow.
-
-MacTeX includes a custom dedicated \LaTeX{} editor called TeXShop for writing your `\file{.tex}' files and BibDesk: a program to manage your references and create your bibliography section just as easily as managing songs and creating playlists in iTunes.
+As a conseqence, the main questions for me is to study the architecture and understand how to use the \vc{}, then understand these algorithms and implement an optimized version of them on the \rasp{} with the help of a homemade \keyword{API} that use the \keyword{GPU} to perform some calculation in order to achieve a real time performance and to relieve the \keyword{CPU}.
 
 %----------------------------------------------------------------------------------------
 
-\section{Getting Started with this Template}
+\section{Project and specifications}
 
-If you are familiar with \LaTeX{}, then you should explore the directory structure of the template and then proceed to place your own information into the \emph{THESIS INFORMATION} block of the \file{main.tex} file. You can then modify the rest of this file to your unique specifications based on your degree/university. Section \ref{FillingFile} on page \pageref{FillingFile} will help you do this. Make sure you also read section \ref{ThesisConventions} about thesis conventions to get the most out of this template.
+Because of the wide range of subjects this problematic contains, from low-level programming to image processing and numerical analysis, the work has been split in two internships: another intern called Simon Bataille with a background on embedded system focused on General-Purpose \keyword{GPU} programming and me on the Computer Vision part.
 
-If you are new to \LaTeX{} it is recommended that you carry on reading through the rest of the information in this document.
+Simon was in charge of the study of the Video Core IV \keyword{GPU} of the Rasperry Pi, how to program this Video Core, understand memory accesses, synchronization structures. The final step is to create an \keyword{api} for the \keyword{GPU} usable from a high-level language such as C++ containing basic functions running on the \keyword{GPU}.
 
-Before you begin using this template you should ensure that its style complies with the thesis style guidelines imposed by your institution. In most cases this template style and layout will be suitable. If it is not, it may only require a small change to bring the template in line with your institution's recommendations. These modifications will need to be done on the \file{MastersDoctoralThesis.cls} file.
+My role is then to work on the \keyword{optical flow} algorithm for the tracking part and on a Machine Learning algorithm for the detector part. The vision system already exists and uses state-of-the-art algorithms such as Clustering of Static-Adaptive Correspondences for \keyword{cmt}\cite{Nebehay2015CVPR}, with the help of the main library used in Computer Vision: \keyword{OpenCV}\footnote{Website: https://opencv.org/}. But all the processing happens on the \keyword{CPU} because the Video Core of the Raspberry is not properly documented and there is no open source \keyword{API} to control it.
 
-\subsection{About this Template}
+Then in order to implement these algorithm on the \keyword{GPU} it is primordial to have company's own implementation of these. It is my role to work on these algorithms with the technologies, libraries, frameworks that fit the best the problem. All the vision system is currently coded in C++ and use few libraries such \keyword{OpenCV} or Eigen\footnote{Website: https://eigen.tuxfamily.org/} library for linear algebra.
 
-This \LaTeX{} Thesis Template is originally based and created around a \LaTeX{} style file created by Steve R.\ Gunn from the University of Southampton (UK), department of Electronics and Computer Science. You can find his original thesis style file at his site, here:
-\url{http://www.ecs.soton.ac.uk/~srg/softwaretools/document/templates/}
+In a first time the focus is to study and understand the popular implementations of the \keyword{optical flow} algorithms, create a state-of-the-art document of these algorithms. Then suggest an optimized implementation for the chosen method and program it on the \keyword{GPU} with the help of Simon. Next this algorithm needs to be test in simulation and real conditions on the Raspberry Pi. This step is fundamental to estimate the gain and loss in quality and computing time compared to the current solution. Finally the last part is to implement it on the drone system and test the whole vision system with the new \keyword{optical flow} algorithm. This is the main subject for this internship.
 
-Steve's \file{ecsthesis.cls} was then taken by Sunil Patel who modified it by creating a skeleton framework and folder structure to place the thesis files in. The resulting template can be found on Sunil's site here:
-\url{http://www.sunilpatel.co.uk/thesis-template}
+In a second time, the problematic is to focus on Machine Learning algorithms to detect the diver in the image. Similarly, the goal is to suggest an optimized solution for the problem and then implement it on the Raspberry Pi and to test it in simulation and real conditions. This part of the project is complementary from the main subject about the optical flow, I will work on this part only after completion of the previous task.
 
-Sunil's template was made available through \url{http://www.LaTeXTemplates.com} where it was modified many times based on user requests and questions. Version 2.0 and onwards of this template represents a major modification to Sunil's template and is, in fact, hardly recognisable. The work to make version 2.0 possible was carried out by \href{mailto:vel@latextemplates.com}{Vel} and Johannes Böttcher.
+Simon and I, we will work in parallel but at all time we will have to coordinate in order to create the dedicated functions on the GPU. I will have to specify the needs for the algorithms (what kind of computations such as a convolution function etc.) and Simon will have to adapt his \keyword{API} to integrate these functions on a program running of the \keyword{GPU}.
 
 %----------------------------------------------------------------------------------------
 
