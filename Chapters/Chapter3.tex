@@ -1,8 +1,8 @@
-% Chapter 3
+% Chapter 4
 
-\chapter{Internship work} % Main chapter title
+\chapter{Internship Subject} % Main chapter title
 
-\label{Chapter3} % For referencing the chapter elsewhere, use \ref{Chapterr3}
+\label{Chapter4} % For referencing the chapter elsewhere, use \ref{Chapter4}
 
 %----------------------------------------------------------------------------------------
 
@@ -15,24 +15,25 @@
 
 %----------------------------------------------------------------------------------------
 
-\section{State of the Art}
-When joining the company, my first task was to write a \emph{State of the Art}<++>report about \emph{Raspberry Pi's Videocore IV GPU}<++>.
+\section{Problematics}
 Welcome to this \LaTeX{} Thesis Template, a beautiful and easy to use template for writing a thesis using the \LaTeX{} typesetting system.
 
 If you are writing a thesis (or will be in the future) and its subject is technical or mathematical (though it doesn't have to be), then creating it in \LaTeX{} is highly recommended as a way to make sure you can just get down to the essential writing without having to worry over formatting or wasting time arguing with your word processor.
 
 \LaTeX{} is easily able to professionally typeset documents that run to hundreds or thousands of pages long. With simple mark-up commands, it automatically sets out the table of contents, margins, page headers and footers and keeps the formatting consistent and beautiful. One of its main strengths is the way it can easily typeset mathematics, even \emph{heavy} mathematics. Even if those equations are the most horribly twisted and most difficult mathematical problems that can only be solved on a super-computer, you can at least count on \LaTeX{} to make them look stunning.
 
+As I said in the previous parts, \textsc{iBubble} drones include a visual tracking system to follow divers underwater. This system uses \emph{openCV} libraries at a rate of \textbf{30} fps. This speed can be improved using CUDA with a graphic chip. These features are only avilable on development \& BtB versions of \textsc{iBubble} fitted with \emph{Nvidia's Jetson embedded board}.
+
+Indeed, BtC versions of the drone uses RaspberryPi cards in spite of the current Graphics Card wich means that CUDA is no longer available.
+
+
 %----------------------------------------------------------------------------------------
 
-\section{\emph{rpi-playground} Project}
+\section{Learning \LaTeX{}}
 
 \LaTeX{} is not a \textsc{wysiwyg} (What You See is What You Get) program, unlike word processors such as Microsoft Word or Apple's Pages. Instead, a document written for \LaTeX{} is actually a simple, plain text file that contains \emph{no formatting}. You tell \LaTeX{} how you want the formatting in the finished document by writing in simple commands amongst the text, for example, if I want to use \emph{italic text for emphasis}, I write the \verb|\emph{text}| command and put the text I want in italics in between the curly braces. This means that \LaTeX{} is a \enquote{mark-up} language, very much like HTML.
 
-\subsection{Driver.c}
-\lstinputlisting[lastline]{grad.c}
-
-
+\subsection{A (not so short) Introduction to \LaTeX{}}
 
 If you are new to \LaTeX{}, there is a very good eBook -- freely available online as a PDF file -- called, \enquote{The Not So Short Introduction to \LaTeX{}}. The book's title is typically shortened to just \emph{lshort}. You can download the latest version (as it is occasionally updated) from here:
 \url{http://www.ctan.org/tex-archive/info/lshort/english/lshort.pdf}
@@ -63,7 +64,7 @@ MacTeX includes a custom dedicated \LaTeX{} editor called TeXShop for writing yo
 
 %----------------------------------------------------------------------------------------
 
-\section{\emph{pi-gemm} Project}
+\section{Getting Started with this Template}
 
 If you are familiar with \LaTeX{}, then you should explore the directory structure of the template and then proceed to place your own information into the \emph{THESIS INFORMATION} block of the \file{main.tex} file. You can then modify the rest of this file to your unique specifications based on your degree/university. Section \ref{FillingFile} on page \pageref{FillingFile} will help you do this. Make sure you also read section \ref{ThesisConventions} about thesis conventions to get the most out of this template.
 
@@ -83,9 +84,9 @@ Sunil's template was made available through \url{http://www.LaTeXTemplates.com} 
 
 %----------------------------------------------------------------------------------------
 
-\section{Gradient Descent Algorithm}
+\section{What this Template Includes}
 
-\subsection{Pyramid}
+\subsection{Folders}
 
 This template comes as a single zip file that expands out to several files and folders. The folder names are mostly self-explanatory:
 
@@ -105,7 +106,7 @@ This chapter layout is specialised for the experimental sciences, your disciplin
 
 \keyword{Figures} -- this folder contains all figures for the thesis. These are the final images that will go into the thesis document.
 
-\subsection{Gradient Descent}
+\subsection{Files}
 
 Included are also several files, most of them are plain text and you can see their contents in a text editor. After initial compilation, you will see that more auxiliary files are created by \LaTeX{} or BibTeX and which you don't need to delete or worry about:
 
@@ -137,7 +138,7 @@ So from this long list, only the files with the \file{.bib}, \file{.cls} and \fi
 
 %----------------------------------------------------------------------------------------
 
-\section{Other Tasks}\label{FillingFile}
+\section{Filling in Your Information in the \file{main.tex} File}\label{FillingFile}
 
 You will need to personalise the thesis template and make it your own by filling in your own information. This is done by editing the \file{main.tex} file in a text editor or your favourite LaTeX environment.
 
@@ -146,10 +147,6 @@ Open the file and scroll down to the third large block titled \emph{THESIS INFOR
 Fill out the information about yourself, your group and institution. You can also insert web links, if you do, make sure you use the full URL, including the \code{http://} for this. If you don't want these to be linked, simply remove the \verb|\href{url}{name}| and only leave the name.
 
 When you have done this, save the file and recompile \code{main.tex}. All the information you filled in should now be in the PDF, complete with web links. You can now begin your thesis proper!
-
-\subsection{gitHub}
-
-\subsection{Linux}
 
 %----------------------------------------------------------------------------------------
 

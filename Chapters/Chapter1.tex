@@ -1,26 +1,58 @@
-% Chapter 1
+% Introduction
 
-\chapter{Chapter Title Here} % Main chapter title
+\chapter{Introduction} % Main chapter title
 
-\label{Chapter1} % For referencing the chapter elsewhere, use \ref{Chapter1} 
+\label{Introduction} % For referencing the chapter elsewhere, use \ref{Introductio}
 
 %----------------------------------------------------------------------------------------
 
-% Define some commands to keep the formatting separated from the content 
+% Define some commands to keep the formatting separated from the content
 \newcommand{\keyword}[1]{\textbf{#1}}
 \newcommand{\tabhead}[1]{\textbf{#1}}
 \newcommand{\code}[1]{\texttt{#1}}
 \newcommand{\file}[1]{\texttt{\bfseries#1}}
 \newcommand{\option}[1]{\texttt{\itshape#1}}
+\newcommand{\iBubble}{\textcolor{mdtRed}{\textsc{iBubble}}}
 
 %----------------------------------------------------------------------------------------
 
-\section{Welcome and Thank You}
-Welcome to this \LaTeX{} Thesis Template, a beautiful and easy to use template for writing a thesis using the \LaTeX{} typesetting system.
+\section{\groupname{} \& \iBubble}
 
-If you are writing a thesis (or will be in the future) and its subject is technical or mathematical (though it doesn't have to be), then creating it in \LaTeX{} is highly recommended as a way to make sure you can just get down to the essential writing without having to worry over formatting or wasting time arguing with your word processor.
+\footnote{\groupname{} website : \url{https://ibubble.camera/}}\groupname{} is a young and innovative start-up based in Lyon. It was created in 2016 by Nicolas \textsc{Gambini} and Benjamin \textsc{Valtin} and early funded through crowd-funding during the 2016 year.
 
-\LaTeX{} is easily able to professionally typeset documents that run to hundreds or thousands of pages long. With simple mark-up commands, it automatically sets out the table of contents, margins, page headers and footers and keeps the formatting consistent and beautiful. One of its main strengths is the way it can easily typeset mathematics, even \emph{heavy} mathematics. Even if those equations are the most horribly twisted and most difficult mathematical problems that can only be solved on a super-computer, you can at least count on \LaTeX{} to make them look stunning.
+Its objective is to develop and sell autonomous and wireless underwater drone called \iBubble.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.4\textwidth]{iBubble3}
+\caption{\iBubble{} drone}
+\end{figure}
+
+The aim of these diving drones is to replace cameraman divers. It is able to follow a diver and captures footage of a diving session without any action from the user. The targeted audience of this product are in particular professional divers, dive centers, free-divers and resorts.
+
+The drone also have a live video feedback feature. In this mode there is a cable link between the drone and the user that enables the video feedback on a smart-phone for example. With the help of a controller the user can explore unknown spots before diving.
+
+There is this consumer market and there is also a business market. The drone can integrate multiple specific features for companies that have real needs in underwater inspection such as dam, harbor or simply ship's hull. With its autonomous feature, it will be able to verify the good shape of a concrete wall for example and provides videos of its inspection.
+
+For now \groupname{} has approximately 15 people from business developers to electronics and computer vision engineers. I joined the Vision team which is composed of a Computer Vision lead, a Computer Vision engineer and a Robotics engineer and Camille a Computer Vision trainee.
+
+%----------------------------------------------------------------------------------------
+
+\section{Problematics}
+
+The drone's main feature is to follow autonomously a diver, in order to create a video of the dive. The diver only controls the drone's possible scenarios such as follow me from behind, follow me from side etc. At any time the diver, or someone else is controlling the drone with a joystick. Because of the countless challenges posed by an underwater environment (no GPS, no Wifi etc.), be able to follow a diver autonomously is a real challenged. This is possible with the help of two technologies : acoustic and vision positioning.\par
+
+The diver have a remote control that is an acoustic emitter. It sends ultrasound pulse and the drones detects with its five acoustic receivers. This technology enables the drone to locate approximately the diver. The acoustic positioning system is not perfectly accurate because of the heavily perturbations of the underwater environment. So a second technique is required : vision system.\par
+
+The drones have two cameras: one to record the dive (generally a GoPro camera or any other action camera) and another one to perform the computer vision part. This one is generally a cheaper camera with a low resolution. When the drone is facing the diver it can now detect the position more precisely with the help of multiple algorithms (Machine learning detectors, tracking systems etc.).\par
+
+The choice has been made by the company is to used Raspberry Pi\footnote{Website: https://www.raspberrypi.org/} as a central embedded computer for the drone. This single board computer is very cheap and reasonably powerful. Therefore all the vision system will be integrated on this small card. The problematic is to achieve correct quality with a real-time processing on a such device.\par
+
+The vision system is globally composed of two parts: a detector to lock the position of the diver and a tracker to follow him between two frames of the video. The bulk of complexity is in the \gls{optical_flow} for the tracking algorithm and in Forward Propagation of a Convolutional Neural Network for the detector part.\par
+
+These algorithms are well-known and can be parallelize very efficiently. Therefore they are a lot of implementation on the \acrshort{gpu} of these algorithms especially with the growth of Nvidia's CUDA cores on embedded chip (for example Jetson TX2 which is a power-efficient embedded AI computing device) for Internet of Thing\footnote{IoT} or for autonomous vehicle. However, there is no reliable implementation on embedded device such as the Raspberry Pi, which is much less expensive than the CUDA-enabled systems.\par
+
+The Raspberry Pi contains a Video Core \acrshort{gpu} but there is no documentation on how to use it. The constructor of the Video Core IV, Broadcom, has only released a documentation\cite{video_core_doc} on the architecture and the different features of this \acrshort{gpu}. This hardware documentation between released due to the growing popularity of the Raspberry Pi. But there was no official \acrfull{api} released in addition to the documentation. The problematic is then to study and understand these algorithms and implement an optimized version of them on a Raspberry Pi with the help of a homemade \acrshort{api} that use the \acrshort{gpu} to perform some calculation in order to achieve a real time performance and to relieve the \acrfull{cpu}.\par
 
 %----------------------------------------------------------------------------------------
 
@@ -35,8 +67,8 @@ If you are new to \LaTeX{}, there is a very good eBook -- freely available onlin
 
 It is also available in several other languages. Find yours from the list on this page: \url{http://www.ctan.org/tex-archive/info/lshort/}
 
-It is recommended to take a little time out to learn how to use \LaTeX{} by creating several, small `test' documents, or having a close look at several templates on:\\ 
-\url{http://www.LaTeXTemplates.com}\\ 
+It is recommended to take a little time out to learn how to use \LaTeX{} by creating several, small `test' documents, or having a close look at several templates on:\\
+\url{http://www.LaTeXTemplates.com}\\
 Making the effort now means you're not stuck learning the system when what you \emph{really} need to be doing is writing your thesis.
 
 \subsection{A Short Math Guide for \LaTeX{}}
@@ -52,9 +84,9 @@ There are a multitude of mathematical symbols available for \LaTeX{} and it woul
 You can use this page as a reference or crib sheet, the symbols are rendered as large, high quality images so you can quickly find the \LaTeX{} command for the symbol you need.
 
 \subsection{\LaTeX{} on a Mac}
- 
+
 The \LaTeX{} distribution is available for many systems including Windows, Linux and Mac OS X. The package for OS X is called MacTeX and it contains all the applications you need -- bundled together and pre-customized -- for a fully working \LaTeX{} environment and work flow.
- 
+
 MacTeX includes a custom dedicated \LaTeX{} editor called TeXShop for writing your `\file{.tex}' files and BibDesk: a program to manage your references and create your bibliography section just as easily as managing songs and creating playlists in iTunes.
 
 %----------------------------------------------------------------------------------------
@@ -107,7 +139,7 @@ Included are also several files, most of them are plain text and you can see the
 
 \keyword{example.bib} -- this is an important file that contains all the bibliographic information and references that you will be citing in the thesis for use with BibTeX. You can write it manually, but there are reference manager programs available that will create and manage it for you. Bibliographies in \LaTeX{} are a large subject and you may need to read about BibTeX before starting with this. Many modern reference managers will allow you to export your references in BibTeX format which greatly eases the amount of work you have to do.
 
-\keyword{MastersDoctoralThesis.cls} -- this is an important file. It is the class file that tells \LaTeX{} how to format the thesis. 
+\keyword{MastersDoctoralThesis.cls} -- this is an important file. It is the class file that tells \LaTeX{} how to format the thesis.
 
 \keyword{main.pdf} -- this is your beautifully typeset thesis (in the PDF file format) created by \LaTeX{}. It is supplied in the PDF with the template and after you compile the template you should get an identical version.
 
