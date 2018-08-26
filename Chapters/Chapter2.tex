@@ -12,20 +12,25 @@
 \newcommand{\code}[1]{\texttt{#1}}
 \newcommand{\file}[1]{\texttt{\bfseries#1}}
 \newcommand{\option}[1]{\texttt{\itshape#1}}
+\newcommand{\iBubble}{\textcolor{mdtRed}{\textsc{iBubble}}}
+\newcommand{\rasp}{\textcolor{mdtRed}{\textsc{Raspberry Pi}}}
+\newcommand{\vc}{\textcolor{mdtRed}{\textsc{VideoCore IV 3D GPU}}}
 
 %----------------------------------------------------------------------------------------
 
 \section{State of the Art}
-When joining the company, my first task was to write a \emph{State of the Art}<++>report about \emph{Raspberry Pi's Videocore IV GPU}<++>.
-Welcome to this \LaTeX{} Thesis Template, a beautiful and easy to use template for writing a thesis using the \LaTeX{} typesetting system.
 
-If you are writing a thesis (or will be in the future) and its subject is technical or mathematical (though it doesn't have to be), then creating it in \LaTeX{} is highly recommended as a way to make sure you can just get down to the essential writing without having to worry over formatting or wasting time arguing with your word processor.
+When arriving at \groupname{}, my first task was to write a \emph{State-of-the-Art} report about the \vc{}. The goal was to list interesting projects using this \keyword{GPU} and know what was possible to do with it.
 
-\LaTeX{} is easily able to professionally typeset documents that run to hundreds or thousands of pages long. With simple mark-up commands, it automatically sets out the table of contents, margins, page headers and footers and keeps the formatting consistent and beautiful. One of its main strengths is the way it can easily typeset mathematics, even \emph{heavy} mathematics. Even if those equations are the most horribly twisted and most difficult mathematical problems that can only be solved on a super-computer, you can at least count on \LaTeX{} to make them look stunning.
+So I spent the first two weeks surfing on the internet to gather every information I found about \vc. I wrote a report containing general information and and every project interesting for the rest of my internship.
+
+Finally I had a meeting with \supname{} where I explained to him which direction I wanted to explore. We decided that I should start with a \emph{\enquote{helloworld}} project that let me understand the basics of the \vc{} and start developping on a \rasp.
 
 %----------------------------------------------------------------------------------------
 
 \section{\emph{rpi-playground} Project}
+
+This project \parencite{wiki:xxx} \parencite{WinNT}
 
 \LaTeX{} is not a \textsc{wysiwyg} (What You See is What You Get) program, unlike word processors such as Microsoft Word or Apple's Pages. Instead, a document written for \LaTeX{} is actually a simple, plain text file that contains \emph{no formatting}. You tell \LaTeX{} how you want the formatting in the finished document by writing in simple commands amongst the text, for example, if I want to use \emph{italic text for emphasis}, I write the \verb|\emph{text}| command and put the text I want in italics in between the curly braces. This means that \LaTeX{} is a \enquote{mark-up} language, very much like HTML.
 
@@ -199,7 +204,7 @@ Due to the differences in the paper size, the resulting margins may be different
 
 \subsection{References}
 
-The \code{biblatex} package is used to format the bibliography and inserts references such as this one \parencite{Reference1}. The options used in the \file{main.tex} file mean that the in-text citations of references are formatted with the author(s) listed with the date of the publication. Multiple references are separated by semicolons (e.g. \parencite{Reference2, Reference1}) and references with more than three authors only show the first author with \emph{et al.} indicating there are more authors (e.g. \parencite{Reference3}). This is done automatically for you. To see how you use references, have a look at the \file{Chapter1.tex} source file. Many reference managers allow you to simply drag the reference into the document as you type.
+The \code{biblatex} package is used to format the bibliography and inserts references such as this one \parencite{Reference4}. The options used in the \file{main.tex} file mean that the in-text citations of references are formatted with the author(s) listed with the date of the publication. Multiple references are separated by semicolons (e.g. \parencite{Reference2, Reference1}) and references with more than three authors only show the first author with \emph{et al.} indicating there are more authors (e.g. \parencite{Reference3}). This is done automatically for you. To see how you use references, have a look at the \file{Chapter1.tex} source file. Many reference managers allow you to simply drag the reference into the document as you type.
 
 Scientific references should come \emph{before} the punctuation mark if there is one (such as a comma or period). The same goes for footnotes\footnote{Such as this footnote, here down at the bottom of the page.}. You can change this but the most important thing is to keep the convention consistent throughout the thesis. Footnotes themselves should be full, descriptive sentences (beginning with a capital letter and ending with a full stop). The APA6 states: \enquote{Footnote numbers should be superscripted, [...], following any punctuation mark except a dash.} The Chicago manual of style states: \enquote{A note number should be placed at the end of a sentence or clause. The number follows any punctuation mark except the dash, which it precedes. It follows a closing parenthesis.}
 
