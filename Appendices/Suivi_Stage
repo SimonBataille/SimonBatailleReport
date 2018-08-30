@@ -1,0 +1,480 @@
+3/04/2018 
+
+	- arrivée entreprise 9h : badge, outils de communication (slack, gmail)
+	- état de l'art projets videocore Raspberry Pi 3, librairie MMAL
+	- premiers essais rhône 
+	- recherche projets utilisant GPU Rpi
+
+4/04/2018
+
+	- lecture doc BCM2387
+	- git hub : herman, pyvideocore
+
+5/04/2018
+
+	- sudo dd bs=1M if=/home/simon/Bureau/Stage/2018-03-13-raspbian-stretch-lite.img of=/dev/mmcblk0 status=progress conv=fsync
+	- démarrage Raspberry Pi 3 (carte SD...)
+	- herman : blink01 (https://github.com/hermanhermitage/videocoreiv/tree/master/blinker01)
+
+6/04/2018
+
+	- déboggage blink01
+	- sudo blockdev --getbsz /dev/sdd
+	- sudo ls -ltr /dev/
+	- sudo dd if=/dev/zero of=/dev/sdd bs=4096
+
+9/04/2018
+
+	- raspistill -o image.jpg
+	- sudo scp pi@10.42.0.81:/home/pi/cookie/image.jpg /home/simon
+	- sudo dd if=/dev/sdd of=~/SDCardBackup.img
+
+10/04/2018
+
+	- github : https://github.com/notiloPlus/NotiloTracker/blob/raspberrypi/src/NotiloTracker/video/pi.cpp
+		   https://github.com/notiloPlus/NotiloTracker/blob/raspberrypi/include/NotiloTracker/video/pi.h
+		   https://github.com/notiloPlus/NotiloTracker/tree/raspberrypi/include/NotiloTracker/video
+
+	- makefile : https://gl.developpez.com/tutoriel/outil/makefile/
+	
+	- doc GPU : http://hardware-libre.fr/2014/03/raspberry-pi-le-gpu-passe-open-source/
+	- https://en.wikipedia.org/wiki/Free_and_open-source_graphics_device_driver#Broadcom
+
+	- driver camera : https://projetsdiy.fr/forum/viewtopic.php?t=8
+
+	- http://pi.bek.no/playVideo/ : programmes test video
+
+	- https://en.wikipedia.org/wiki/Free_and_open-source_graphics_device_driver#Broadcom : Free and open-source graphics device driver
+	- https://en.wikipedia.org/wiki/VideoCore#Linux_support : VideoCore 
+
+	- FFT example : http://www.aholme.co.uk/GPU_FFT/Main.htm
+	- vidocore assembleur : http://maazl.de/project/vc4asm/doc/index.html
+
+	- raspberry pi jessie userland
+	- https://wiki.matthiasbock.net/index.php/Hardware-accelerated_video_playback_on_the_Raspberry_Pi
+	- https://elinux.org/Rpi_Camera_Module
+	- http://mitchtech.net/raspberry-pi-opencv/
+	- https://www.raspberrypi.org/forums/viewtopic.php?t=125148
+	- https://www.raspberrypi.org/forums/viewtopic.php?f=43&t=124964#p839004
+	- http://www.stuffaboutcode.com/2013/08/compile-raspberry-pi-userland-raspivid.html : compile userland
+
+	- openCV : https://erget.wordpress.com/2013/12/17/using-opencv-with-the-raspberry-pi-camera/
+	- openCV : https://www.pihomeserver.fr/2014/01/22/raspberry-pi-home-server-utiliser-opencv-avec-la-pi-camera/
+
+	- openCL : https://github.com/doe300/VC4CL
+	- https://github.com/nineties/py-videocore
+
+11/04/2018
+
+	- Redaction document
+	- différence openGL, openCL, openCV : https://www.quora.com/What-are-OpenGL-OpenCL-and-OpenCV-for-respectively
+
+12/04/2018
+	- https://www.elesoftrom.com.pl/blog/en/bcm2835.php
+	- https://github.com/puppeh/vc4-toolchain
+	- https://fgiesen.wordpress.com/2011/07/10/a-trip-through-the-graphics-pipeline-2011-part-8/
+	- FFT explaination : https://www.youtube.com/watch?v=EsJGuI7e_ZQ
+
+	- intro processeur graphique
+	- lecture de la documentation
+
+13/04/2018
+
+	- sudo cp -R root /media/simon/Disque\ externe/Stage/GPU_Projects/FaceDetectionOpenCVpy
+	- scp myfile.txt pi@192.168.1.3
+	- echo 'export PATH=$PATH:/home/pi/rpi-playground/QPU/assembler' >> /home/pi/.bashrc
+	- sudo cp /home/pi/rpi-playground/QPU/helloworld/helloworld.asm /home/pi/rpi-playground/QPU/assembler/helloworld.asm
+	- ./qpu-assembler -o helloworld.bin < helloworld.asm
+	- sudo cp /home/pi/rpi-playground/QPU/assembler/helloworld.bin /home/pi/rpi-playground/QPU/helloworld/helloworld.bin
+ 
+	- https://thebookofshaders.com/03/?lan=fr : shader
+
+	- sudo scp -r  pi@10.42.0.81:/home/pi/rpi-playground /home/simon/Bureau/Stage/GPU_Projects
+
+	- premier point Filip
+
+16/04/2018
+
+	- helloworld.asm, doc videocore
+	- réunion hebdomadaire : implication équipe
+	- https://github.com/jetpacapp/pi-gemm : GEMM
+
+17/04/2018
+
+	- cp -R /home/simon/Bureau/Stage/lib/_txt /home/simon/Bureau/Stage/lib/_pdf
+	- rename 's/JPG/jpg/' *
+	- https://github.com/raspberrypi/firmware/wiki/Mailbox-property-interface : mailbox property
+	- http://manpagesfr.free.fr/man/man2/ioctl.2.html : ioctl()
+	- https://www.mjmwired.net/kernel/Documentation/ioctl-number.txt : _IOWR()
+	- https://stackoverflow.com/questions/16642552/linux-ioctl-commands : _IOWR()
+
+18/04/2018
+
+	- http://www.loligrub.be/contrib/tlepoint/BASE/node178.html : mknod
+	- https://github.com/anholt/linux/tree/rpi-4.4.y-qpu-execute : qpu-execute
+	- pdftk VideoCoreIV-AG100-R.pdf cat 13 output VideoCorepage13.pdf
+
+19/04/2018
+	
+	- modification old-helloworld.asm vs. helloworld.asm 
+	- sudo scp -r  pi@10.42.0.81:/home/pi/rpi-playground/QPU/helloworld /home/simon/Bureau/Stage/GPU_Projects/rpi-playground/QPU/helloworld : from RPI to Acer
+
+20/04/2018
+
+	- https://github.com/Idein/qmkl : QMKL is a Math Kernel Library for VideoCore IV QPU.
+	- sudo scp -r  pi@10.42.0.81:/home/pi/rpi-playground/QPU/helloworld/1736driver.c /home/simon/Bureau/helloworld : from RPi/terminalPC
+	- sudo chmod -R 777 /home/simon/Bureau/helloworld/ : correct synthax
+	- https://github.com/notiloPlus/videocore_samples/tree/master : github
+
+23/04/2018
+	
+	- 1736helloworld.asm 1736driver.c
+	- git installation : https://help.github.com/articles/connecting-to-github-with-ssh/
+	- ssh-keygen
+	- git clone git@github.com:notiloPlus/videocore_samples.git
+	- https://git-scm.com/book/fr/v1/Les-bases-de-Git-Enregistrer-des-modifications-dans-le-d%C3%A9p%C3%B4t : bases de git
+	- scp helloworld.asm driver.c pi@10.42.0.81:/home/pi/rpi-playground/QPU/helloworld : to RPi
+	- FFFFFFFFFE9EF000 = -23138304 // 
+
+24/04/2018
+
+	- scp -rp /home/simon/videocore_samples pi@10.42.0.81:/home/pi/
+	- point stage : préparation réunion
+
+25/04/2018
+
+	- scp helloworldLoop.asm pi@10.42.0.81:/home/pi/videocore_samples/QPU/helloworld : to RPi
+	- sudo scp -r  pi@10.42.0.81:/home/pi/videocore_samples/QPU/helloworld/helloworld64.asm /home/simon/Bureau/helloworld/Loop
+
+26/04/2018
+
+	- helloworld64.asm // loop4.asm	
+	- mise en place du GIT
+	- scp helloworld1024.asm driver1024.c pi@10.42.0.81:/home/pi/videocore_samples/QPU/helloworld : to RPi/PCTerm
+	- sudo scp pi@10.42.0.81:/home/pi/videocore_samples/QPU/helloworld/driver1024.c /home/simon/Bureau/helloworld : from Pi/PCTerm
+	- git add . (helloworld/helloworld1)
+	- git commit -m "Update README.md and add helloworl/helloworld1 projects on master branch"
+	- GIT PUSH ORIGIN master
+
+27/04/2018
+
+	- git push -f origin HEAD^:master : supprimer last git push
+	- git reset --hard HEAD~1 : supprimer commit
+	- https://www.tilcode.com/add-a-screenshot-to-your-github-repo-readme-md/ : add img to README.md
+
+30/04/2018
+
+	- load-imm-per-elmt-unsigned cond_add=always sf=1 waddr_add=nop immediate=0x7fff7fff
+	- load-imm-32 cond_add=zs waddr_add=ra0 imm=1234
+	- https://www.raspberrypi.org/forums/viewtopic.php?t=169576
+
+	- https://community.arm.com/processors/b/blog/posts/condition-codes-1-condition-flags-and-codes : Z,N,C flags
+
+	- scp -r py-videocore/  pi@10.42.0.81:/home/pi
+	- scp -r rpi-vcsm/ pi@10.42.0.81:/home/pi
+
+	- ack -i .py /home/simon/Bureau/Stage/GPU_Projects/py-videocore
+
+	- sudo python -c 'import test_alu; print test_alu.test_per_elmt_imm()'
+	- pdb.set_trace()
+
+2/05/2018
+
+	- https://cnugteren.github.io/tutorial/pages/page2.html : gemm
+	- scp -r helloworldCamille pi@10.42.0.81:/home/pi/videocore_samples/QPU : to RPi/PC terminal
+	- sudo scp pi@10.42.0.81:/home/pi/videocore_samples/QPU/helloworldCamille/helloworldCamille.asm /home/simon/Bureau/Stage/GPU_Projects/new_helloworld/helloworldCamille
+
+3/05/2018
+
+	- loopGPU vs. loopCPU
+	- sudo scp -r pi@10.42.0.81:/home/pi/videocore_samples/QPU/helloworldCamille /home/simon/Bureau/Stage/GPU_Projects/new_helloworld/ : from Pi / PC term
+	- scp run_loopBenchMark pi@10.42.0.81:/home/pi/videocore_samples/QPU/loopGPU
+
+4/05/2018
+	
+	- git clone git@github.com:jetpacapp/qpu-asm
+	
+7/05/2018
+
+	- pdfnup --nup 2x1 --suffix '2x1' myfile.pdf
+
+9/05/2018
+
+	- "-ldl" FLAGS : used to load libraries during links edition
+
+15/05/2018
+
+	- sudo dd if=/dev/sdd of=~/SDCardBackup0515.img
+	- https://www.gnu.org/software/make/manual/html_node/Text-Functions.html : Makefile shell fnction
+
+	- sudo apt install m4
+	- ./qpu-asm -o load16ArrayTMU.cdat -c g_load16ArrayTMUCode < load16ArrayTMU.asm
+	- m4 load16ArrayTMU.asm > load16ArrayTMU.m4.asm
+	- ./qpu-asm -o load16ArrayTMU.bin < load16ArrayTMU.m4.asm
+	- scp -r load16ArrayTMU.bin pi@10.42.0.81:/home/pi/videocore_samples/secondAssemblerCPP/load16ArrayTMU
+
+16/05/2018
+
+	- https://www.rapidtables.com/code/linux/gcc/gcc-l.html : -l linker options
+	- https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf : memory mapp
+	- memcpy, driver(.., .., input);
+
+17/05/2018
+
+	- https://courses.cs.washington.edu/courses/cse378/97au/help/compilation.html : linker
+	- https://solarianprogrammer.com/2017/12/08/raspberry-pi-raspbian-install-gcc-compile-cpp-17-programs/
+	- gcc version 5.4.0
+	- tar xf gcc-8.1.0.tar.bz2
+	- export PATH=/usr/local/gcc-8.1.0/bin:$PATH
+	- sudo apt install cmake
+	- g++-8.1.0 -std=c++17 -Wall -pedantic qpu-asm.cpp -o qpu-asm
+
+22/05/2018 
+
+	- http://tvaira.free.fr/projets/activites/activite-raspberry-pi-cross-compilation.html
+
+23/05/2018
+
+	- https://github.com/dwelch67/raspberrypi
+
+24/05/2018
+
+	- https://petewarden.com/2015/10/25/an-engineers-guide-to-gemm/ : row major
+	- https://developer.apple.com/documentation/accelerate/1513264-cblas_sgemm?language=objc : cblas_gemm
+
+28/05/2018
+
+	- https://www.geeksforgeeks.org/memory-layout-of-c-program/ : variable in c
+	- https://www.quora.com/What-is-difference-between-local-static-and-global-static-variables : static/global
+
+05/06/2018
+
+	- https://gcc.gnu.org/onlinedocs/gcc/ARM-Options.html : ARM-compilation option
+	- scp -r  pi@10.42.0.81:/home/pi/videocore_samples/secondAssemblerCPP/old-conv3X3 /home/simon/Bureau/Stage/GPU_Projects/videocore_samples/secondAssemblerCPP/
+	- git commit -m "Update README.md and add first sample-projects on master branch"
+        - sudo dd if=/dev/sdd of=~/SDCardBackup0605.img status=progress
+
+12/06/2018
+
+	- convX3, offsetX3
+	- https://developer.nvidia.com/gpugems/GPUGems2/gpugems2_chapter33.html : GPU structure
+	- git commitsudo 
+	- apt-get install libpng12-dev
+	- http://www.libpng.org/pub/png/libpng-1.4.0-manual.pdf : libpng manual
+	- http://zarb.org/~gc/html/libpng.html : simple exemple
+	- https://gist.github.com/niw/5963798
+	- convert -resize 1024X768  source.png dest.jpg
+	- https://www.w3.org/TR/PNG/#4Concepts.Sourceimage
+
+13/06/2018
+
+	- scp -r  pi@10.42.0.81:/home/pi/videocore_samples/secondAssemblerCPP/convX3 /home/simon/Bureau/
+	- https://www.w3.org/TR/PNG-DataRep.html : data png
+	- http://www.libpng.org/pub/png/libpng-1.2.5-manual.html
+
+14/06/2018
+
+	- cat float_blurred_image.txt | sed "1,10080d" > dataCamille.txt
+	- ls -lrt
+	- scp -r  pi@10.42.0.81:/home/pi/videocore_samples/secondAssemblerCPP/Image-convX3/resultsGPU.txt /home/simon/Bureau/
+	- ls -lrt
+	- diff dataCamille.txt resultsGPU.txt 
+	- vimdiff dataCamille.txt resultsGPU.txt 
+	- man gnuplot
+	- gnuplot
+	- sudo apt install gnuplot5-qt
+        - plot 'resultsGPU.txt' using 1 t 'x', 'dataCamille.txt' using 1 t 'x'
+
+
+	## RASPBERRY PI
+	- cat float_blurred_image.txt | sed "1,10080d" > dataCamille.txt
+	- ls -lrt
+	- scp -r  pi@10.42.0.81:/home/pi/videocore_samples/secondAssemblerCPP/Image-convX3/resultsGPU.txt /home/simon/Bureau/
+	- ls -lrt
+	- diff dataCamille.txt resultsGPU.txt 
+	- vimdiff dataCamille.txt resultsGPU.txt 
+	- man gnuplot
+	- gnuplot
+	- sudo apt install gnuplot5-qt
+	- head data.txt | grep resultsGPU | sed 's/.*= \(.*\)f/\1/'
+	- head data.txt | grep resultsGPU | sed 's/.*= \(.*\)\(f\)/\1-----\2/'
+	- cat data.txt | grep resultsGPU | sed 's/.*= \(.*\)f/\1/' > resultsCPU.txt
+	- cat data.txt | grep resultsGPU | sed 's/f --.*//' | sed 's/.*= //' > resultsGPU.txt
+
+        - head data.txt
+	- head data.txt | grep resultGPU
+	- head data.txt | grep resultsGPU
+	- head data.txt | grep resultsGPU | sed 's/.*= //'
+	- head data.txt | grep resultsGPU | sed 's/f --.*//'
+	- head data.txt | grep resultsGPU | sed 's/f --.*//' | sed 's/.*= //'
+	- cat data.txt | grep resultsGPU | sed 's/f --.*//' | sed 's/.*= //'
+	- cat data.txt | grep resultsGPU | sed 's/f --.*//' | sed 's/.*= //' > resultsGPU.txt
+
+
+15/06/2018
+
+	- https://openclassrooms.com/courses/la-commande-sed : commande sed
+	- cat data.txt | grep resultsGPU | sed 's/f --.*//' | sed 's/.*= //' > resultsGPU.txt
+
+	- rename 's/img/double/g' *
+	- sed -i 's/imgConvX3/doubleConvX3/g' *
+	- sed -i 's/resultShared/firstResultShared/g' *
+
+	- rename 's/doubleConvX3/redImg/g' *
+	- sed -i 's/doubleConvX3/redImg/g' *
+	- sed -i 's/resultShared/firstResultShared/g' *
+	- sudo ./pyramid | tee foo.txt
+
+18/06/2018
+
+	- sed -e '655,821s/^/#/' pyramid.asm > dbg-pyramid.asm
+	- sed -i '745,760s/^#//' pyramid.asm
+
+19/06/2018
+
+	- * https://www.geeksforgeeks.org/c-classes-and-objects/
+	- * https://www.codeproject.com/Articles/128426/Design-Patterns-Explained-For-Beginners
+	- * https://www.youtube.com/watch?v=j9arNRRoPe8
+	- sed -i '1078,1095s/^#//' pyramid.asm
+
+21/06/2018
+
+	- rename 's/pyramid/pyramidAddr/g' *
+	- sed -i 's/pyramid/pyramidAddr/g' *
+
+	- https://www.raspberrypi.org/documentation/configuration/wireless/access-point.md : Using the Raspberry Pi as an access point to share an internet connection (bridge) 
+
+	- rename 's/pyramidAddr/pyramid/g' *
+	- sed -i 's/pyramidAddr/pyramid/g' *
+	- sudo ./pyramid | grep ^0.* > data.txt
+        - awk '/^0.0/{a++}END{print a}' data.txt
+	- sudo ./imgConvX3 sudo | grep ^0.* > X3resultGPU.txt
+	- awk '{ print $0, NR }' X3resultGPU.txt >NX3resultGPU.txt && awk '{ print $0, NR }' float_blurred_white_image.txt > Nfloat_blurred_white_image.txt
+	- grep ^0.* NX3resultGPU.txt > cmpValues.txt && grep ^0.* Nfloat_blurred_white_image.txt >> cmpValues.txt
+
+25/06/2018
+	
+	- sed -i '1,37s/$/GPU/' cmpSecond.txt
+	- sed -i 's/^GPU//' cmpSecond.txt
+	- 0.9375×1+0.8750×2+0.9375×1+0.8750×2+0.7500×4+0.8750×2+0.9375×1+0.8750×2+0.9375×1
+	- 1×1+1×2+1×1+1×2+1×4+1×2+1×1+1×2+1×1
+	- 1×1+1×2+1×1+1×2+1×4+1×2+1×1+0.875×2+0.9375×1
+
+27/06/2018
+
+	- connexion à un serveur : sftp://pi@10.42.0.81/home/pi
+	- ssh -X pi@10.42.0.81
+	- sudo chown root:root pyr_down
+	- sudo chmod u+s pyr_down : set uid bit
+	- https://www.gtk.org/setuid.html : gtk+ 
+	- grep "^0.0"  TEST.txt | wc -l
+	- grep "^0.0" -c TEST.txt
+
+28/06/2018
+
+	- sudo apt-get install libopencv*
+	- nc -l 2222 | mplayer -fps 200 -demuxer h264es - : client/PC
+	- raspivid -t 0 -w 1280 -h 720 -o - | nc 10.42.0.81 5001 : RPi
+	- http://www.linux-france.org/article/kafkafr/node19.html : /dev linux
+	- https://blog.ghost.org/markdown/ : markdown tuto
+
+03/07/2018
+
+	- http://www.grymoire.com/Unix/Sed.html : commande sed
+	- https://www.ibm.com/developerworks/library/l-virtual-filesystem-switch/index.html : vfs linux
+	- scp -r  pi@10.42.0.81:/home/pi/videocore_samples/pyramidBenchmark/ /home/simon/Bureau/Stage/
+
+06/07/2018
+
+	- En fait oui. La problématique est la suivante: on a un système de tracking visuel qui tourne avec OpenCV à 30fps pas de problèmes éventuellement accéléré par CUDA (=chip graphique)
+Pour la version BtC du drone, on remplace notre carte graphique embarquée par une raspberry pi ==> plus de CUDA. La pi a un GPU mais il ne supporte pas CUDA (c'est un videocore IV) et du coup, il est inutilisé ==> le tracking tourne sur CPU ==> on tombe à 7fps.La partie qui prend le plus de temps CPU est quelque chose qui s'appelle le "flux optique" qui est un algo de suivi fondamental en Computer Vision et qui utilise la descente de gradient pour obtenir le déplacement de points d'intérêt. Du coup, si on veut utiliser la puissance GPU on est obligé de réimplémenter cet algo sur le GPU de la raspberry pi.Donc non seulement Simon fait la descente de gradient lui-meme, mais il la fait en assembleur. Tout ça c'est dans le cadre du stage de Camille & Simon
+
+09/07/2018
+
+	- wget https://raw.githubusercontent.com/rhysd/vim-gfm-syntax/master/after/syntax/markdown/gfm.vimTo As 
+	- https://github.com/nicovince/vimrc
+	- sed -i 's/pyramid/grad/g' main.c
+	- sudo dd if=/dev/sdd of=~/SDCardBackup180712.img status=progress
+
+13/07/2018
+
+	- https://www.overleaf.com/latex/templates/template-for-a-masters-slash-doctoral-thesis/mkzrzktcbzfl : template  latex
+	- https://www.overleaf.com/latex/templates/template-for-a-project-report-or-memoire/zcgzvcmrsxsb : template latex
+
+17/07/2018
+
+	- grep '^\.' test.txt >> gradXcpu.txt
+	- head gradXcpu.txt | sed 's/^\.//'
+	- sed -i 's/^\.//' gradXcpu.txt
+	- grep -v '^\.' test.txt | head
+	- grep -v '^\.' test.txt >> gradXgpu.txt
+	- cat testValues.txt | sed "1,242d" >> inputGPU.txt
+	- cat testValues.txt | sed "241,\$d" >> inputCPU.txt
+
+	- :s/,//gn : number of "," on line
+	- :%s/,;/;/gc
+	- :2,$s/   / /gc
+
+	- cat outputTest.txt | sed "13231,\$d" > outCPU.txt
+	- cat outputTest.txt | sed "1,13230d" > outGPU.txt
+
+20/07/2018
+
+	- sed -i 's/memcpy_inputShared/grad_inputSharedCpy/g' *
+	- sed -i 's/\<code\>/gradXcode/' grad.c
+
+23/07/2018
+
+	- sed -i 's/\<gradX\>/gradY/g' *
+	- rename 's/gradX/gradY/g' *
+	- find . -name ".*~" -exec rm -i {} \;
+	- ls /usr/share/vim/vim74/colors/
+	- cat TESTY.txt | sed "1,13230d" > outGPU.txt
+	- cat TESTY.txt | sed "13231,\$d" > outCPU.txt
+
+26/07/2018
+
+	- find pyramidBenchmark/ -type f | grep -v build | grep -v ".*~" | grep -v vscode | xargs git add
+
+14/08/2017
+
+	- https://www.gnebehay.com/cmt/ : CMT 
+	- https://www.alatortsev.com/2018/04/27/installing-opencv-on-raspberry-pi-3-b/
+
+21/08/2018
+
+	- ffmpeg -i plongeur_em.mp4 -ss 00:00:00.000 -t 00:00:01.000 -strict -2 video_out.mp4
+	- !m4 % | ./qpu-asm -o *.bin
+	- find src/ -type f | grep -v ".*~" | grep -v "*.bin" | grep -v qpu-asm : doesn't work	
+	- find src/ -type f | grep -v ".*~" | grep -v "\.bin" | grep -v qpu-asm
+	- find src -type f | grep -v ".*~\|\.bin"
+	- git ls-files --modified | xargs git add
+
+22/08/2018
+
+	- sudo dd if=/dev/sdd of=~/SDCardBackup20180821.img status=progress
+	- %s/\v(foo|bar)/\={'foo':'bar','bar':'foo'}[submatch(0)]/g
+	- git ls-files --modified | xargs git add
+	- git commit -m "compute_lk_gpu() generated .avi video with 1 Loop"
+	- git push origin gpu
+	- sudo apt install exuberant-ctags : vim tags
+	- ctags *
+
+24/08/2018
+
+	- pdflatex
+	- bibtex main.aux
+	- https://www.sharelatex.com/learn/Code_listing#Using_listings_to_highlight_code
+
+26/08/2018
+
+	- https://petewarden.com/2014/08/07/how-to-optimize-raspberry-pi-code-using-its-gpu/ : 
+	- https://www.raspberrypi.org/forums/viewtopic.php?t=158157 : GPU memory functions
+
+30/08/2018
+
+	- grep -rn . -e deltaXY : find word in directory
+	- sed -i 's/deltaXY/frameX3/g' * 
+	- git overwrite : git fetch --all && git reset --hard origin/gpu
+	- git show sha1:path/file >> file
+

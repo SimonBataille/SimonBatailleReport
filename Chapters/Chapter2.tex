@@ -1,8 +1,8 @@
-% Chapter 3
+% Chapter 2
 
 \chapter{Internship work} % Main chapter title
 
-\label{Chapter3} % For referencing the chapter elsewhere, use \ref{Chapterr3}
+\label{Chapter2} % For referencing the chapter elsewhere, use \ref{Chapter2}
 
 %----------------------------------------------------------------------------------------
 
@@ -15,6 +15,7 @@
 \newcommand{\iBubble}{\textcolor{mdtRed}{\textsc{iBubble}}}
 \newcommand{\rasp}{\textcolor{mdtRed}{\textsc{Raspberry Pi}}}
 \newcommand{\vc}{\textcolor{mdtRed}{\textsc{VideoCore IV 3D GPU}}}
+\newcommand{\cpu}{\textcolor{mdtRed}{\textsc{ARM CPU}}}
 
 %----------------------------------------------------------------------------------------
 
@@ -22,42 +23,58 @@
 
 When arriving at \groupname{}, my first task was to write a \emph{State-of-the-Art} report about the \vc{}. The goal was to list interesting projects using this \keyword{GPU} and know what was possible to do with it.
 
-So I spent the first two weeks surfing on the internet to gather every information I found about \vc. I wrote a report containing general information and and every project interesting for the rest of my internship.
+So I spent my first two weeks surfing on the internet to gather every information I found about \vc. I wrote a report containing general information and every accurate project for the rest of my internship.
 
 Finally I had a meeting with \supname{} where I explained to him which direction I wanted to explore. We decided that I should start with a \emph{\enquote{helloworld}} project that let me understand the basics of the \vc{} and start developping on a \rasp.
 
 %----------------------------------------------------------------------------------------
 
-\section{\emph{rpi-playground} Project}
+\section{Raspberry Pi Playground}
 
-This project \parencite{refRpiPlayground}
-\LaTeX{} is not a \textsc{wysiwyg} (What You See is What You Get) program, unlike word processors such as Microsoft Word or Apple's Pages. Instead, a document written for \LaTeX{} is actually a simple, plain text file that contains \emph{no formatting}. You tell \LaTeX{} how you want the formatting in the finished document by writing in simple commands amongst the text, for example, if I want to use \emph{italic text for emphasis}, I write the \verb|\emph{text}| command and put the text I want in italics in between the curly braces. This means that \LaTeX{} is a \enquote{mark-up} language, very much like HTML.
+\emph{Raspberry Pi Playground}\parencite{refRpiPlayground} is the first project I focused on to better understand the \vc. It is associated with a \enquote{\code{github}} repository, here : \url{//github.com/elorimer/rpi-playground}
 
-\subsection{Driver.c}
-\lstinputlisting[lastline]{grad.c}
+It is the most important project I studied during my internship because it contains a \enquote{\code{helloworld}} program that helped me to understand the architecture of the \vc{} and above all how to use it. I detail this program because all the rest of my internship is based on it. I followed every step of this project permanantly reading the documention.
 
 
+%\subsection{Driver.c}
+%\lstinputlisting[lastline]{grad.c}
 
-If you are new to \LaTeX{}, there is a very good eBook -- freely available online as a PDF file -- called, \enquote{The Not So Short Introduction to \LaTeX{}}. The book's title is typically shortened to just \emph{lshort}. You can download the latest version (as it is occasionally updated) from here:
-\url{http://www.ctan.org/tex-archive/info/lshort/english/lshort.pdf}
 
-It is also available in several other languages. Find yours from the list on this page: \url{http://www.ctan.org/tex-archive/info/lshort/}
+\subsection{\code{helloworld} Architecture}
 
-It is recommended to take a little time out to learn how to use \LaTeX{} by creating several, small `test' documents, or having a close look at several templates on:\\
-\url{http://www.LaTeXTemplates.com}\\
-Making the effort now means you're not stuck learning the system when what you \emph{really} need to be doing is writing your thesis.
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.4\textwidth,scale=0.2]{helloworldArchitecture}
+\caption{Architecture of \code{helloworld} project}
+\label{helloworldArchitecture}
+\end{figure}
+\FloatBarrier
 
-\subsection{A Short Math Guide for \LaTeX{}}
+Figure~\ref{helloworldArchitecture} shows the architecture of the \code{helloworld} project once cloned from the \code{github} repository: \code{git clone git@github.com:elorimer/rpi-playground.git}
+The project is made of two directories:
+\begin{itemize}
+\item \keyword{assembler} directory contains: \file{assemble.cpp}, the \keyword{assembly parser}
+\item \keyword{helloworld} directory contains: \file{helloworld.asm}, the \keyword{code-to-execute} on the \vc{} and \file{driver.c}, the code that \keyword{drive} the \vc
+\end{itemize}
 
-If you are writing a technical or mathematical thesis, then you may want to read the document by the AMS (American Mathematical Society) called, \enquote{A Short Math Guide for \LaTeX{}}. It can be found online here:
-\url{http://www.ams.org/tex/amslatex.html}
-under the \enquote{Additional Documentation} section towards the bottom of the page.
 
-\subsection{Common \LaTeX{} Math Symbols}
-There are a multitude of mathematical symbols available for \LaTeX{} and it would take a great effort to learn the commands for them all. The most common ones you are likely to use are shown on this page:
-\url{http://www.sunilpatel.co.uk/latex-type/latex-math-symbols/}
+\subsection{\code{helloworld} Behavior}
 
-You can use this page as a reference or crib sheet, the symbols are rendered as large, high quality images so you can quickly find the \LaTeX{} command for the symbol you need.
+The first really important thing I understood is that a \keyword{GPU} is driven by a host \keyword{CPU}. In the case of \emph{Broadcom BCM2837}, the \vc{} is driven by a quad-core \keyword{ARM Cortex A53} (ARMv8) cluster. In the rest of this report I will call it the \cpu. Furthermore, the \vc{} and the \cpu{} share the same \keyword{RAM} memory:
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{sharedRAM}
+\caption{Shared RAM memory between \vc{} and \cpu}
+\label{sharedRAM}
+\end{figure}
+\FloatBarrier
+
+As a consequence, in the case of a \keyword{GPU} programing, a \code{helloworld} is not a trivial exercice because a lot of parts are involved:
+\begin{itemize}
+\item \keyword{assembler} directory contains: \file{assemble.cpp}, the \keyword{assembly parser}
+\item \keyword{helloworld} directory contains: \file{helloworld.asm}, the \keyword{code-to-execute} on the \vc{} and \file{driver.c}, the code that \keyword{drive} the \vc
+\end{itemize}
 
 \subsection{\LaTeX{} on a Mac}
 
