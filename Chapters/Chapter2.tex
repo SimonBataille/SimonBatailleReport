@@ -33,24 +33,24 @@ Finally I had a meeting with \supname{} where I explained to him which direction
 
 \emph{Raspberry Pi Playground}\parencite{refRpiPlayground} is the first project I focused on to better understand the \vc. It is associated with a \enquote{\code{github}} repository, here : \url{//github.com/elorimer/rpi-playground}
 
-It is the most important project I studied during my internship because it contains a \enquote{\code{helloworld}} program that helped me to understand the architecture of the \vc{} and above all how to use it. I detail this program because all the rest of my internship is based on it. I followed every step of this project permanantly reading the documention.
+It is the most important project I studied during my internship because it contains a \enquote{\code{helloworld}} program that helped me to understand the architecture of the \vc{} and above all how to use it. I detail this program because all the rest of my internship is based on it. I followed every step of this project permanantly reading the \vc{} documention\parencite{refVC}.
 
 
 %\subsection{Driver.c}
 %\lstinputlisting[lastline]{grad.c}
 
 
-\subsection{\code{helloworld} Architecture}
+\subsection{\code{rpi-playground} Architecture}
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=0.4\textwidth,scale=0.2]{helloworldArchitecture}
-\caption{Architecture of \code{helloworld} project}
-\label{helloworldArchitecture}
+\includegraphics[width=0.4\textwidth,scale=0.2]{rpiPlaygroundArchitecture}
+\caption{\code{rpi-playground} Architecture}
+\label{rpiPlaygroundFigure}
 \end{figure}
 \FloatBarrier
 
-Figure~\ref{helloworldArchitecture} shows the architecture of the \code{helloworld} project once cloned from the \code{github} repository: \code{git clone git@github.com:elorimer/rpi-playground.git}
+Figure~\ref{rpiPlaygroundFigure} shows the architecture of the \code{rpi-playground} project once cloned from the \code{github} repository: \code{git clone git@github.com:elorimer/rpi-playground.git}
 The project is made of two directories:
 \begin{itemize}
 \item \keyword{assembler} directory contains: \file{assemble.cpp}, the \keyword{assembly parser}
@@ -58,7 +58,7 @@ The project is made of two directories:
 \end{itemize}
 
 
-\subsection{\code{helloworld} Behavior}
+\subsection{\code{helloworld} Program}
 
 The first really important thing I understood is that a \keyword{GPU} is driven by a host \keyword{CPU}. In the case of \emph{Broadcom BCM2837}, the \vc{} is driven by a quad-core \keyword{ARM Cortex A53} (ARMv8) cluster. In the rest of this report I will call it the \cpu. Furthermore, the \vc{} and the \cpu{} share the same \keyword{RAM} memory:
 

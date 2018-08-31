@@ -14,7 +14,8 @@
 \newcommand{\option}[1]{\texttt{\itshape#1}}
 \newcommand{\iBubble}{\textcolor{mdtRed}{\textsc{iBubble}}}
 \newcommand{\rasp}{\textcolor{mdtRed}{\textsc{Raspberry Pi}}}
-\newcommand{\vc}{\textcolor{mdtRed}{\textsc{VideoCore IV 3D GPU}}}
+\newcommand{\vc}{\textcolor{mdtRed}{\textsc{VideoCore IV 3D}}}
+\newcommand{\bcm}{\textcolor{mdtRed}{\textsc{BCM2837}}}
 
 %----------------------------------------------------------------------------------------
 
@@ -46,7 +47,7 @@ In addition to this \keyword{BtC} sector, \iBubble{} is suitable for a large ran
 
 \section{Autonomous Tracking Systems}
 
-As said in the previous section, \iBubble's main feature is to follow \emph{autonomously} a diver to film the diving session. The diver can only choose one of the drone's available scenarii such as \emph{follow me}, \emph{circle me}, \emph{follow me side} etc. At any time the diver, or someone else is controlling the drone with a joystick. Because of the countless difficulties raised by underwater environments (no GPS, no Wi-Fi etc.), \emph{autonomously} follow a diver is a high technical challenge. To achieve this goal, \iBubble{} uses two technologies: \emph{acoustic} and \emph{vision} location.
+As I said in the previous section, \iBubble's main feature is to follow \emph{autonomously} a diver to film the diving session. The diver can only choose one of the drone's available scenarii such as \emph{follow me}, \emph{circle me}, \emph{follow me side} etc. At any time the diver, or someone else is controlling the drone with a joystick. Because of the countless difficulties raised by underwater environments (no GPS, no Wi-Fi etc.), \emph{autonomously} follow a diver is a high technical challenge. To achieve this goal, \iBubble{} uses two technologies: \emph{acoustic} and \emph{vision} location.
 
 
 \subsection{Acoustic System}
@@ -70,11 +71,17 @@ The vision system is globally composed of two parts: a \emph{machine learning de
 
 The algorithms mentionned in the previous subsection (Vision System~\ref{Vision}) are well-known and can be parallelize very efficiently on \keyword{GPU}s to improve compute speed. Therefore there are a lot of implementations on \keyword{GPU}s of these algorithms especially with the growth of \emph{Nvidia's CUDA GPGPU cores} on embedded chip (for instance the Jetson TX2, a power-efficient embedded AI computing device) for \emph{Internet of Things} or \emph{autonomous vehicles}.
 
-However, \groupname{} chose \rasp\footnote{Raspberry Pi: https://www.raspberrypi.org/} as the central embedded computer for \iBubble. Indeed, this board is far less expensive than \emph{CUDA} systems, reasonably powerful and very well-documented with a huge community of developers. The chip used in the \rasp{} is a \emph{Broadcom BCM2837} fitted with the \vc{}.
+However, \groupname{} chose \rasp\footnote{Raspberry Pi: https://www.raspberrypi.org/} as the central embedded computer for \iBubble. Indeed, this board is far less expensive than \emph{CUDA} systems, reasonably powerful and very well-documented with a huge community of developers.\par
 
-Currently, the vision system (e.g.\emph{detector \& tracker}~\ref{Vision}) uses state-of-the-art algorithms such as \keyword{CMT}\footnote{\keyword{CMT} algorithm: \url{https://www.gnebehay.com/cmt/}}, developed with \keyword{OpenCV}\footnote{OpenCV: https://opencv.org/} the main library used in Computer Vision.
+The \keyword{SoC} used in the \rasp{} is a \keyword{\textsc{Broadcom}} \bcm{}\parencite{refBCM} fitted with:
+\begin{itemize}
+\item \keyword{CPU} -- \keyword{ARM Cortex A53} (ARMv8) cluster
+\item \keyword{GPU} -- \vc{}\parencite{refVC}
+\end{itemize}
 
-The main issue is that the \emph{BCM2837 SoC} is not designed with a \emph{CUDA} architecture and there is no reliable implementation of the algorithms on the \rasp. As a consequence, the \vc{} can't be used and the whole \emph{tracking algorithm} is running only on the \rasp's \keyword{CPU}, resulting in slow computing time and poor performances. Since all the vision system will be integrated on the \rasp, the difficulty is to achieve correct quality with a real-time processing on a such device.
+Currently, the vision system (\emph{detector \& tracker}~\ref{Vision}) uses state-of-the-art algorithms such as \keyword{CMT}\footnote{\keyword{CMT} algorithm: \url{https://www.gnebehay.com/cmt/}}, developed with \keyword{OpenCV}\footnote{OpenCV: https://opencv.org/} the main library used in Computer Vision.
+
+The main issue is that the \bcm{} is not designed with a \emph{CUDA} architecture and there is no reliable implementation of the algorithms on the \rasp. As a consequence, the \vc{} can't be used and the whole \emph{tracking algorithm} is running only on the \rasp's \keyword{CPU}, resulting in slow computing time and poor performances. Since all the vision system will be integrated on the \rasp, the difficulty is to achieve correct quality with a real-time processing on a such device.
 
 To meet these objectives, \groupname{} have decided to developp its own implementation of the algorithms using an homemade \keyword{API} for the \vc. This is the subject of my internship.
 
@@ -97,14 +104,14 @@ Indeed, before implementing these algorithms on the \vc, it was crucial that \gr
 
 In a first time he has to study and understand the popular implementations of the \keyword{optical flow} algorithms, create a state-of-the-art document of these algorithms. Then he suggests an optimized implementation for the chosen method. This implementation must be highly parallelizable in order to use the \vc. At this stage, wa have to communicate together so that I understand how the \vc{} can be helpful for the implementation of the \keyword{optical flow} algorithm.
 
-Next this algorithm needs to be test in simulation and real conditions on the \rasp. This step is fundamental to estimate the gain and loss in quality and computing time compared to the current solution. Finally the last part is to implement it on the drone system and test the whole vision system with the new \keyword{optical flow} algorithm.
+Next this algorithm needs to be test in simulation and real conditions on the \rasp. This step is fundamental to estimate the gain and loss in quality and computing time compared to the current solution. Finally the last part is to implement it on the drone system and test the whole vision system with the new \keyword{optical flow} algorithm(Appendice~\ref{AppendixA}).
 
 
 \subsubsection{API for the \textsc{VideoCore IV 3D GPU}}
 
 Personnaly I had to study and understand the \vc{}. The goal was to create an homemade \keyword{API} accessible from a high-level language such as \keyword{C++}. This \keyword{API} was to provide basic functions to run computations of the \keyword{optical flow} algorithm on the \vc{} in order to achieve a real time performance and relieve the \keyword{CPU}.
 
-Due to the growing popularity of the \rasp{}, \emph{Broadcom} released an official documentation\footnote{VideoCore Spec: \url{https://docs.broadcom.com/docs/12358545}} (Appendice~\ref{AppendixA}) of the \vc{} architecture, but without any official \keyword{API}.
+Due to the growing popularity of the \rasp{}, \keyword{\textsc{Broadcom}} released an official \vc{} architecture reference guide\footnote{VideoCore Spec: \url{https://docs.broadcom.com/docs/12358545}}, but without any official \keyword{API}.
 
 As a conseqence, the main questions for me was to study the architecture and understand how to use the \vc{}, then understand the \keyword{optical flow} algorithm and implement an optimized and parallelized version running on the \vc{}.
 

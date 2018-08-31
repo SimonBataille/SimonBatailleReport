@@ -478,3 +478,7 @@ Pour la version BtC du drone, on remplace notre carte graphique embarquée par u
 	- git overwrite : git fetch --all && git reset --hard origin/gpu
 	- git show sha1:path/file >> file
 
+31/08/2018
+
+	- sed -i 's/define(`rDMAStoreAddrX', ra29)/define(`rDMAStoreAddrX', ra31)/g' *
+	- sed -i 's/ra29/ra31/g' *
