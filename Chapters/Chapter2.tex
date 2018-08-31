@@ -16,6 +16,7 @@
 \newcommand{\rasp}{\textcolor{mdtRed}{\textsc{Raspberry Pi}}}
 \newcommand{\vc}{\textcolor{mdtRed}{\textsc{VideoCore IV 3D GPU}}}
 \newcommand{\cpu}{\textcolor{mdtRed}{\textsc{ARM CPU}}}
+\newcommand{\bcm}{\textcolor{mdtRed}{\textsc{BCM2837}}}
 
 %----------------------------------------------------------------------------------------
 
@@ -60,12 +61,12 @@ The project is made of two directories:
 
 \subsection{\code{helloworld} Program}
 
-The first really important thing I understood is that a \keyword{GPU} is driven by a host \keyword{CPU}. In the case of \emph{Broadcom BCM2837}, the \vc{} is driven by a quad-core \keyword{ARM Cortex A53} (ARMv8) cluster. In the rest of this report I will call it the \cpu. Furthermore, the \vc{} and the \cpu{} share the same \keyword{RAM} memory:
+The first really important thing I understood is that a \keyword{GPU} is driven by a host \keyword{CPU}. In the case of \bcm, the \vc{} is driven by an \cpu{}(ARM Cortex A53). Furthermore, the \vc{} and the \cpu{} share the same \keyword{RAM} memory:
 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.4\textwidth]{sharedRAM}
-\caption{Shared RAM memory between \vc{} and \cpu}
+\caption{\vc{} and \cpu{} Shared RAM memory}
 \label{sharedRAM}
 \end{figure}
 \FloatBarrier
