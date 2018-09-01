@@ -40,6 +40,39 @@ It is the most important project I studied during my internship because it conta
 %\subsection{Driver.c}
 %\lstinputlisting[lastline]{grad.c}
 
+\subsection{\code{helloworld} Program}
+
+The first \keyword{key thing} to understand is that a \keyword{GPU} is driven by a host \keyword{CPU}. In the case of \bcm, the \vc{} is driven by an \cpu{}(ARM Cortex A53).
+
+The second \keyword{key thing} is that they share the same \keyword{RAM} memory as figure~\ref{sharedRAM} taken from the \bcm{} documentation\parencite{refBCM} shows:
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=1.0\textwidth]{BCM2837memory}
+\caption{\vc{} and \cpu{} Shared RAM}
+\label{sharedRAM}
+\end{figure}
+\FloatBarrier
+
+As a consequence, in the case of a \keyword{GPU} programing, a \code{helloworld} is not a trivial exercice because a lot of parts are involved. To run \code{code} on \vc, we must write a \cpu{} program (in \keyword{C} language) that will:
+\begin{itemize}
+\item initialize the GPU
+\item map memory
+\item configure parameters
+\item send data and code to the GPU
+\item get back resutls
+\end{itemize}\\~\\
+
+So, within the \code{rpi-playground} project, the \code{helloworld} program will:
+
+\begin{itemize}
+\item initialize the \vc
+\item map the RAM memory shared by the \vc{} and the \cpu
+\item transfer a single input value from \cpu{} to \vc
+\item use the \vc{} to add constant to this input value
+\item get back the result from \vc{} to \cpu
+\end{itemize}
+
 
 \subsection{\code{rpi-playground} Architecture}
 
@@ -54,34 +87,26 @@ It is the most important project I studied during my internship because it conta
 Figure~\ref{rpiPlaygroundFigure} shows the architecture of the \code{rpi-playground} project once cloned from the \code{github} repository: \code{git clone git@github.com:elorimer/rpi-playground.git}
 The project is made of two directories:
 \begin{itemize}
-\item \keyword{assembler} directory contains: \file{assemble.cpp}, the \keyword{assembly parser}
-\item \keyword{helloworld} directory contains: \file{helloworld.asm}, the \keyword{code-to-execute} on the \vc{} and \file{driver.c}, the code that \keyword{drive} the \vc
+\item \keyword{assembler} directory contains:
+	\begin{itemize}
+		\item \file{assemble.cpp} -- the \keyword{assembly parser} of \vc{} instructions set
+	\end{itemize}
+\item \keyword{helloworld} directory contains:
+	\begin{itemize}
+		\item \file{helloworld.asm} -- the \keyword{code-to-execute} on the \vc
+		\item \file{driver.c} -- the code that \keyword{drive} the \vc
+	\end{itemize}
 \end{itemize}
 
 
-\subsection{\code{helloworld} Program}
 
-The first really important thing I understood is that a \keyword{GPU} is driven by a host \keyword{CPU}. In the case of \bcm, the \vc{} is driven by an \cpu{}(ARM Cortex A53). Furthermore, the \vc{} and the \cpu{} share the same \keyword{RAM} memory:
-
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=0.4\textwidth]{sharedRAM}
-\caption{\vc{} and \cpu{} Shared RAM memory}
-\label{sharedRAM}
-\end{figure}
-\FloatBarrier
-
-As a consequence, in the case of a \keyword{GPU} programing, a \code{helloworld} is not a trivial exercice because a lot of parts are involved:
-\begin{itemize}
-\item \keyword{assembler} directory contains: \file{assemble.cpp}, the \keyword{assembly parser}
-\item \keyword{helloworld} directory contains: \file{helloworld.asm}, the \keyword{code-to-execute} on the \vc{} and \file{driver.c}, the code that \keyword{drive} the \vc
-\end{itemize}
-
-\subsection{\LaTeX{} on a Mac}
+\subsection{\keyword{assembler} directory}
 
 The \LaTeX{} distribution is available for many systems including Windows, Linux and Mac OS X. The package for OS X is called MacTeX and it contains all the applications you need -- bundled together and pre-customized -- for a fully working \LaTeX{} environment and work flow.
 
 MacTeX includes a custom dedicated \LaTeX{} editor called TeXShop for writing your `\file{.tex}' files and BibDesk: a program to manage your references and create your bibliography section just as easily as managing songs and creating playlists in iTunes.
+
+\subsection{\keyword{helloworld} directory}
 
 %----------------------------------------------------------------------------------------
 
