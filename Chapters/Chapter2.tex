@@ -34,7 +34,7 @@ Finally I had a meeting with \supname{} where I explained to him which direction
 
 \emph{Raspberry Pi Playground}\parencite{refRpiPlayground} is the first project I focused on to better understand the \vc. It is associated with a \enquote{\code{github}} repository, here : \url{//github.com/elorimer/rpi-playground}
 
-It is the most important project I studied during my internship because it contains a \enquote{\code{helloworld}} program that helped me to understand the architecture of the \vc{} and above all how to use it. I detail this program because all the rest of my internship is based on it. I followed every step of this project permanantly reading the \vc{} documention\parencite{refVC}.
+It is the most important project I studied during my internship because it contains a \enquote{\code{helloworld}} program that helped me to understand the preliminary basis of the \vc{} architecture and above all how to use this \keyword{GPU}. I detail this program because all the rest of my internship is based on it. I followed every step of this project permanantly reading the \vc{} documention\parencite{refVC}.
 
 
 %\subsection{Driver.c}
@@ -48,7 +48,7 @@ The second \keyword{key thing} is that they share the same \keyword{RAM} memory 
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=1.0\textwidth]{BCM2837memory}
+\includegraphics[width=0.9\textwidth]{BCM2837memory}
 \caption{\vc{} and \cpu{} Shared RAM}
 \label{sharedRAM}
 \end{figure}
@@ -61,7 +61,8 @@ As a consequence, in the case of a \keyword{GPU} programing, a \code{helloworld}
 \item configure parameters
 \item send data and code to the GPU
 \item get back resutls
-\end{itemize}\\~\\
+\end{itemize}
+\vspace{10 mm}
 
 So, within the \code{rpi-playground} project, the \code{helloworld} program will:
 
@@ -74,6 +75,21 @@ So, within the \code{rpi-playground} project, the \code{helloworld} program will
 \end{itemize}
 
 
+
+\subsection{\vc{} Overview}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{architectureOverview}
+\caption{\vc{}}
+\label{sharedRAM}
+\end{figure}
+\FloatBarrier
+
+
+
+
+
 \subsection{\code{rpi-playground} Architecture}
 
 \begin{figure}[!htbp]
@@ -84,7 +100,7 @@ So, within the \code{rpi-playground} project, the \code{helloworld} program will
 \end{figure}
 \FloatBarrier
 
-Figure~\ref{rpiPlaygroundFigure} shows the architecture of the \code{rpi-playground} project once cloned from the \code{github} repository: \code{git clone git@github.com:elorimer/rpi-playground.git}
+Figure~\ref{rpiPlaygroundFigure} shows the architecture of the \file{rpi-playground} project once cloned from the \file{github} repository: \code{git clone git@github.com:elorimer/rpi-playground.git}
 The project is made of two directories:
 \begin{itemize}
 \item \keyword{assembler} directory contains:
@@ -102,11 +118,53 @@ The project is made of two directories:
 
 \subsection{\keyword{assembler} directory}
 
-The \LaTeX{} distribution is available for many systems including Windows, Linux and Mac OS X. The package for OS X is called MacTeX and it contains all the applications you need -- bundled together and pre-customized -- for a fully working \LaTeX{} environment and work flow.
+\subsubsection{assemble.cpp}
 
-MacTeX includes a custom dedicated \LaTeX{} editor called TeXShop for writing your `\file{.tex}' files and BibDesk: a program to manage your references and create your bibliography section just as easily as managing songs and creating playlists in iTunes.
+\file{assemble.cpp} is the \keyword{assembly parser} written by Eric \textsc{Lorimer} the author of \file{rpi-playground} project. This code translates instuctions written in the \file{helloworld.asm} file of the \keyword{helloworld} directory (Figure~\ref{rpiPlaygroundFigure}) into a binary file (\file{helloworld.bin}) that the \vc{} will understand.
+
+Figure~\ref{VCinstructionsFigure} taken from \parencite{refVC} shows the \enquote{\code{add operations}} of the \vc{}. This \keyword{GPU} has also \enquote{\code{mul}}, \enquote{\code{load}}, \enquote{\code{branch}} or \enquote{\code{semaphore}} instructions.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{VCinstructions}
+\caption{Part of \vc{} instructions set}
+\label{VCinstructionsFigure}
+\end{figure}
+\FloatBarrier
+
+In the \file{assemble.cpp} file, these instructions are declared with the following \keyword{C++} code:
+
+\lstset{language=C++,caption={Declaration of \enquote{\code{add operations}} in \file{assemble.cpp}},captionpos=b,label=addLabel}
+\begin{lstlisting}
+static string addOps[] = {
+    "nop", "fadd", "fsub", "fmin", "fmax", "fminabs", "fmaxabs",
+    "ftoi", "itof", "XXX", "XXX", "XXX", "add", "sub", "shr",
+    "asr", "ror", "shl", "min", "max", "and", "or", "xor", "not",
+    "clz", "XXX", "XXX", "XXX", "XXX", "XXX", "v8adds", "v8subs" };
+\end{lstlisting}
+
+
+\subsubsection{Makefile}
+
+\lstset{language=make,caption={Makefile from assembler directory},captionpos=t,label=assMakefileLabel}
+\begin{lstlisting}
+qpu-assembler: assemble.cpp
+	g++ -g -o qpu-assembler assemble.cpp
+\end{lstlisting}
+
+This \file{Makefile} contains only one instruction. So running the \code{make} command inside the \keyword{assembler} directory generates \file{qpu-assembler} \keyword{executable}.
+\vspace{5 mm}
+
+Then, this \keyword{executable} is used in the \keyword{helloworld} directory to generate \file{helloworld.bin}:
+
+\lstset{language=make,caption={qpu-assembler run on helloworld.asm},captionpos=b,label=executeLabel}
+\begin{lstlisting}
+../assembler/qpu-assembler -o helloworld.bin < helloworld.asm
+\end{lstlisting}
+
 
 \subsection{\keyword{helloworld} directory}
+
 
 %----------------------------------------------------------------------------------------
 
