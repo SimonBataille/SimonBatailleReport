@@ -17,6 +17,7 @@
 \newcommand{\vc}{\textcolor{mdtRed}{\textsc{VideoCore IV 3D GPU}}}
 \newcommand{\cpu}{\textcolor{mdtRed}{\textsc{ARM CPU}}}
 \newcommand{\bcm}{\textcolor{mdtRed}{\textsc{BCM2837}}}
+\newcommand{\qpu}{\textcolor{mdtRed}{\textsc{QPU}}}
 
 %----------------------------------------------------------------------------------------
 
@@ -44,13 +45,13 @@ It is the most important project I studied during my internship because it conta
 
 The first \keyword{key thing} to understand is that a \keyword{GPU} is driven by a host \keyword{CPU}. In the case of \bcm, the \vc{} is driven by an \cpu{}(ARM Cortex A53).
 
-The second \keyword{key thing} is that they share the same \keyword{RAM} memory as figure~\ref{sharedRAM} taken from the \bcm{} documentation\parencite{refBCM} shows:
+The second \keyword{key thing} is that they share the same \keyword{RAM} memory as figure~\ref{sharedFigure} taken from the \bcm{} documentation\parencite{refBCM} shows:
 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.9\textwidth]{BCM2837memory}
 \caption{\vc{} and \cpu{} Shared RAM}
-\label{sharedRAM}
+\label{sharedFigure}
 \end{figure}
 \FloatBarrier
 
@@ -78,15 +79,73 @@ So, within the \code{rpi-playground} project, the \code{helloworld} program will
 
 \subsection{\vc{} Overview}
 
+Figure~\ref{archFigure} taken from \parencite{refVC} shows an architecture overview of the \vc. The \keyword{GPU} parts involved \code{helloworld} program are highlighted with \textcolor{blue}{blue} rectangle.
+
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.9\textwidth]{architectureOverview}
-\caption{\vc{}}
-\label{sharedRAM}
+\caption{\vc{} archictecture overview}
+\label{archFigure}
 \end{figure}
 \FloatBarrier
 
 
+\begin{itemize}
+	\item \keyword{AXI ARB} -- bus that connects \vc{} to shared RAM
+	\item \keyword{Uniforms Cache (QUC)} -- cache containning variables transferred from \cpu{} to \vc
+	\item \keyword{Icache (QIC)} -- cache containning code-to-execute transferred from \cpu{} to \vc
+	\item \keyword{Quad Processor Unit (QPU)} -- \vc{} internal processor
+	\item \keyword{Vertex Pipe Memory (VPM)} -- \vc{} internal memory buffer
+	\item \keyword{VPM DMA Writer (VDM)} -- writes DATA from VPM to shared RAM
+	\item \keyword{Vertex Cache Manager \& DMA (VCM and VCD)} -- writes DATA from shared RAM to VPM
+\end{itemize}
+\vspace{5 mm}
+
+\cpu{} and \vc{} communicate through \keyword{AXI ARB} bus. Within \code{helloworld} program, we will use \cpu{} to:
+\begin{itemize}
+\item initialize and allocate shared RAM in the \keyword{ARM Virtual Adresses} (Figure~\ref{sharedFigure})
+\item transfer variables to the \keyword{QUC}
+\item transfer code-to-execute to the \keyword{QIC}
+\item execute code using \keyword{QPU}
+\item give back results to \cpu{} through \keyword{VDM}
+\end{itemize}
+
+
+\subsubsection{Quad Processor Unit}
+
+\qpu{} is the \vc{} internal processor. It is the \keyword{key component}. Figure~\ref{qpuFigure} taken from \parencite{refVC} shows the pipeline:
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.9\textwidth]{QPU}
+\caption{\qpu{} pipeline}
+\label{qpuFigure}
+\end{figure}
+\FloatBarrier
+
+\qpu{} is a vector processor developed by \textsc{Broadcom} with instructions that operate on 16-element vectors of 32-bit integer or floating point values. For example, given two 16-element vectors
+
+\begin{tabular}{cccc|cccc|cccc|cccc}
+	10&11&12&13&14&15&16&17&18&19&20&21&22&23&24&25
+\end{tabular}
+
+and
+
+\begin{tabular}{cccc|cccc|cccc|cccc}
+	20&21&22&23&24&25&26&27&28&29&30&31&32&33&34&35
+\end{tabular}
+
+the QPU's integer-add instruction computes a third vector
+
+\begin{tabular}{cccc|cccc|cccc|cccc}
+	30&32&34&36&38&40&42&44&46&48&50&52&54&56&58&60
+\end{tabular}
+
+where each element in the output is the sum of the corresponding two elements in the inputs.
+
+Each 16-element vector is comprised of four quads. This is where the name ``Quad Processing Unit'' comes from: a QPU processes one quad per clock cycle, and a QPU instruction takes four consecutive clock cycles to deliver a full 16-element result vector.
+
+\rasp{} contains 12 \qpu{}s in total, each running at 250MHz. That's a max throughput of 750M vector instructions per second (250M cycles divided by 4 cycles-per-instruction times 12 QPUs). Or: 12B operations per second (750M instructions times 16 vector elements). \qpu{} instructions can in some cases deliver two results at a time, so the Pi's QPUs are often advertised at 24 GFLOPS.
 
 
 
