@@ -50,23 +50,32 @@ headsepline, % Uncomment to get a line under the header
 
 \usepackage{color}
 \usepackage{xcolor}
+\usepackage{soul}
+\definecolor{mGreen}{rgb}{0,0.6,0}
+\definecolor{mGray}{rgb}{0.5,0.5,0.5}
+\definecolor{mPurple}{rgb}{0.58,0,0.82}
+\definecolor{backgroundColour}{rgb}{0.95,0.95,0.92}
+
+\definecolor{Light}{gray}{.90}
+\sethlcolor{Light}
 
 
 \usepackage[autostyle=true]{csquotes} % Required to generate language-dependent quotes in the bibliography
 
 
 \usepackage{listings}
+
 \lstdefinestyle{CStyle}{
     backgroundcolor=\color{backgroundColour},
     commentstyle=\color{mGreen},
     keywordstyle=\color{magenta},
     numberstyle=\tiny\color{mGray},
     stringstyle=\color{mPurple},
-    %basicstyle=\scriptsize,
-    basicstyle=\tiny,
+    basicstyle=\scriptsize,
+    %basicstyle=\tiny,
     breakatwhitespace=false,
     breaklines=true,
-    captionpos=b,
+    captionpos=t,
     keepspaces=true,
     numbers=left,
     numbersep=5pt,
@@ -75,6 +84,15 @@ headsepline, % Uncomment to get a line under the header
     showtabs=false,
     tabsize=2,
     language=C
+}
+
+\lstdefinestyle{customasm}{
+  belowcaptionskip=1\baselineskip,
+  frame=L,
+  xleftmargin=\parindent,
+  language=[x86masm]Assembler,
+  basicstyle=\footnotesize\ttfamily,
+  commentstyle=\itshape\color{purple!40!black},
 }
 
 \usepackage{placeins}
