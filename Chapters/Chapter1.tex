@@ -15,7 +15,9 @@
 \newcommand{\iBubble}{\textcolor{mdtRed}{\textsc{iBubble}}}
 \newcommand{\rasp}{\textcolor{mdtRed}{\textsc{Raspberry Pi}}}
 \newcommand{\vc}{\textcolor{mdtRed}{\textsc{VideoCore IV 3D}}}
+\newcommand{\cpu}{\textcolor{mdtRed}{\textsc{ARM CPU}}}
 \newcommand{\bcm}{\textcolor{mdtRed}{\textsc{BCM2837}}}
+\newcommand{\qpu}{\textcolor{mdtRed}{\textsc{QPU}}}
 
 %----------------------------------------------------------------------------------------
 
@@ -73,10 +75,10 @@ The algorithms mentionned in the previous subsection (Vision System~\ref{Vision}
 
 However, \groupname{} chose \rasp\footnote{Raspberry Pi: https://www.raspberrypi.org/} as the central embedded computer for \iBubble. Indeed, this board is far less expensive than \emph{CUDA} systems, reasonably powerful and very well-documented with a huge community of developers.\par
 
-The \keyword{SoC} used in the \rasp{} is a \keyword{\textsc{Broadcom}} \bcm{}\parencite{refBCM} fitted with:
+The \keyword{SoC} used in the \rasp{} is a \keyword{\textsc{Broadcom}} \bcm{}\footnote{BCM2837: \url{https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf}} fitted with:
 \begin{itemize}
 \item \keyword{CPU} -- \keyword{ARM Cortex A53} (ARMv8) cluster
-\item \keyword{GPU} -- \vc{}\parencite{refVC}
+\item \keyword{GPU} -- \vc{}
 \end{itemize}
 
 Currently, the vision system (\emph{detector \& tracker}~\ref{Vision}) uses state-of-the-art algorithms such as \keyword{CMT}\footnote{\keyword{CMT} algorithm: \url{https://www.gnebehay.com/cmt/}}, developed with \keyword{OpenCV}\footnote{OpenCV: https://opencv.org/} the main library used in Computer Vision.
@@ -100,18 +102,18 @@ From low-level programming to image processing and numerical analysis, this subj
 
 Camille's job was to work on the \keyword{optical flow} algorithm for the \emph{tracker} and on a \emph{Machine Learning} algorithm for the \emph{detector}.
 
-Indeed, before implementing these algorithms on the \vc, it was crucial that \groupname{} has its own implementation of them. Currently all the vision system is coded in \keyword{C++} and use few libraries such \keyword{OpenCV} or Eigen\footnote{Eigen: https://eigen.tuxfamily.org/} library for linear algebra. Camille had to work on these algorithms with the technologies, libraries, frameworks that fit the best the problem, namely processing parts of these algorithms on the \vc{} in order to release some \keyword{CPU} ressorces.
+Indeed, before implementing these algorithms on the \vc, it was crucial that \groupname{} has its own implementation of them. Currently all the vision system is coded in \keyword{C++} and use few libraries such \keyword{OpenCV} or Eigen\footnote{Eigen: https://eigen.tuxfamily.org/} library for linear algebra. Camille had to work on these algorithms with the technologies, libraries, frameworks that fit the best the problem, namely processing parts of these algorithms on the \vc{} in order to release some \keyword{CPU} ressources.
 
 In a first time he has to study and understand the popular implementations of the \keyword{optical flow} algorithms, create a state-of-the-art document of these algorithms. Then he suggests an optimized implementation for the chosen method. This implementation must be highly parallelizable in order to use the \vc. At this stage, wa have to communicate together so that I understand how the \vc{} can be helpful for the implementation of the \keyword{optical flow} algorithm.
 
-Next this algorithm needs to be test in simulation and real conditions on the \rasp. This step is fundamental to estimate the gain and loss in quality and computing time compared to the current solution. Finally the last part is to implement it on the drone system and test the whole vision system with the new \keyword{optical flow} algorithm(Appendice~\ref{AppendixA}).
+Next this algorithm needs to be test in simulation and real conditions on the \rasp. This step is fundamental to estimate the gain and loss in quality and computing time compared to the current solution. Finally the last part is to implement it on the drone system and test the whole vision system with the new \keyword{optical flow} algorithm.
 
 
 \subsubsection{API for the \textsc{VideoCore IV 3D GPU}}
 
 Personnaly I had to study and understand the \vc{}. The goal was to create an homemade \keyword{API} accessible from a high-level language such as \keyword{C++}. This \keyword{API} was to provide basic functions to run computations of the \keyword{optical flow} algorithm on the \vc{} in order to achieve a real time performance and relieve the \keyword{CPU}.
 
-Due to the growing popularity of the \rasp{}, \keyword{\textsc{Broadcom}} released an official \vc{} architecture reference guide\footnote{VideoCore Spec: \url{https://docs.broadcom.com/docs/12358545}}, but without any official \keyword{API}.
+Due to the growing popularity of the \rasp{}, \keyword{\textsc{Broadcom}} released an official \vc{} architecture reference guide\footnote{\vc{} Documentation: \url{https://docs.broadcom.com/docs/12358545}}, but without any official \keyword{API}.
 
 As a conseqence, the main questions for me was to study the architecture and understand how to use the \vc{}, then understand the \keyword{optical flow} algorithm and implement an optimized and parallelized version running on the \vc{}.
 
