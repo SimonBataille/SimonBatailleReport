@@ -482,3 +482,9 @@ Pour la version BtC du drone, on remplace notre carte graphique embarquée par u
 
 	- sed -i 's/define(`rDMAStoreAddrX', ra29)/define(`rDMAStoreAddrX', ra31)/g' *
 	- sed -i 's/ra29/ra31/g' *
+
+01/09/2018
+
+	- pdftk VideoCoreIV-AG100-R.pdf cat 13 output VideoCorepage13.pdf
+	- pdfcrop --margins '-50 -50 -50 -50' input.pdf output.pdf
+	- pdftk BCM2835-ARM-Peripherals.pdf cat 5 output BCM2835-ARM-PeripheralsPage5.pdf
