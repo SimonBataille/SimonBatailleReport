@@ -39,55 +39,51 @@ The main difficulty is that there is no official \keyword{API} released by \text
 
 \section{Optical Flow}
 
-\emph{Optical flow} (or \emph{optic flow}) concept was introduced in the beginning of the 20\textsuperscript{th} century by \textsc{Helmholtz}. \textsc{Horn} gave a more recent definition in 1986: \say{The apparent motion of brightness patterns observed when a camera is moving relative to the objects being imaged is called optical flow.}~\cite{horn}.\par
+For the \iBubble{} tracking system - NotiloTracker - optical flow is the displacement of points of interest - called \keyword{features} - between two consecutive frames from a video.
 
-\emph{Optical flow} can be estimated on a set of continuous frames from a video in order to do object recognition, tracking or movement detection. It is also used for video compression. In \iBubble, \emph{optical flow} is compute within \keyword{CMT} to achieve diver \emph{autonomous tracking and following}.\par
-
-
-\emph{Optical flow} and motion estimation referred usually to the same concept: the process of finding corresponding points between two consecutive video frames. Figure~\ref{opticalflow_detection} explained well the concept for the human visual system behavior and the estimation of \emph{optical flow} in the image plane, where it computes a vector of movement for a set of points.\par
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.4\textwidth]{opticalflow}
-\caption{Production and detection of optical flow \cite{optical_flow_scholarpedia}}
-\label{opticalflow_detection}
-\end{figure}
-\FloatBarrier
-
-\emph{Optical flow} can be represented as a \emph{vector field}. From this vector field it can be deduced what kind of movement the object on interest is doing: translation on the image plane, rotation, approaching from the camera etc \ldots Figure~\ref{opticalflow_movement} shows the correlation between the movement types and the estimated \emph{optical flow}.\par
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.6\textwidth]{opticalflow_movement}
-\caption{Different types of movement represented from the optical flow representation as vector field \cite{optical_flow_scholarpedia}}
-\label{opticalflow_movement}
-\end{figure}
-\FloatBarrier
-
-For \iBubble{} tracking system, we compute the \emph{sparse optical flow}, namely we compute \emph{optical flow} only for \emph{sparse points} - called \keyword{features} - of the image.
-
-If the \emph{sparse optical flow} estimation is done on a video, it can print the movement of each \keyword{feature} during the video and give a result like the one of Figure \ref{opticalflow_sparse}.\par
-
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=0.5\textwidth]{sparse_opticalflow_lk}
-\caption{Optical flow for a set of features on a video \cite{optical_flow_opencv}}
-\label{opticalflow_sparse}
-\end{figure}
-\FloatBarrier
-
+Computing \emph{optical flow} between two consecutive frames involves the following steps:
 \begin{itemize}
-	\item detect points of interest on first image
-	\item find the same points of interest on the second image
-	\item compute optical flow for each point of interest
-	\item give back results
+	\item detect \keyword{features} on first image -- Figure~\ref{initFeaturesFig}
+	\item find the next \keyword{features} positions on the second image -- Figure~\ref{secondFeaturesFig}
+	\item compute \emph{displacemnt} for each \keyword{features} -- Figure~\ref{opticalFlowFig}
 \end{itemize}
 
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.5\textwidth]{plongeurInitFeatures}
+	\caption{First frame of a diving video with the initial set of features}
+	\label{initFeaturesFig}
+\end{figure}
+\FloatBarrier
+
+
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.5\textwidth]{plongeurNextFeatures}
+	\caption{Second frame of a diving video with new features positions}
+	\label{secondFeaturesFig}
+\end{figure}
+\FloatBarrier
+
+
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.5\textwidth]{plongeurOpticalFlow}
+	\caption{Optical flow for the initial set of features}
+	\label{opticalFlowFig}
+\end{figure}
+\FloatBarrier
+
+\emph{Optical flow} can be represented as a \emph{vector field}, representing \keyword{features} displacement between two consecutive frames. It is used to do object recognition, tracking or movement detection. In \iBubble, \emph{optical flow} is compute within \keyword{CMT} to achieve diver \emph{autonomous tracking and following}.\par
 
 %----------------------------------------------------------------------------------------
 
 \section{Lucas-Kanade algorithm}
 
+There are several algorithms to compute \emph{optical flow}. Camille selected the \keyword{Lucas-Kanade} method to be implemented on \vc.
 %----------------------------------------------------------------------------------------
 
 \section{Implementation on \vc}
