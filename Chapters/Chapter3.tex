@@ -39,7 +39,7 @@ The main difficulty is that there is no official \keyword{API} released by \text
 
 \section{Optical Flow}
 
-For the \iBubble{} tracking system - NotiloTracker - optical flow is the displacement of points of interest - called \keyword{features} - between two consecutive frames from a video.
+Within \iBubble{} visual tracking system - \keyword{CMT} - \keyword{optical flow} is the displacement of points of interest - called \keyword{features} - between two consecutive frames from a video.
 
 Computing \emph{optical flow} between two consecutive frames involves the following steps:
 \begin{itemize}
@@ -72,7 +72,7 @@ Computing \emph{optical flow} between two consecutive frames involves the follow
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=0.5\textwidth]{plongeurOpticalFlow}
-	\caption{Optical flow for the initial set of features}
+	\caption{Optical flow for the initial set of features -- \small{norm of the \textcolor{blue}{blue} vectors is overstated for better visualization}}
 	\label{opticalFlowFig}
 \end{figure}
 \FloatBarrier
@@ -81,9 +81,26 @@ Computing \emph{optical flow} between two consecutive frames involves the follow
 
 %----------------------------------------------------------------------------------------
 
-\section{Lucas-Kanade algorithm}
+\section{Lucas-Kanade method}
 
-There are several algorithms to compute \emph{optical flow}. Camille selected the \keyword{Lucas-Kanade} method to be implemented on \vc.
+There are several ways to compute \keyword{optical flow}. Camille selected \keyword{Lucas-Kanade} method to be implemented on \vc.
+
+\subsection{Images encodind}
+
+As I mentioned in~\ref{Matrices}, frames from the \rasp{} camera are stored as \option{float-matrices} inside the shared RAM memory. Each \option{float value} is a 32-bit word All the algorithms described below are using grayscale images. That means that all
+images contain pixels that have a single intensity channel (generally encoded as float 32 bits).
+
+Frames dimensions are 240X360. It is row major.
+
+\[
+\begin{bmatrix}
+pixel_{0,0} & pixel_{0,1} & \ldots & pixel_{0,359}\\
+pixel_{1,0} & \ddots & \ldots & pixel_{1,359}\\
+\vdots & \vdots & \ddots & \vdots\\
+pixel_{239,0} & \ldots & \ldots & pixel_{239,359}
+\end{bmatrix}_{240\times 360}
+\]
+
 %----------------------------------------------------------------------------------------
 
 \section{Implementation on \vc}
