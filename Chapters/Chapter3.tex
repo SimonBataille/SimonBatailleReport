@@ -87,6 +87,7 @@ There are several ways to compute \keyword{optical flow}. Camille selected \keyw
 
 The \emph{vision tracking} algorithm detects \keyword{30 features} on each frame from the camera. Thus, our \emph{homemade} algorithm must compute \keyword{optical flow} for these 30 features between two consecutive frames.
 
+Although there are 30 features, I will present the Lucas-Kanade method for one \keyword{feature}, $feature_{x,y}$. The processing is the same for the rest of the features.
 
 \subsection{Images encoding}
 
@@ -183,7 +184,6 @@ Before invoking the \keyword{optical flow} computation, the \emph{tracking syste
 
 A pixel from first frame will be noted $firstFrame_{x,y}$. A pixel from second frame will be noted $secondFrame_{x,y}$. A pixel from window in firstFrame will be noted $firstWindow_{x,y}$. A pixel from window in secondFrame will be noted $secondWindow_{x,y}$.
 
-Although there are 30 features, I will present the Lucas-Kanade method for one \keyword{feature}, $feature_{x,y}$. The processing is the same for the rest of the features.
 
 \begin{figure}[!htbp]
 	\centering
