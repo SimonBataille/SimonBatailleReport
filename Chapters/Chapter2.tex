@@ -516,7 +516,15 @@ This project is interesting for several reasons:
 
 \keyword{TMU} is the \vc{} component that enables \qpu{} to directly access data from the shared RAM. We just have to pass data pointer from the \emph{VC CPU Bus Addresses} in some \keyword{uniforms} variables to load the values containing at this address.
 
-For instance, matrices which are stored in the shared RAM can be accessed knowing the pointer of the first element. I also noticed that matrices are stored in \emph{row-major} order. That means row values are contiguous in shared RAM memory. This is a \keyword{key point} to know because frames from the \rasp{} camera are stored as \option{float-matrices} in memory and to compute the \keyword{optical flow} we have to access data from those frames.
+For instance, matrices which are stored in the shared RAM can be accessed knowing the pointer of the first element. I also noticed that matrices are stored in \emph{row-major} order (Figure~\ref{rowcolumnarrays}). That means row values are contiguous in shared RAM memory. This is a \keyword{key point} to know because frames from the \rasp{} camera are stored as \option{float-matrices} in memory and to compute the \keyword{optical flow} we have to access data from those frames.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.6\textwidth]{rowcolumnarrays}
+	\caption{Row-major vs. Colon-major matrices}
+	\label{rowcolumnarrays}
+\end{figure}
+\FloatBarrier
 
 
 \subsection{Refactoring projects}
