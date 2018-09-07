@@ -66,7 +66,7 @@ These are really two crucial \keyword{concepts} to keep in mind for the rest of 
 As a consequence of \ref{concepts}, in the case of \keyword{GPU} programing, a \file{helloworld} is not a trivial exercice because a lot of parts are involved. To run \code{code} on \vc, we must write a \cpu{} program (in \keyword{C} language) that will:
 \begin{itemize}
 	\item initialize the GPU
-	\item map shared RAM memory space
+	\item map \ram{} memory space
 	\item configure parameters
 	\item send data and code to the GPU
 	\item get back resutls
@@ -132,24 +132,24 @@ Appendice~\ref{AppendixC} taken from \parencite{refVC} shows an architecture ove
 
 
 \begin{itemize}
-	\item \keyword{AXI ARB} -- bus that connects \vc{} to shared RAM and \cpu
+	\item \keyword{AXI ARB} -- bus that connects \vc{} to \ram{} and \cpu
 	\item \keyword{Uniforms Cache (QUC)} -- cache containning variables transferred from \cpu{} to \vc
 	\item \keyword{Icache (QIC)} -- cache containning code-to-execute transferred from \cpu{} to \vc
 	\item \keyword{Quad Processor Unit (QPU)} -- \vc{} internal processor
 	\item \keyword{Vertex Pipe Memory (VPM)} -- \vc{} internal memory buffer
-	\item \keyword{VPM DMA Writer (VDM)} -- writes DATA from VPM to shared RAM
-	\item \keyword{Vertex Cache Manager \& DMA (VCM and VCD)} -- writes DATA from shared RAM to VPM
+	\item \keyword{VPM DMA Writer (VDM)} -- writes DATA from VPM to \ram{}
+	\item \keyword{Vertex Cache Manager \& DMA (VCM and VCD)} -- writes DATA from \ram{} to VPM
 \end{itemize}
 \vspace{5 mm}
 
 \cpu{} and \vc{} communicate through \keyword{AXI ARB} bus. Within \file{helloworld} program, we will use \cpu{} to:
 \begin{itemize}
-	\item initialize and allocate shared RAM in the \keyword{ARM Virtual Adresses} (Appendice~\ref{AppendixB})
+	\item initialize and allocate \ram{} in the \keyword{ARM Virtual Adresses} (Appendice~\ref{AppendixB})
 	\item transfer variables to the \keyword{QUC}
 	\item transfer code-to-execute to the \keyword{QIC}
 	\item execute code with \keyword{QPU}
 	\item store result into \keyword{VPM}
-	\item write back results into shared RAM through \keyword{VDM}
+	\item write back results into \ram{} through \keyword{VDM}
 \end{itemize}
 
 
@@ -312,11 +312,11 @@ int gpu_fft_get_host_info(struct GPU_FFT_HOST *info);
 
 \code{\# Move 16 words (1 vector) back to the host (DMA)\\ldi rb49, 0x88010000}\\
 -- From \parencite{refVC} page 58, we configure the \emph{VPM DMA storing} by writing \emph{rb49} register : \code{VPMVCD\_WR\_SETUP}.\\
--- We configure the \emph{DMA} transfer of 16-word vector from \emph{VPM buffer} to the shared RAM memory.\\
+-- We configure the \emph{DMA} transfer of 16-word vector from \emph{VPM buffer} to the \ram{} memory.\\
 
 \code{\# Initiate the DMA (next uniform, ra32, is the host address to write to)\\or rb50, ra32, 0; nop}\\
 \code{\# Wait for the DMA to complete\\or rb39, rb50, ra39; nop}\\
--- Finally, we write the results in the shared RAM memory at the second uniforms address \emph{ra32} register.\\
+-- Finally, we write the results in the \ram{} memory at the second uniforms address \emph{ra32} register.\\
 
 \code{\# Trigger a host interrupt (writing rb38) to stop the program\\or rb38, ra39, ra39; nop}\\
 \code{nop.tend ra39, ra39, ra39; nop rb39, rb39, rb39\\nop ra39, ra39, ra39; nop rb39, rb39, rb39\\nop ra39, ra39, ra39; nop rb39, rb39, rb39}\\
@@ -329,7 +329,7 @@ The whole \file{driver.c} is written in Appendice~\ref{AppendixE}, but I will de
 
 
 \code{\#include ``mailbox.h''}\\
--- We use \keyword{mailbox interface} to communicate between \vc{} and \cpu.\\
+-- We use \mail{} interface to communicate between \vc{} and \cpu.\\
 -- This interface uses low-level linux kernel functions that enable \keyword{CPU} to send \code{code-to-execute} and \code{input data} - \keyword{uniforms} - to \keyword{GPU}, and then get back results.\\
 
 
@@ -349,7 +349,7 @@ struct memory_map {
 \code{int code\_words = loadShaderCode(argv[1], qpu\_code, MAX\_CODE\_SIZE);}\\
 -- We use \code{loadShaderCode()} function to load \file{helloworld.bin} binary code file.\\~\\
 
-\lstset{style=CStyle,caption={init mailbox interface}}
+\lstset{style=CStyle,caption={init \mail{} interface}}
 \begin{lstlisting}
     int mb = mbox_open();
     if (qpu_enable(mb, 1))
@@ -370,8 +370,8 @@ struct memory_map {
     unsigned ptr = mem_lock(mb, handle);
 \end{lstlisting}
 
--- Initialize the \keyword{mailbox} interface and send a message to enable the \qpu{} with the \code{qpu\_enable()} mailbox's function\\
--- We allocate and lock GPU memory with \code{mem\_alloc()} mailbox's function\\
+-- Initialize the \mail{} interface and send a message to enable the \qpu{} with the \code{qpu\_enable()} \mail{}'s function\\
+-- We allocate and lock GPU memory with \code{mem\_alloc()} \mail{}'s function\\
 -- \emph{ptr} is now the base Bus Address of the GPU memory mapping\\
 -- \emph{ptr} is located inside \emph{VC CPU BUS Addresses} (Appendice~\ref{AppendixB})\\
 
@@ -410,7 +410,7 @@ struct memory_map {
     unsigned ret = execute_qpu(mb, NUM_QPUS, vc_msg, GPU_FFT_NO_FLUSH,
                                GPU_FFT_TIMEOUT);
 \end{lstlisting}
--- To execute a \qpu{} program on the \keyword{GPU}, we pass an array of message structures \emph{vc\_msg}, through \code{execute\_qpu()} function from the \keyword{mailbox} interface. This array contains:
+-- To execute a \qpu{} program on the \keyword{GPU}, we pass an array of message structures \emph{vc\_msg}, through \code{execute\_qpu()} function from the \mail{} interface. This array contains:
 \begin{itemize}
 	\item First - \emph{vc\_uniforms} - a pointer to all the uniforms to bind to the QPU program
 	\begin{itemize}
@@ -440,11 +440,11 @@ Figure~\ref{flowFigure} sums up the \file{helloworld} program execution:
 			\item input value - \emph{100}
 			\item results array address - \emph{results[NUM\_QPUS][16]}
 		\end{itemize}
-		from the host \cpu{} to the \emph{QPU 0,0} through the \keyword{mailbox} interface (\code{execute\_qpu()} function in \file{driver.c}). These 2 uniforms will be load into \emph{QUC : Uniforms Cache}.
-	\item We also use \keyword{mailbox} interface to tranfer \code{code-to-execute} to the \keyword{GPU}. \code{code-to-execute} is then load into \emph{QIC : Icache (Instructions cache)}.
+		from the host \cpu{} to the \emph{QPU 0,0} through the \mail{} interface (\code{execute\_qpu()} function in \file{driver.c}). These 2 uniforms will be load into \emph{QUC : Uniforms Cache}.
+	\item We also use \mail{} interface to tranfer \code{code-to-execute} to the \keyword{GPU}. \code{code-to-execute} is then load into \emph{QIC : Icache (Instructions cache)}.
 	\item \emph{QPU 0,0} adds \emph{100} to \emph{0x1234}.
 	\item The result (16-word vector) is sent back to \keyword{VPM} (Vertex Pipe Memory).
-	\item The result (16-word vector) is write back from \keyword{VPM} to shared RAM memory through \keyword{DMA} transfer.
+	\item The result (16-word vector) is write back from \keyword{VPM} to \ram{} memory through \keyword{DMA} transfer.
 \end{itemize}
 
 
@@ -452,7 +452,7 @@ Figure~\ref{flowFigure} sums up the \file{helloworld} program execution:
 
 This project taught me the basis of \vc{} programming and laid the groundwork for the rest of my internship. I understood that:
 \begin{itemize}
-	\item GPU and CPU share the same RAM memory - Appendice~\ref{AppendixB}:
+	\item GPU and CPU share the same RAM memory - Appendice~\ref{AppendixB}
 		\begin{itemize}
 			\item CPU sends code and data in \emph{VC CPU Bus Addresses}
 			\item GPU gives back results in \emph{ARM Virtual Addresses}
@@ -464,7 +464,7 @@ This project taught me the basis of \vc{} programming and laid the groundwork fo
 			\item send code and data
 			\item get back results
 		\end{itemize}
-	\item GPU and CPU communicate via \keyword{mailbox}:
+	\item GPU and CPU communicate via \mail{}:
 		\begin{itemize}
 			\item \keyword{API} that uses low-level linux kernel functions
 			\item source code is available in the raspbian distribution: \code{}
@@ -477,7 +477,7 @@ This project taught me the basis of \vc{} programming and laid the groundwork fo
 	\item GPU is fitted with - Appendice~\ref{AppendixC}:
 		\begin{itemize}
 			\item VPM to store result from QPU
-			\item DMA to send result from VPM to shared RAM memory
+			\item DMA to send result from VPM to \ram{} memory
 		\end{itemize}
 	\item To run program on GPU:
 		\begin{itemize}
@@ -498,7 +498,9 @@ To build the homemade \keyword{API} for \iBubble, I focused on:
 
 %----------------------------------------------------------------------------------------
 
-\section{\emph{pi-gemm} Project}
+\section{Standard Framework Project}
+
+\subsection{\emph{pi-gemm} Project}
 
 \emph{pi-gemm} \parencite{refPiGemm} is a project written by Pete \textsc{Warden} with associated \file{github}: \url{https://github.com/jetpacapp/pi-gemm}. It implements optimized \emph{GEMM} algorithm on \vc.
 
@@ -506,17 +508,17 @@ This project is interesting for several reasons:
 \begin{itemize}
 	\item the author wrote an improved \keyword{assembly parser} -- \file{qpu-asm.cpp}
 	\item \file{pi-gemm} introduces the \keyword{TMU} -- Appendice~\ref{AppendixC}
-	\item multiply matrix is massively used in \keyword{optical flow} processing
-	\item \file{pi-gemm} algorithm is called in a \file{main.cpp} file -- as an \keyword{API}
+	\item multiply matrix is massively used in \flow{} processing
+	\item \file{pi-gemm} algorithm is called in a \file{main.cpp} file -- as our homemade \api
 	\item \file{pi-gemm} \file{Makefile} is more generic
 \end{itemize}
 
 
-\subsection{TMU and Matrices}\label{Matrices}
+\subsection{Texture Memory Unit and Matrices}\label{Matrices}
 
-\keyword{TMU} is the \vc{} component that enables \qpu{} to directly access data from the shared RAM. We just have to pass data pointer from the \emph{VC CPU Bus Addresses} in some \keyword{uniforms} variables to load the values containing at this address.
+\emph{pi-gemm} introduced \keyword{TMU}, a new crucial component of \vc{} and how to use matrices. \keyword{TMU} enables \qpu{} to directly access data from the \ram{}. We just have to pass data pointer from the \emph{VC CPU Bus Addresses} in some \keyword{uniforms} variables to load the values containing at this address.
 
-For instance, matrices which are stored in the shared RAM can be accessed knowing the pointer of the first element. I also noticed that matrices are stored in \emph{row-major} order (Figure~\ref{rowcolumnarrays}). That means row values are contiguous in shared RAM memory. This is a \keyword{key point} to know because frames from the \rasp{} camera are stored as \option{float-matrices} in memory and to compute the \keyword{optical flow} we have to access data from those frames.
+For instance, matrices which are stored in the \ram{} can be accessed knowing the pointer of the first element. I also noticed that matrices are stored in \emph{row-major} order (Figure~\ref{rowcolumnarrays}). That means row values are contiguous in \ram{} memory. This is a \keyword{key point} to know because frames from the \rasp{} camera are stored as \option{float-matrices} in memory and to compute the \flow{} we have to access data from those frames.
 
 \begin{figure}[!htbp]
 	\centering
@@ -534,28 +536,61 @@ My goal while studying \file{pi-gemm} project was to create a standard framework
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=0.4\textwidth,scale=0.2]{projectArchitecture}
-	\caption{project Architecture}
+	\caption{Standard Framework Project Architecture}
 	\label{projectArchitectureFigure}
 \end{figure}
 \FloatBarrier
 
+
 \subsubsection{qpu-asm}
 
-I included the \file{qpu-asm.cpp} \keyword{assembly parser} from \file{pi-gemm}. I used it the same way as \file{assembler.cpp}. It is more comprhensive because it features more instructions of the \vc.
+This directory contains 3 files: \file{qpu-asm.cpp}, \file{Makefile}, and \file{qpu-asm}.
 
-\subsubsection{include}
+\file{qpu-asm.cpp} is the \keyword{assembly parser} from \file{pi-gemm} written by Pete \textsc{Warden}. It is more comprhensive because it features more instructions of the \vc.
 
-I included \keyword{mailbox} source code directly in this directory for more software portabilty.
+\lstset{language=make,caption={},captionpos=t,label=}
+\begin{lstlisting}
+qpu-assembler: assemble.cpp
+	g++ -g -o qpu-assembler assemble.cpp
+\end{lstlisting}
+
+Run the \code{make} command will generate \file{qpu-asm}, an \keyword{executable} file and then:\\
+\code{./qpu-asm -o projectName.bin < projectName.asm}
+
+
+\subsubsection{Include}
+
+This directory contains 4 files: \file{qpu.h}, \file{qpu.c}, \file{mailbox.h} and \file{mailbox.c}.
+Those files are included into the \emph{Raspbian Stretch Lite} distribution and allow us to use the \mail{} interface to communicate between \vc{} and \cpu.
+
+I included \mail{} source code directly in this directory for more software portabilty.
 
 \subsubsection{projectName}
 
 \file{projectName} directory contains:
 \begin{itemize}
 	\item \file{project.asm}/\file{project.bin} -- \code{code-to-execute} on \vc.
-	\item \file{projectName\_driver.h}/\file{projectName\_driver.c} -- \keyword{GPU} driver that map memory, send data and code etc \ldots
-	\item \file{main.c} -- invoke functions from \file{projectName\_driver.c} to run calculs in \vc.
-	\item \file{Makefile} -- generic \file{Makefile} that generate an \keyword{executable}.
+	\item \file{projectName\_driver.h}/\file{projectName\_driver.c} -- \keyword{GPU} driver that contains functions to map memory, send data and code to \vc{} etc \ldots
+	\item \file{main.c} -- invoke functions from \file{projectName\_driver.c} to run \code{code-to-execute} on \vc.
+	\item \file{Makefile} -- generic \file{Makefile} that generates an \keyword{executable} called \file{projectName} - Appendice~\ref{AppendixF}.
 \end{itemize}
+
+
+\subsubsection{Run project}
+\lstset{language=make,caption={},captionpos=t,label=}
+\begin{lstlisting}
+cd qpu-asm
+make qpu-asm
+cd projectName
+make
+sudo ./projectName
+\end{lstlisting}
+
+
+\subsubsection{Project Examples}
+
+Once my standard framework was running good, I started developping several little project to run on the \rasp.
+
 %----------------------------------------------------------------------------------------
 
 \section{Other Tasks}\label{FillingFile}
@@ -576,3 +611,4 @@ Since I developped on \rasp{}, I started using \emph{Vim} editor. Nicolas \texts
 
 \section{Conclusion}\label{Conclusion2}
 
+I was more confortable to deal with my internship subject.

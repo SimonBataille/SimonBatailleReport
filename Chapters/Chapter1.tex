@@ -13,12 +13,17 @@
 \newcommand{\code}[1]{\texttt{\hl{#1}}}
 \newcommand{\file}[1]{\texttt{\bfseries#1}}
 \newcommand{\option}[1]{\texttt{\itshape#1}}
-\newcommand{\iBubble}{\textcolor{mdtRed}{\textsc{iBubble}}}
-\newcommand{\rasp}{\textcolor{mdtRed}{\textsc{Raspberry Pi}}}
-\newcommand{\vc}{\textcolor{mdtRed}{\textsc{VideoCore iv 3d}}}
-\newcommand{\cpu}{\textcolor{mdtRed}{\textsc{arm cpu}}}
-\newcommand{\bcm}{\textcolor{mdtRed}{\textsc{bcm2837}}}
+\newcommand{\iBubble}{\textsc{iBubble}}
+\newcommand{\rasp}{\textsc{Raspberry Pi}}
+\newcommand{\vc}{\textsc{VideoCore iv 3D}}
+\newcommand{\cpu}{\textsc{arm cpu}}
+\newcommand{\bcm}{\textsc{bcm2837}}
 \newcommand{\qpu}{\textsc{qpu}}
+\newcommand{\flow}{\textsc{optical flow}}
+\newcommand{\feat}{\textsc{feature}}
+\newcommand{\api}{\textsc{api}}
+\newcommand{\ram}{\textsc{shared ram}}
+\newcommand{\mail}{\textsc{mailbox}}
 
 %----------------------------------------------------------------------------------------
 
@@ -44,7 +49,7 @@ The objective of \groupname{} is to develop and sell an \emph{autonomous} and \e
 A live video feedback is also available on \iBubble. In this mode, a cable link between the drone and the user enables the video feedback on a smartphone and users can explore unknown spots before diving.\\
 
 
-In addition to this \keyword{BtC} sector, \iBubble{} is suitable for a large range of \keyword{BtB} applications. Indeed, it can integrate multiple specific features for companies that have real needs in underwater inspection such as dam, harbor or simply ship's hull. Thanks to its \emph{autonomous} ability, it will be able to verify the good shape of a concrete wall for example and provides videos of its inspection.
+In addition to this \keyword{BtC} sector, \iBubble{} is suitable for a large range of \keyword{BtB} applications. Indeed, it can integrate multiple specific feat{}s for companies that have real needs in underwater inspection such as dam, harbor or simply ship's hull. Thanks to its \emph{autonomous} ability, it will be able to verify the good shape of a concrete wall for example and provides videos of its inspection.
 
 %----------------------------------------------------------------------------------------
 
@@ -65,7 +70,7 @@ The diver is outfitted with a remote control that is an \emph{acoustic} emitter 
 
 \iBubble{} has two cameras at his disposal: one to record the diving session (generally a \emph{GoPro} camera) and another one to capture frames used in the computer vision part. This camera is generally a cheaper camera with a low resolution. When \iBubble{} is opposite the diver it can detect the position more precisely thanks to several algorithms running on the embedded board.
 
-The vision system is globally composed of two parts: a \emph{machine learning detector} to lock the position of the diver and a \emph{tracker} to follow him between two frames of the video. The bulk of complexity is to compute the \keyword{optical flow} for the \emph{tracking} algorithm and in Forward Propagation of a Convolutional Neural Network for the \emph{detector} algorithm.
+The vision system is globally composed of two parts: a \emph{machine learning detector} to lock the position of the diver and a \emph{tracker} to follow him between two frames of the video. The bulk of complexity is to compute the \flow{} for the \emph{tracking} algorithm and in Forward Propagation of a Convolutional Neural Network for the \emph{detector} algorithm.
 
 %----------------------------------------------------------------------------------------
 
@@ -106,24 +111,24 @@ Camille's job was to work on:
 
 \begin{itemize}
 	\item \emph{Machine Learning} algorithm for the \emph{detector}
-	\item \keyword{optical flow} computation -- part of \keyword{CMT} algorithm -- for the \emph{tracker}
+	\item \flow{} computation -- part of \keyword{CMT} algorithm -- for the \emph{tracker}
 \end{itemize}
 
 Indeed, before implementing these algorithms on the \vc, it was crucial that \groupname{} has its own implementation of them. Currently all the vision system is coded in \keyword{C++} and uses libraries such as \emph{OpenCV}. Camille had to work on these algorithms with the technologies, libraries, frameworks that fit the best the problem, namely processing parts of these algorithms on the \vc{} in order to release some \keyword{CPU} ressources.
 
-In a first time he has to study and understand the popular implementations of the \keyword{optical flow} algorithms, create a state-of-the-art document of these algorithms. Then he suggests an optimized implementation for the chosen method. This implementation must be highly parallelizable in order to use the \vc. At this stage, wa have to communicate together so that I understand how the \vc{} can be helpful for the implementation of the \keyword{optical flow} algorithm.
+In a first time he has to study and understand the popular implementations of the \flow{} algorithms, create a state-of-the-art document of these algorithms. Then he suggests an optimized implementation for the chosen method. This implementation must be highly parallelizable in order to use the \vc. At this stage, wa have to communicate together so that I understand how the \vc{} can be helpful for the implementation of the \flow{} algorithm.
 
-Next this algorithm needs to be test in simulation and real conditions on the \rasp. This step is fundamental to estimate the gain and loss in quality and computing time compared to the current solution. Finally the last part is to implement it on the drone system and test the whole vision system with the new \keyword{optical flow} algorithm.
+Next this algorithm needs to be test in simulation and real conditions on the \rasp. This step is fundamental to estimate the gain and loss in quality and computing time compared to the current solution. Finally the last part is to implement it on the drone system and test the whole vision system with the new \flow{} algorithm.
 
 
 \subsubsection{API for the \textsc{VideoCore IV 3D GPU}}
 
-Personnaly I had to study and understand the \vc{}. The goal was to create an homemade \keyword{API} accessible from a high-level language such as \keyword{C++}. This \keyword{API} was to provide basic functions to run computations of the \keyword{optical flow} algorithm on the \vc{} in order to achieve a real time performance and relieve the \keyword{CPU}.
+Personnaly I had to study and understand the \vc{}. The goal was to create an homemade \keyword{API} accessible from a high-level language such as \keyword{C++}. This \keyword{API} was to provide basic functions to run computations of the \flow{} algorithm on the \vc{} in order to achieve a real time performance and relieve the \keyword{CPU}.
 
 Due to the growing popularity of the \rasp{}, \keyword{\textsc{Broadcom}} released an official \vc{} architecture reference guide\footnote{\vc{} Documentation: \url{https://docs.broadcom.com/docs/12358545}}, but without any official \keyword{API}.
 
-As a conseqence, the main questions for me was to study the architecture and understand how to use the \vc{}, then understand the \keyword{optical flow} algorithm and implement an optimized and parallelized version running on the \vc{}.
+As a conseqence, the main questions for me was to study the architecture and understand how to use the \vc{}, then understand the \flow{} algorithm and implement an optimized and parallelized version running on the \vc{}.
 
-Camille and I worked in parallel but we had to coordinate ourselves in order to develop the dedicated functions. Camille had to specify the needs for the \keyword{optical flow} algorithm (what kind of computations such as a convolution, gradient or interpolation functions etc.) and I have to adapt the \keyword{API} to integrate these functions on a program running of the \vc.
+Camille and I worked in parallel but we had to coordinate ourselves in order to develop the dedicated functions. Camille had to specify the needs for the \flow{} algorithm (what kind of computations such as a convolution, gradient or interpolation functions etc.) and I have to adapt the \keyword{API} to integrate these functions on a program running of the \vc.
 
 %----------------------------------------------------------------------------------------

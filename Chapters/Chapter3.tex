@@ -17,17 +17,17 @@
 
 \section{Problematics}
 
-As I said in the previous parts, \iBubble{} includes a visual tracking system, \keyword{CMT}, to \emph{autonomously} follow divers underwater. This system currently uses \emph{openCV} libraries at a rate of \textbf{30 fps}. This speed can be improved using \emph{CUDA} technology. These features are only available on \keyword{BtB} versions of \iBubble{} fitted with \emph{Nvidia's Jetson embedded board}.
+As I said in the previous parts, \iBubble{} includes a visual tracking system, \keyword{CMT}, to \emph{autonomously} follow divers underwater. This system currently uses \emph{openCV} libraries at a rate of \textbf{30 fps}. This speed can be improved using \emph{CUDA} technology. These feat{}s are only available on \keyword{BtB} versions of \iBubble{} fitted with \emph{Nvidia's Jetson embedded board}.
 
 \keyword{BtC} versions of the drone uses \rasp{} in spite of the current \emph{Nvidia Graphics Card} wich means that \emph{CUDA} is no longer available because \vc{} is not designed with this technology.
 
 As a consequence, \vc{} is not used so the whole tracking system is running only on the \cpu{} and the system rate drops to \textbf{7 fps}.
 
-The more time-consuming part of the \keyword{CMT} is the \keyword{optical flow} computation. This is a fundamental tracking algorithm in Computer Vision. It uses \keyword{Gradient Descent} and \keyword{Pyramid} algorithms to get the displacement of the points of interest between two frames.
+The more time-consuming part of the \keyword{CMT} is the \flow{} computation. This is a fundamental tracking algorithm in Computer Vision. It uses \keyword{Gradient Descent} and \keyword{Pyramid} algorithms to get the displacement of the points of interest between two frames.
 
-Therefore if we want to use the computing power of the \vc{}, it is compulsory to make our own implementation of the \keyword{optical flow} on \rasp, that was my internship subject.
+Therefore if we want to use the computing power of the \vc{}, it is compulsory to make our own implementation of the \flow{} on \rasp, that was my internship subject.
 
-The main difficulty is that there is no official \keyword{API} released by \textsc{Broadcom}. To compute the \keyword{optical flow} on \rasp, it was to necessary to follow the same steps as in Chapter~\ref{Chapter2}, namely:
+The main difficulty is that there is no official \keyword{API} released by \textsc{Broadcom}. To compute the \flow{} on \rasp, it was to necessary to follow the same steps as in Chapter~\ref{Chapter2}, namely:
 \begin{itemize}
 	\item write \code{code-to-execute} on \keyword{GPU} -- in \option{assembly language}
 	\item parse this \code{code-to-execute} with \keyword{assembly parser} -- \file{qpu-asm.cpp}
@@ -41,20 +41,20 @@ The main difficulty is that there is no official \keyword{API} released by \text
 
 \subsection{Definition}
 
-Within \iBubble{} visual tracking system - \keyword{CMT} - \keyword{optical flow} is the displacement of points of interest - called \keyword{features} - between two consecutive frames from a video.
+Within \iBubble{} visual tracking system - \keyword{CMT} - \flow{} is the displacement of points of interest - called \feat{}s - between two consecutive frames from a video.
 
 Computing \emph{optical flow} between two consecutive frames involves the following steps:
 \begin{itemize}
-	\item detect \keyword{features} on first image -- Figure~\ref{initFeaturesFig}
-	\item find the next \keyword{features} positions on the second image -- Figure~\ref{secondFeaturesFig}
-	\item compute \emph{displacemnt} for each \keyword{features} -- Figure~\ref{opticalFlowFig}
+	\item detect \feat{}s on first image -- Figure~\ref{initFeaturesFig}
+	\item find the next \feat{}s positions on the second image -- Figure~\ref{secondFeaturesFig}
+	\item compute \emph{displacemnt} for each \feat{}s -- Figure~\ref{opticalFlowFig}
 \end{itemize}
 
 
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=0.5\textwidth]{plongeurInitFeatures}
-	\caption{First frame of a diving video with the initial set of features}
+	\caption{First frame of a diving video with the initial set of \feat{}s}
 	\label{initFeaturesFig}
 \end{figure}
 \FloatBarrier
@@ -64,7 +64,7 @@ Computing \emph{optical flow} between two consecutive frames involves the follow
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=0.5\textwidth]{plongeurNextFeatures}
-	\caption{Second frame of a diving video with new features positions}
+	\caption{Second frame of a diving video with new \feat{}s positions}
 	\label{secondFeaturesFig}
 \end{figure}
 \FloatBarrier
@@ -74,12 +74,12 @@ Computing \emph{optical flow} between two consecutive frames involves the follow
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=0.5\textwidth]{plongeurOpticalFlow}
-	\caption{Optical flow for the initial set of features -- \small{norm of the \textcolor{blue}{blue vectors} is overstated for better visualization}}
+	\caption{Optical flow for the initial set of \feat{}s -- \small{norm of the \textcolor{blue}{blue vectors} is overstated for better visualization}}
 	\label{opticalFlowFig}
 \end{figure}
 \FloatBarrier
 
-\emph{Optical flow} can be viewed as a \emph{vector field} representing \keyword{features} displacement between two consecutive frames. It is used to do object recognition, tracking or movement detection. In \iBubble, \emph{optical flow} is compute within \keyword{CMT} to achieve diver \emph{autonomous tracking and following}.\par
+\emph{Optical flow} can be viewed as a \emph{vector field} representing \feat{}s displacement between two consecutive frames. It is used to do object recognition, tracking or movement detection. In \iBubble, \emph{optical flow} is compute within \keyword{CMT} to achieve diver \emph{autonomous tracking and following}.\par
 
 
 \subsection{Images encoding}
@@ -109,7 +109,7 @@ pixel_{239,0} & \ldots & \ldots  & \ldots & \ldots & pixel_{239,359}
 \end{figure}
 \FloatBarrier
 
-Moreover, \keyword{optical flow} algorithm uses \emph{grayscale} images:
+Moreover, \flow{} algorithm uses \emph{grayscale} images:
 
 \begin{itemize}
 	\item each $pixel_{x,y}$ is encoded as \option{32-bit float}
@@ -171,7 +171,7 @@ As a result to access particular $pixel_{x,y}$ value with the \qpu, we must pass
 	\item $y$ -- pixel coloumn number
 \end{itemize}
 
-Within a frame, a \keyword{feature} is a specific $pixel$ with specific $(x,y)$ numbers (Figure~\ref{frameFig}). To know the \option{32-bit float value} of $feature_{x,y}$, we must pass those 3 parameters to the \keyword{TMU}.
+Within a frame, a \feat{} is a specific $pixel$ with specific $(x,y)$ numbers (Figure~\ref{frameFig}). To know the \option{32-bit float value} of $feature_{x,y}$, we must pass those 3 parameters to the \keyword{TMU}.
 
 
 \subsection{Parameters, Notations and Expected Outcomes}
@@ -179,7 +179,7 @@ Within a frame, a \keyword{feature} is a specific $pixel$ with specific $(x,y)$ 
 
 \subsubsection{Parameters}
 
-Before invoking the \keyword{optical flow} computation, the \emph{tracking system} must provide three parameters to the \vc:
+Before invoking the \flow{} computation, the \emph{tracking system} must provide three parameters to the \vc:
 
 \begin{itemize}
 	\item first frame data -- must be a pointer to the first pixel $\textcolor{blue}{firstFrame_{0,0}}$
@@ -198,28 +198,28 @@ A pixel from window in firstFrame will be noted $\textcolor{blue}{firstWindow_{x
 A pixel from window in secondFrame will be noted $\textcolor{red}{secondWindow_{x,y}}$.\\
 A feature \keyword{row number} will be noted $\textcolor{blue}{x_{1}}$ on \textcolor{blue}{firstFrame} and $\textcolor{red}{x_{2}}$ on \textcolor{red}{secondFrame}.\\
 A feature \keyword{column number} will be noted $\textcolor{blue}{x_{1}}$ on \textcolor{blue}{firstFrame} and $\textcolor{red}{x_{2}}$ on \textcolor{red}{secondFrame}.\\
-Finally, the \keyword{same feature} will be noted $feature_{\textcolor{blue}{x_{1},y_{1}}}$ on \textcolor{blue}{firstFrame} and $feature_{\textcolor{red}{x_{1},y_{1}}}$ on \textcolor{red}{secondFrame}.
+Finally, the \keyword{same feature} will be noted $feature_{\textcolor{blue}{y_{1},y_{1}}}$ on \textcolor{blue}{firstFrame} and $feature_{\textcolor{red}{x_{1},y_{1}}}$ on \textcolor{red}{secondFrame}.
 
 \subsubsection{Expected Outcomes}
 
-The expected results of the \keyword{optical flow} algorithm are written Figure~\ref{framesWindowFig}. For each \keyword{feature}, the \vc{} must compute:
+The expected results of the \flow{} algorithm are written Figure~\ref{framesWindowFig}. For each \feat{}, the \vc{} must compute:
 \begin{itemize}
-	\item \textbf{$d_{x}$} -- the feature displacement along the row axis measured in pixel
-	\item \textbf{$d_{y}$} -- the feature displacement along the column axis measured in pixel
+	\item \textbf{$d_{x}$} -- the feature displacement along the row axis measured in pixel: $\textcolor{red}{x_{2}}-\textcolor{blue}{x_{1}}$
+	\item \textbf{$d_{y}$} -- the feature displacement along the column axis measured in pixel: $\textcolor{red}{y_{2}}-\textcolor{blue}{y_{1}}$
 \end{itemize}
 
-So the \keyword{optical flow} program will return a \file{float} $displacementsArray[2][30]$ containing:
+So the \flow{} program will return a \file{float} $displacementsArray[2][30]$ containing:
 \begin{itemize}
 	\item 30 $d_{x}$ \option{float values} -- one for each feature
 	\item 30 $d_{y}$ \option{float values} -- one for each feature
 \end{itemize}
 
-This is the \keyword{optical flow} between two consecutive frames for 30 \keyword{features}.
+This is the \flow{} between two consecutive frames for 30 \feat{}s.
 
 
 \subsubsection{Summary}
 
-To summarize the \keyword{optical flow} computation between two consecutive frames for each feature on \vc:
+To summarize the \flow{} computation between two consecutive frames for each feature on \vc:
 \begin{itemize}
 	\item inputs:
 		\begin{itemize}
@@ -242,19 +242,19 @@ To summarize the \keyword{optical flow} computation between two consecutive fram
 
 \section{Lucas-Kanade method}
 
-There are several ways to compute \keyword{optical flow}. Camille selected \keyword{Lucas-Kanade} method to be implemented on \vc.
+There are several ways to compute \flow{}. Camille selected \keyword{Lucas-Kanade} method to be implemented on \vc.
 
-The \emph{vision tracking} algorithm detects \keyword{30 features} on each frame from the camera. Thus, our \emph{homemade} algorithm must compute \keyword{optical flow} for these 30 features between two consecutive frames.
+The \emph{vision tracking} algorithm detects \keyword{30} feat{}s on each frame from the camera. Thus, our \emph{homemade} algorithm must compute \flow{} for these 30 feat{}s between two consecutive frames.
 
-Although there are 30 features, I will present the Lucas-Kanade method for one \keyword{feature}, $feature_{x,y}$. The processing is the same for the rest of the features.
+Although there are 30 feat{}s, I will present the Lucas-Kanade method for one \feat{}, $feature_{x,y}$. The processing is the same for the rest of the feat{}s.
 
 For the rest of this section, keep in mind Figure~\ref{framesWindowFig}.
 
 \subsection{First Frame Processing}
 
-When \vc{} gets $firstFrame_{0,0}$, \file{int} $featuresArray[2][30]$ and $secondFrame_{0,0}$ he starts processing the first frame.
+When \vc{} gets $\textcolor{blue}{firstFrame_{0,0}}$, \file{int} $featuresArray[2][30]$ and $\textcolor{red}{secondFrame_{0,0}}$ he starts processing the first frame.
 
-The goal is to get 4 values per \keyword{feature}:
+The goal is to get 4 values per \feat{}:
 \begin{itemize}
 	\item $G_{XX}$ -- vertical gradient of the feature
 	\item $G_{YY}$ -- horizontal gradient of the feature
@@ -262,7 +262,7 @@ The goal is to get 4 values per \keyword{feature}:
 	\item $det = \frac{1}{G_{XX}G_{YY}-G_{XY}G_{XX}}$
 \end{itemize}
 
-As shown in Figure~\ref{framesWindow}, we use a $21\times21$ \option{pixel window} around the feature:
+As shown in Figure~\ref{framesWindowFig}, we use a $21\times21$ \option{pixel window} around the feature:
 
 $$G_{XX} = \sum_{i=1}^{21}\sum_{j=1}^{21} grad_{x}[i,j]^{2}$$
 $$G_{YY} = \sum_{i=1}^{21}\sum_{j=1}^{21} grad_{y}[i,j]^{2}$$
@@ -296,29 +296,98 @@ To compute the feature displacement, we use the following algorithm:
 \end{figure}
 \FloatBarrier
 
-Within the displacement algorithm, $secondWindow_{i+d_{x},j+d_{y}}$ is a \emph{bilinear interpolation}:
+The algorithm Figure~\ref{algoFig} is running several times to have a better precision on $d_{x}$ and $d_{y}$ values. Each time, we reinject previous $d_{x}$ and $d_{y}$ to compute $\textcolor{red}{secondWindow_{i+d_{x},j+d_{y}}}$. Results analysis shows that for a little feature displacement, 5 times is enough to have better precision than \emph{OpenCV} function.\\
+
+
+Within the displacement algorithm, $\textcolor{red}{secondWindow_{i+d_{x},j+d_{y}}}$ is a \emph{bilinear interpolation}:
+
 \begin{figure}[!htbp]
 \begin{equation*}
 	\begin{split}
 		secondWindow_{i+d_{x},j+d_{y}} = secondWindow_{floor(i+d_{x}),floor(j+d_{y})}\times (1-fract(i+d_{x}))\times (1-fract(i+d_{y}))\\
 		+ secondWindow_{floor(i+d_{x})+1,floor(j+d_{y})}\times (fract(i+d_{x}))\times (1-fract(i+d_{y}))\\
 		+ secondWindow_{floor(i+d_{x}),floor(j+d_{y})+1}\times (1-fract(i+d_{x}))\times (fract(i+d_{y}))\\
-		+ secondWindow_{floor(i+d_{x})+1,floor(j+d_{y})+1}\times (fract(i+d_{x}))\times (fract(i+d_{x}))
+		+ secondWindow_{floor(i+d_{x})+1,floor(j+d_{y})+1} \times (fract(i+d_{x}))\times (fract(i+d_{x}))
 	\end{split}
 \end{equation*}
-\caption{Bilinear interpolation within secondWindow}
+\caption{Bilinear interpolation within second frame window}
 \label{BIPFig}
 \end{figure}
 \FloatBarrier
 
 The \emph{bilinear interpolation} Figure~\ref{BIPFig} was though to achieve with the \vc{} because it needs \option{floor} and \option{fractional functions} that are not native in this \keyword{GPU}. To do so I used \code{ftoi}, \code{itof}, and \code{fsub} functions Figure~\ref{VCinstructionsFigure}.
 
-The algorithm Figure~\ref{algoFig} is running several times to have a better precision on $d_{x}$ and $d_{y}$ values. Each time, we reinject previous $d_{x}$ and $d_{y}$ to compute $secondWindow_{i+d_{x},j+d_{y}}$. Results analysis shows that for a little feature displacement, 5 times is enough to have better precision than \emph{OpenCV} function.
 
-Camille detailed me those algorithm on a big white board (Appendice~\ref{AppendixB}) and implemented them in \keyword{C++}. Then it was easier for me to translate them into \option{assembly language}.
+Camille detailed me those algorithm on a big white board (Appendice~\ref{AppendixA}) and implemented them in \keyword{C++}. Then it was easier for me to translate them into \option{assembly language}.
 
+%----------------------------------------------------------------------------------------
+
+\section{Current Solution \& testing framework}
+
+\subsection{Current Solution}
+
+The \flow{} computation is used within the \keyword{CMT} algorithm for \iBubble's \emph{visual tracking system}. Currently, the tracking system invokes an \emph{OpenCV} function: \code{calcOpticalFlowPyrLK()}.
+
+The main objective of Camille and I's internships was to write an homemade \code{calcOpticalFlowPyrLK()} function that invokes the \vc{} to parallelize some computing tasks and so, free resources of \cpu. In our homemade \keyword{API} the name of this function is \code{compute\_lk\_gpu()}.
+
+
+\subsection{Testing framework}
+
+Camille provided me a comprehensive testing environment to test my \keyword{API}. It was a whole \keyword{C++} project using \keyword{CMake} program. The project name was \file{optical\_flow\_internship} and I just had to \code{clone} this project from the \file{gitHub} platform. To run the project I followed the standard \code{CMake} procedure:
+
+
+\lstset{language=make,caption={CMake for optical\_flow\_internship framework},label=}
+
+\begin{lstlisting}
+cd optical_flow_internship
+mkdir build && cd build
+cmake..
+make
+sudo ./optical_flow_internship /path_to_video_sample
+\end{lstlisting}
+
+\code{cmake ..} followed by \code{make} generates \file{optical\_flow\_internship}, an \keyword{executable} file that takes a path to a \emph{video\_sample}. The program computes the \flow{} between each consecutive frames of the sample until the end of the video. The sample was an underwater video from \iBubble. Figures~\ref{initFeaturesFig} to ~\ref{opticalFlowFig} are fames from this sample.
+
+In this framework, 3 \file{files} concerne my \api{}:
+\begin{itemize}
+	\item \file{opt\_flow\_lk.cpp} -- where I write \code{compute\_lk\_gpu()}.
+	\item \file{opt\_flow\_video.cpp} -- where \code{compute\_lk\_gpu()} is invoked.
+	\item \file{main.cpp} -- the \code{main} program that process the \emph{video\_sample}.
+\end{itemize}
+
+\lstset{style=CStyle,caption={Select between OpenCV and \vc},label=selectList}
+
+\begin{lstlisting}
+if (this->use_opencv_lk_)
+{
+	calcOpticalFlowPyrLK(prev_gray, gray, points[0], points[1], status,
+        this->max_iterations_, cpt);
+}
+else if (this->use_lk_gpu_)
+{
+	this->estim_flow.compute_lk_gpu(prev_gray, gray, points[0], points[1], status,
+	this->max_iterations_, cpt);
+}
+\end{lstlisting}
+
+Listing~\ref{selectList} taken from \file{opt\_flow\_video.cpp} shows how we can choose between \code{calcOpticalFlowPyrLK()} and \code{compute\_lk\_gpu()} to compute \flow.
+
+Both functions takes the same input parameters:
+\begin{itemize}
+	\item \keyword{prev\_gray} -- firstFrame
+	\item \keyword{gray} -- secondFrame
+	\item \keyword{points[0]} -- array containing 30 initial \feat{}s (x,y) positions
+	\item \keyword{points[1]} -- array containing 30 (dx, dy) displacements
+	\item \keyword{status} -- parameter needed for the rest of the tracking
+	\item \keyword{max\_iterations} -- number of times that displacement algorithm is invoked
+	\item \keyword{cpt} -- number of frame in the \emph{video\_sample}
+\end{itemize}
 %----------------------------------------------------------------------------------------
 
 \section{Implementation on \vc}
 
-%----------------------------------------------------------------------------------------
+\subsection{Architecture}
+
+I followed the same method as in the previous part to develop the \api.
+
+\subsection{invoke GPU function}

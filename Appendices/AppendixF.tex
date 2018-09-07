@@ -1,0 +1,48 @@
+% Appendix F
+
+\chapter{Generic Makefile} % Main appendix title
+
+\label{AppendixF} % For referencing this appendix elsewhere, use \ref{AppendixB}
+
+\lstset{language=make,caption={},captionpos=t,label=}
+
+\begin{lstlisting}
+CC = gcc
+CFLAGS=-W -Wall -pedantic
+LDFLAGS = -ldl
+EXEC = projectName
+INC = -I../Include
+XCCSRCS = $(shell find ../Include -name '*.c')
+SRC= $(wildcard *.c)
+OBJ = $(SRC:.c=.o)
+
+
+all: $(EXEC)
+
+$(EXEC): $(OBJ)
+	$(CC) -g -O3 -o $@ $^ $(XCCSRCS) $(LDFLAGS)
+
+
+%.o: %.c
+	$(CC) -o $@ -c $< $(INC) $(CFLAGS)
+
+
+$(EXEC).bin: $(EXEC).asm
+	m4 $< | ../qpu-asm/qpu-asm -o $@
+
+
+$(EXEC).cdat: $(EXEC).asm helpers.asm
+	m4 $< | ./qpu-asm -o $(EXEC).cdat -c g_$(EXEC)Code
+
+
+.PHONY: clean mrproper check
+
+clean:
+	rm -rf *.o
+
+mrproper: clean
+	rm -rf $(EXEC)
+\end{lstlisting}
+
+
+This Makefile is generic and can be use for each project just by changing the \emph{EXEC} variable.
