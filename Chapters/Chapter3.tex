@@ -388,6 +388,15 @@ Both functions takes the same input parameters:
 
 \subsection{Architecture}
 
-I followed the same method as in the previous part to develop the \api.
-
 \subsection{invoke GPU function}
+I followed the same method as in the previous part~\ref{GPUconclusion} invoke GPU.
+
+My driver (grad.c) will:
+\begin{itemize}
+	\item initialize \qpu{}s
+	\item map the \ram
+	\item copy code and data (frames 1 and 2 and featuresArray) in \ram
+	\item send code pointer and \uni{}s
+	\item get back the results
+\end{itemize}
+

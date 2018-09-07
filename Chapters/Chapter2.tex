@@ -144,7 +144,7 @@ Appendice~\ref{AppendixC} taken from \parencite{refVC} shows an architecture ove
 
 \cpu{} and \vc{} communicate through \keyword{AXI ARB} bus. Within \file{helloworld} program, we will use \cpu{} to:
 \begin{itemize}
-	\item initialize and allocate \ram{} in the \keyword{ARM Virtual Adresses} (Appendice~\ref{AppendixB})
+	\item initialize and allocate \ram{} in both \keyword{ARM Virtual Adresses} and \keyword{ARM Virtual Adresses} (Appendice~\ref{AppendixB})
 	\item transfer variables to the \keyword{QUC}
 	\item transfer code-to-execute to the \keyword{QIC}
 	\item execute code with \keyword{QPU}
@@ -368,15 +368,21 @@ struct memory_map {
     }
 
     unsigned ptr = mem_lock(mb, handle);
+    void *arm\_ptr = mapmem(BUS\_TO\_PHYS(ptr + host.mem\_map), size);
 \end{lstlisting}
 
 -- Initialize the \mail{} interface and send a message to enable the \qpu{} with the \code{qpu\_enable()} \mail{}'s function\\
 -- We allocate and lock GPU memory with \code{mem\_alloc()} \mail{}'s function\\
 -- \emph{ptr} is now the base Bus Address of the GPU memory mapping\\
 -- \emph{ptr} is located inside \emph{VC CPU BUS Addresses} (Appendice~\ref{AppendixB})\\
+-- Last line is a \keyword{key step} in our driver. Keep in mind that \vc{} is an \cpu{} peripheral so, to bind both \emph{VC CPU BUS Addresses} and \emph{ARM Virtual Addresses} we use both \code{mapmem() \& BUS\_TO\_PHYS()} functions.\\
+-- Now we have two addresses (Appendice~\ref{AppendixB}) to refer to the memory:
+\begin{itemize}
+	\item \emph{ptr} is address that the \vc{} understands in \emph{VC CPU Bus Addresses}. When passing pointers to \keyword{GPU} from \keyword{CPU} we need to use \keyword{ptr}.
+	\item \emph{arm\_map} is used when accessing \cpu{} memory in \emph{ARM Virtual Addresses}. This is the address that \keyword{CPU} understands.
+\end{itemize}
+-- \keyword{Physically}, \emph{ptr} and \emph{arm\_map} point on the same RAM space.
 
-\code{void *arm\_ptr = mapmem(BUS\_TO\_PHYS(ptr + host.mem\_map), size);}\\
--- Keep in mind that \vc{} is an \cpu{} peripheral. As a consequence, we first map the memory layout from \emph{ptr} into \emph{ARM Virtual Addresses} with \code{mapmem()} function\\
 
 \lstset{style=CStyle,caption={pointer arithmetic}}
 \begin{lstlisting}
@@ -391,11 +397,8 @@ struct memory_map {
     memcpy(arm_map->code, qpu_code, code_words * sizeof(unsigned int));
 \end{lstlisting}
 -- We make pointer arithmetic to create the same mapping inside \emph{VC CPU Bus Addresses} to communicate with the \keyword{GPU}\\
--- Now we have two addresses (Appendice~\ref{AppendixB}) to refer to the memory:
-\begin{itemize}
-\item \emph{ptr} is address that the \vc{} understands in \emph{VC CPU Bus Addresses}. When passing pointers to \keyword{GPU} we need to use THOSE \emph{vc\_addresses}
-\item \emph{arm\_map} is used when accessing the memory from the host \cpu. This is a valid \keyword{CPU} address
-\end{itemize}
+-- Finally we copy \code{code} in memory with \code{memcpy}. So this \code{code} will accessible by \keyword{GPU} using \emph{VC CPU BUS Addresses}: \code{vc\_code}.
+
 
 \lstset{style=CStyle,caption={Transfer uniforms, code-to-execute and execute\_qpu}}
 \begin{lstlisting}
@@ -412,7 +415,7 @@ struct memory_map {
 \end{lstlisting}
 -- To execute a \qpu{} program on the \keyword{GPU}, we pass an array of message structures \emph{vc\_msg}, through \code{execute\_qpu()} function from the \mail{} interface. This array contains:
 \begin{itemize}
-	\item First - \emph{vc\_uniforms} - a pointer to all the uniforms to bind to the QPU program
+	\item First - \emph{vc\_uniforms} - a pointer to all the \uni{}s to bind to the QPU program:
 	\begin{itemize}
 		\item \emph{uniform\_val} - 100
 		\item \emph{vc\_results} - address of \code{results[NUM\_QPU][16]} in \emph{VC CPU Bus Addresses}
@@ -435,41 +438,41 @@ struct memory_map {
 Figure~\ref{flowFigure} sums up the \file{helloworld} program execution:
 
 \begin{itemize}
-	\item We use two \keyword{uniforms} to transfer:
-		\begin{itemize}
-			\item input value - \emph{100}
-			\item results array address - \emph{results[NUM\_QPUS][16]}
-		\end{itemize}
-		from the host \cpu{} to the \emph{QPU 0,0} through the \mail{} interface (\code{execute\_qpu()} function in \file{driver.c}). These 2 uniforms will be load into \emph{QUC : Uniforms Cache}.
-	\item We also use \mail{} interface to tranfer \code{code-to-execute} to the \keyword{GPU}. \code{code-to-execute} is then load into \emph{QIC : Icache (Instructions cache)}.
+	\item We use two \uni{}s to transfer an \emph{input value} (100) and a pointer to \emph{results array address} (results[NUM\_QPUS][16]), from the host \cpu{} to the \emph{QPU 0,0}
+	\item We send them with \code{execute\_qpu()}, a \mail{} function.
+	\item These 2 uniforms will be load into \emph{QUC : Uniforms Cache}.
+	\item We also use the \mail{} to tranfer a pointer to the \code{code-to-execute} from \keyword{CPU} to \keyword{GPU}.
+	\item \code{code-to-execute} is then load into \emph{QIC : Icache (Instructions cache)}.
 	\item \emph{QPU 0,0} adds \emph{100} to \emph{0x1234}.
-	\item The result (16-word vector) is sent back to \keyword{VPM} (Vertex Pipe Memory).
-	\item The result (16-word vector) is write back from \keyword{VPM} to \ram{} memory through \keyword{DMA} transfer.
+	\item First, the result (16-word vector) is write back to \keyword{VPM} (Vertex Pipe Memory).
+	\item Then, the result (16-word vector) is write back from \keyword{VPM} to \ram{} memory through \keyword{DMA} transfer.
 \end{itemize}
 
 
-\subsection{Conclusion}
+\subsection{Conclusion}\label{GPUconclusion}
 
 This project taught me the basis of \vc{} programming and laid the groundwork for the rest of my internship. I understood that:
 \begin{itemize}
 	\item GPU and CPU share the same RAM memory - Appendice~\ref{AppendixB}
 		\begin{itemize}
-			\item CPU sends code and data in \emph{VC CPU Bus Addresses}
-			\item GPU gives back results in \emph{ARM Virtual Addresses}
+			\item CPU sends code \keyword{pointers} and variables called \uni{}s in the \emph{VC CPU Bus Addresses}
+			\item GPU gives back results in \emph{VC CPU Bus Addresses}
+			\item CPU gets results as: \emph{ARM Virtual Addresses} and \emph{VC CPU Bus Addresses} are bind together with \code{mapmem()}
 		\end{itemize}
 	\item GPU is driven by CPU program (\file{driver.c}) that:
 		\begin{itemize}
 			\item initialize GPU
 			\item map shared memory
-			\item send code and data
+			\item copy code and data in the \ram
+			\item send code pointers and variables called \uni{}s in the \emph{VC CPU Bus Addresses}
 			\item get back results
 		\end{itemize}
 	\item GPU and CPU communicate via \mail{}:
 		\begin{itemize}
 			\item \keyword{API} that uses low-level linux kernel functions
-			\item source code is available in the raspbian distribution: \code{}
+			\item source code is available in the raspbian distribution
 		\end{itemize}
-	\item GPU processor is called QPU - Appendice~\ref{AppendixD}:
+	\item GPU processor is called \qpu{} -- Appendice~\ref{AppendixD}:
 		\begin{itemize}
 			\item SIMD processors -- operates on 16-words vector
 			\item 12 QPUs on \vc
@@ -483,10 +486,12 @@ This project taught me the basis of \vc{} programming and laid the groundwork fo
 		\begin{itemize}
 			\item \code{code-to-execute} is written in \keyword{assembly language} - \file{helloworld.asm}
 			\item \code{code-to-execute} is translate into \keyword{binary} file - \file{helloworld.bin}
-			\item \code{code-to-execute} is sent to \keyword{GPU} with other variables called \code{uniforms}
+			\item \code{code-to-execute} is copied in \ram{} by the \cpu
+			\item \code{code-to-execute} pointer is sent to \keyword{GPU}
+			\item \code{variables} called \uni{}s are sent to \qpu{}
+			\item \vc{} gives back in the \emph{VC CPU Bus Addresses}
 		\end{itemize}
 \end{itemize}
-\emph{VC CPU Bus Addresses}
 To build the homemade \keyword{API} for \iBubble, I focused on:
 \begin{itemize}
 	\item improve \file{driver.c}
@@ -498,7 +503,7 @@ To build the homemade \keyword{API} for \iBubble, I focused on:
 
 %----------------------------------------------------------------------------------------
 
-\section{Standard Framework Project}
+\section{Standard Project}
 
 \subsection{\emph{pi-gemm} Project}
 
