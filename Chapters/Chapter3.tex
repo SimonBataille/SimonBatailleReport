@@ -39,6 +39,8 @@ The main difficulty is that there is no official \keyword{API} released by \text
 
 \section{Optical Flow}
 
+\subsection{Definition}
+
 Within \iBubble{} visual tracking system - \keyword{CMT} - \keyword{optical flow} is the displacement of points of interest - called \keyword{features} - between two consecutive frames from a video.
 
 Computing \emph{optical flow} between two consecutive frames involves the following steps:
@@ -72,26 +74,17 @@ Computing \emph{optical flow} between two consecutive frames involves the follow
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=0.5\textwidth]{plongeurOpticalFlow}
-	\caption{Optical flow for the initial set of features -- \small{norm of the \textcolor{blue}{blue} vectors is overstated for better visualization}}
+	\caption{Optical flow for the initial set of features -- \small{norm of the \textcolor{blue}{blue vectors} is overstated for better visualization}}
 	\label{opticalFlowFig}
 \end{figure}
 \FloatBarrier
 
 \emph{Optical flow} can be viewed as a \emph{vector field} representing \keyword{features} displacement between two consecutive frames. It is used to do object recognition, tracking or movement detection. In \iBubble, \emph{optical flow} is compute within \keyword{CMT} to achieve diver \emph{autonomous tracking and following}.\par
 
-%----------------------------------------------------------------------------------------
-
-\section{Lucas-Kanade method}
-
-There are several ways to compute \keyword{optical flow}. Camille selected \keyword{Lucas-Kanade} method to be implemented on \vc.
-
-The \emph{vision tracking} algorithm detects \keyword{30 features} on each frame from the camera. Thus, our \emph{homemade} algorithm must compute \keyword{optical flow} for these 30 features between two consecutive frames.
-
-Although there are 30 features, I will present the Lucas-Kanade method for one \keyword{feature}, $feature_{x,y}$. The processing is the same for the rest of the features.
 
 \subsection{Images encoding}
 
-As I mentioned in~\ref{Matrices}, frames from the \rasp's camera (Figures~\ref{initFeaturesFig} to ~\ref{opticalFlowFig}) are \option{row major float-matrices}. More specifically, ($240\times 360$) pixel array:
+As I mentioned in~\ref{Matrices}, frames from the \rasp's camera (Figures~\ref{initFeaturesFig} to ~\ref{opticalFlowFig}) are \option{row major float-matrices}. More specifically, a frame is a ($240\times 360$) pixel array:
 
 \begin{figure}[!htbp]
 \[
@@ -103,7 +96,7 @@ pixel_{1,0} & \ddots & \ldots & \ldots & \ldots & pixel_{1,359}\\
 
 \vdots & \ldots & \ddots & \ldots & \ldots & \vdots\\
 
-\vdots & \ldots & \ldots & feature_{x,y} & \ldots & \vdots\\
+\vdots & \ldots & \ldots & \cellcolor{yellow}{feature_{x,y}} & \ldots & \vdots\\
 
 \vdots & \ldots & \ldots & \ldots & \ddots & \vdots\\
 
@@ -122,10 +115,11 @@ Moreover, \keyword{optical flow} algorithm uses \emph{grayscale} images:
 	\item each $pixel_{x,y}$ is encoded as \option{32-bit float}
 	\item stored at @$pixel_{x,y}$ address
 	\item @$pixel_{x,y}$ is a \option{32-bit integer} -- Appendice~\ref{AppendixB}
-\end{itemize}\\~\\
+\end{itemize}
 
 
 From the shared RAM point of view, a frame is a contiguous array:
+\begin{figure}[h]
 \begin{center}
 \begin{tabular}{|c|c|c|}
 
@@ -142,13 +136,19 @@ From the shared RAM point of view, a frame is a contiguous array:
 	\vdots & \vdots & \vdots \\
 
 	\hline
-	@$pixel_{1,0}$ & @$pixel_{0,0} + 359\times 4$ & $pixel_{0,359}$ \\
+	@$pixel_{0,359}$ & @$pixel_{0,0} + 359\times 4$ & $pixel_{0,359}$ \\
 
 	\hline
-	@$pixel_{x,y}$ & @$pixel_{0,0} + 1\times 360$ & $pixel_{1,0}$ \\
+	@$pixel_{1,0}$ & @$pixel_{0,0} + 1\times 360$ & $pixel_{1,0}$ \\
 
 	\hline
-	@$pixel_{x,y}$ & @$pixel_{0,0} + 1\times 360 + 1\times 4$ & $pixel_{1,1}$ \\
+	@$pixel_{1,1}$ & @$pixel_{0,0} + 1\times 360 + 1\times 4$ & $pixel_{1,1}$ \\
+
+	\hline
+	\vdots & \vdots & \vdots \\
+
+	\hline
+	\rowcolor{yellow}@$pixel_{x,y}$ & @$pixel_{0,0} + x\times 360 + y\times 4$ & $pixel_{x,y}$ \\
 
 	\hline
 	\vdots & \vdots & \vdots \\
@@ -160,39 +160,95 @@ From the shared RAM point of view, a frame is a contiguous array:
 
 \end{tabular}
 \end{center}
+\caption{Contiguous Array in Memory}
+\end{figure}
 \FloatBarrier
 
 As a result to access particular $pixel_{x,y}$ value with the \qpu, we must pass 3 parameters to the \vc's \keyword{TMU}:
 \begin{itemize}
 	\item @$pixel_{0,0}$ -- starting address of the frame in the \emph{VC CPU Bus Addresses}
 	\item $x$ -- pixel row number
-	\item $y$ -- pixel colon number
+	\item $y$ -- pixel coloumn number
 \end{itemize}
 
 Within a frame, a \keyword{feature} is a specific $pixel$ with specific $(x,y)$ numbers (Figure~\ref{frameFig}). To know the \option{32-bit float value} of $feature_{x,y}$, we must pass those 3 parameters to the \keyword{TMU}.
 
 
-\subsection{Parameters, Notations and Expected Outcome}
+\subsection{Parameters, Notations and Expected Outcomes}
+
+
+\subsubsection{Parameters}
 
 Before invoking the \keyword{optical flow} computation, the \emph{tracking system} must provide three parameters to the \vc:
 
 \begin{itemize}
-	\item first frame data -- must be a pointer to the first pixel $firstFrame_{0,0}$
+	\item first frame data -- must be a pointer to the first pixel $\textcolor{blue}{firstFrame_{0,0}}$
 	\item 30 $feature_{x,y}$ positions -- must be a pointer to an integer array: \file{int} $featuresArray[2][30]$
-	\item second frame data -- must be a pointer to the first pixel $secondFrame_{0,0}$
+	\item second frame data -- must be a pointer to the first pixel $\textcolor{red}{secondFrame_{0,0}}$
 \end{itemize}
 
-A pixel from first frame will be noted $firstFrame_{x,y}$. A pixel from second frame will be noted $secondFrame_{x,y}$. A pixel from window in firstFrame will be noted $firstWindow_{x,y}$. A pixel from window in secondFrame will be noted $secondWindow_{x,y}$.
 
+\subsubsection{Notations}
+
+All notations are summarized on Figure~\ref{framesWindowFig}.
+
+A pixel from first frame will be noted $\textcolor{blue}{firstFrame_{x,y}}$.\\
+A pixel from second frame will be noted $\textcolor{red}{secondFrame_{x,y}}$.\\
+A pixel from window in firstFrame will be noted $\textcolor{blue}{firstWindow_{x,y}}$.\\
+A pixel from window in secondFrame will be noted $\textcolor{red}{secondWindow_{x,y}}$.\\
+A feature \keyword{row number} will be noted $\textcolor{blue}{x_{1}}$ on \textcolor{blue}{firstFrame} and $\textcolor{red}{x_{2}}$ on \textcolor{red}{secondFrame}.\\
+A feature \keyword{column number} will be noted $\textcolor{blue}{x_{1}}$ on \textcolor{blue}{firstFrame} and $\textcolor{red}{x_{2}}$ on \textcolor{red}{secondFrame}.\\
+Finally, the \keyword{same feature} will be noted $feature_{\textcolor{blue}{x_{1},y_{1}}}$ on \textcolor{blue}{firstFrame} and $feature_{\textcolor{red}{x_{1},y_{1}}}$ on \textcolor{red}{secondFrame}.
+
+\subsubsection{Expected Outcomes}
+
+The expected results of the \keyword{optical flow} algorithm are written Figure~\ref{framesWindowFig}. For each \keyword{feature}, the \vc{} must compute:
+\begin{itemize}
+	\item \textbf{$d_{x}$} -- the feature displacement along the row axis measured in pixel
+	\item \textbf{$d_{y}$} -- the feature displacement along the column axis measured in pixel
+\end{itemize}
+
+So the \keyword{optical flow} program will return a \file{float} $displacementsArray[2][30]$ containing:
+\begin{itemize}
+	\item 30 $d_{x}$ \option{float values} -- one for each feature
+	\item 30 $d_{y}$ \option{float values} -- one for each feature
+\end{itemize}
+
+This is the \keyword{optical flow} between two consecutive frames for 30 \keyword{features}.
+
+
+\subsubsection{Summary}
+
+To summarize the \keyword{optical flow} computation between two consecutive frames for each feature on \vc:
+\begin{itemize}
+	\item inputs:
+		\begin{itemize}
+			\item $\textcolor{blue}{firstFrame_{0,0}}$ pointer
+			\item $\textcolor{red}{secondFrame_{0,0}}$ pointer
+			\item \file{int} $featuresArray[2][30]$
+		\end{itemize}
+	\item outputs: \file{float} $displacementsArray[2][30]$
+\end{itemize}
 
 \begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=0.8\textwidth]{frameWindow}
-	\caption{Window arround feature within a frame}
-	\label{frameWindowFig}
+	\includegraphics[width=0.8\textwidth]{framesWindow}
+	\caption{Optical flow between \textcolor{blue}{first frame} and \textcolor{red}{second frame} for one feature}
+	\label{framesWindowFig}
 \end{figure}
 \FloatBarrier
 
+%----------------------------------------------------------------------------------------
+
+\section{Lucas-Kanade method}
+
+There are several ways to compute \keyword{optical flow}. Camille selected \keyword{Lucas-Kanade} method to be implemented on \vc.
+
+The \emph{vision tracking} algorithm detects \keyword{30 features} on each frame from the camera. Thus, our \emph{homemade} algorithm must compute \keyword{optical flow} for these 30 features between two consecutive frames.
+
+Although there are 30 features, I will present the Lucas-Kanade method for one \keyword{feature}, $feature_{x,y}$. The processing is the same for the rest of the features.
+
+For the rest of this section, keep in mind Figure~\ref{framesWindowFig}.
 
 \subsection{First Frame Processing}
 
@@ -206,18 +262,20 @@ The goal is to get 4 values per \keyword{feature}:
 	\item $det = \frac{1}{G_{XX}G_{YY}-G_{XY}G_{XX}}$
 \end{itemize}
 
-As shown in Figure~\ref{frameWindowFig}, we use a $21\times21$ \option{pixel window} around the feature:
+As shown in Figure~\ref{framesWindow}, we use a $21\times21$ \option{pixel window} around the feature:
 
 $$G_{XX} = \sum_{i=1}^{21}\sum_{j=1}^{21} grad_{x}[i,j]^{2}$$
 $$G_{YY} = \sum_{i=1}^{21}\sum_{j=1}^{21} grad_{y}[i,j]^{2}$$
 $$G_{XY} = \sum_{i=1}^{21}\sum_{j=1}^{21} grad_{x}[i,j]\times grad_{y}[i,j]$$
 
-Where, for a pixel element of the window -- $firstWindow_{i,j}$:
+Where, for a pixel element - $firstWindow_{i,j}$ -  of the window:
 $$grad_{x}[i,j] = \frac{firstWindow_{i+1,j} - firstWindow_{i-1,j}}{2}$$
 $$grad_{y}[i,j] = \frac{firstWindow_{i,j+1} - firstWindow_{i,j-1}}{2}$$
 
 
 \subsection{Displacement computation}
+
+To compute the feature displacement, we use the following algorithm:
 
 \begin{figure}[!htbp]
 \begin{algorithmic}
@@ -228,12 +286,36 @@ $$grad_{y}[i,j] = \frac{firstWindow_{i,j+1} - firstWindow_{i,j-1}}{2}$$
 	\State $frames\_mismatch.x = diff\_frames\times grad_{x}[i,j]$
 	\State $frames\_mismatch.y = diff\_frames\times grad_{y}[i,j]$
 
+	\EndFor
+
 	\State $d_{x} = det\times (G_{YY}\times frames\_mismatch.x - G_{XY}\times frames\_mismatch.y)$
 	\State $d_{y} = det\times (G_{XX}\times frames\_mismatch.y - G_{XY}\times frames\_mismatch.x)$
-
-	\EndFor
 \end{algorithmic}
+\caption{Displacement algorithm for one feature}
+\label{algoFig}
 \end{figure}
+\FloatBarrier
+
+Within the displacement algorithm, $secondWindow_{i+d_{x},j+d_{y}}$ is a \emph{bilinear interpolation}:
+\begin{figure}[!htbp]
+\begin{equation*}
+	\begin{split}
+		secondWindow_{i+d_{x},j+d_{y}} = secondWindow_{floor(i+d_{x}),floor(j+d_{y})}\times (1-fract(i+d_{x}))\times (1-fract(i+d_{y}))\\
+		+ secondWindow_{floor(i+d_{x})+1,floor(j+d_{y})}\times (fract(i+d_{x}))\times (1-fract(i+d_{y}))\\
+		+ secondWindow_{floor(i+d_{x}),floor(j+d_{y})+1}\times (1-fract(i+d_{x}))\times (fract(i+d_{y}))\\
+		+ secondWindow_{floor(i+d_{x})+1,floor(j+d_{y})+1}\times (fract(i+d_{x}))\times (fract(i+d_{x}))
+	\end{split}
+\end{equation*}
+\caption{Bilinear interpolation within secondWindow}
+\label{BIPFig}
+\end{figure}
+\FloatBarrier
+
+The \emph{bilinear interpolation} Figure~\ref{BIPFig} was though to achieve with the \vc{} because it needs \option{floor} and \option{fractional functions} that are not native in this \keyword{GPU}. To do so I used \code{ftoi}, \code{itof}, and \code{fsub} functions Figure~\ref{VCinstructionsFigure}.
+
+The algorithm Figure~\ref{algoFig} is running several times to have a better precision on $d_{x}$ and $d_{y}$ values. Each time, we reinject previous $d_{x}$ and $d_{y}$ to compute $secondWindow_{i+d_{x},j+d_{y}}$. Results analysis shows that for a little feature displacement, 5 times is enough to have better precision than \emph{OpenCV} function.
+
+Camille detailed me those algorithm on a big white board (Appendice~\ref{AppendixB}) and implemented them in \keyword{C++}. Then it was easier for me to translate them into \option{assembly language}.
 
 %----------------------------------------------------------------------------------------
 
