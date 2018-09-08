@@ -27,12 +27,12 @@ The more time-consuming part of the \keyword{CMT} is the \flow{} computation. Th
 
 Therefore if we want to use the computing power of the \vc{}, it is compulsory to make our own implementation of the \flow{} on \rasp, that was my internship subject.
 
-The main difficulty is that there is no official \keyword{API} released by \textsc{Broadcom}. To compute the \flow{} on \rasp, it was to necessary to follow the same steps as in Chapter~\ref{Chapter2}, namely:
+The main difficulty is that there is no official \api{} released by \textsc{Broadcom}. To compute the \flow{} on \rasp, it was to necessary to follow the same steps as in Chapter~\ref{Chapter2}, namely:
 \begin{itemize}
 	\item write \code{code-to-execute} on \keyword{GPU} -- in \option{assembly language}
 	\item parse this \code{code-to-execute} with \keyword{assembly parser} -- \file{qpu-asm.cpp}
 	\item write a \code{driver program} for the \keyword{CPU} -- in \option{c-language}
-	\item include this \keyword{API} in a \option{C++} project -- \keyword{CMT} is written in \option{C++}
+	\item include this \api{} in a \option{C++} project -- \keyword{CMT} is written in \option{C++}
 \end{itemize}
 
 %----------------------------------------------------------------------------------------
@@ -177,7 +177,7 @@ Within a frame, a \feat{} is a specific $pixel$ with specific $(x,y)$ numbers (F
 \subsection{Parameters, Notations and Expected Outcomes}
 
 
-\subsubsection{Parameters}
+\subsubsection{Parameters}\label{parameters}
 
 Before invoking the \flow{} computation, the \emph{tracking system} must provide three parameters to the \vc:
 
@@ -269,8 +269,8 @@ $$G_{YY} = \sum_{i=1}^{21}\sum_{j=1}^{21} grad_{y}[i,j]^{2}$$
 $$G_{XY} = \sum_{i=1}^{21}\sum_{j=1}^{21} grad_{x}[i,j]\times grad_{y}[i,j]$$
 
 Where, for a pixel element - $firstWindow_{i,j}$ -  of the window:
-$$grad_{x}[i,j] = \frac{firstWindow_{i+1,j} - firstWindow_{i-1,j}}{2}$$
-$$grad_{y}[i,j] = \frac{firstWindow_{i,j+1} - firstWindow_{i,j-1}}{2}$$
+$$grad_{x}[i,j] = \frac{\textcolor{blue}{firstWindow_{i+1,j}} - \textcolor{blue}{firstWindow_{i-1,j}}}{2}$$
+$$grad_{y}[i,j] = \frac{\textcolor{blue}{firstWindow_{i,j+1}} - \textcolor{blue}{firstWindow_{i,j-1}}}{2}$$
 
 
 \subsection{Displacement computation}
@@ -279,9 +279,9 @@ To compute the feature displacement, we use the following algorithm:
 
 \begin{figure}[!htbp]
 \begin{algorithmic}
-	\ForAll {$firstWindow_{i,j}$ and $secondWindow_{i,j}$}
+	\ForAll {$\textcolor{blue}{firstWindow_{i,j}}$ and $\textcolor{red}{secondWindow_{i,j}}$}
 
-	\State $diff\_frames = firstWindow_{i,j} - secondWindow_{i+d_{x},j+d_{y}}$
+	\State $diff\_frames = \textcolor{blue}{firstWindow_{i,j}} - \textcolor{red}{secondWindow_{i+d_{x},j+d_{y}}}$
 
 	\State $frames\_mismatch.x = diff\_frames\times grad_{x}[i,j]$
 	\State $frames\_mismatch.y = diff\_frames\times grad_{y}[i,j]$
@@ -328,16 +328,15 @@ Camille detailed me those algorithm on a big white board (Appendice~\ref{Appendi
 
 The \flow{} computation is used within the \keyword{CMT} algorithm for \iBubble's \emph{visual tracking system}. Currently, the tracking system invokes an \emph{OpenCV} function: \code{calcOpticalFlowPyrLK()}.
 
-The main objective of Camille and I's internships was to write an homemade \code{calcOpticalFlowPyrLK()} function that invokes the \vc{} to parallelize some computing tasks and so, free resources of \cpu. In our homemade \keyword{API} the name of this function is \code{compute\_lk\_gpu()}.
+The main objective of Camille and I's internships was to write an homemade \code{calcOpticalFlowPyrLK()} function that invokes the \vc{} to parallelize some computing tasks and so, free resources of \cpu. In our homemade \api{} the name of this function is \code{compute\_lk\_gpu()}.
 
 
 \subsection{Testing framework}
 
-Camille provided me a comprehensive testing environment to test my \keyword{API}. It was a whole \keyword{C++} project using \keyword{CMake} program. The project name was \file{optical\_flow\_internship} and I just had to \code{clone} this project from the \file{gitHub} platform. To run the project I followed the standard \code{CMake} procedure:
+Camille provided me a comprehensive testing environment to test my \api{} - Figure~\ref{optFlowFig}. It was a whole \keyword{C++} project using \keyword{CMake} program. The project name was \file{optical\_flow\_internship} and I just had to \code{clone} this project from the \file{gitHub} platform. To run the project I followed the standard \code{CMake} procedure:
 
 
 \lstset{language=make,caption={CMake for optical\_flow\_internship framework},label=}
-
 \begin{lstlisting}
 cd optical_flow_internship
 mkdir build && cd build
@@ -345,6 +344,7 @@ cmake..
 make
 sudo ./optical_flow_internship /path_to_video_sample
 \end{lstlisting}
+
 
 \code{cmake ..} followed by \code{make} generates \file{optical\_flow\_internship}, an \keyword{executable} file that takes a path to a \emph{video\_sample}. The program computes the \flow{} between each consecutive frames of the sample until the end of the video. The sample was an underwater video from \iBubble. Figures~\ref{initFeaturesFig} to ~\ref{opticalFlowFig} are fames from this sample.
 
@@ -355,8 +355,8 @@ In this framework, 3 \file{files} concerne my \api{}:
 	\item \file{main.cpp} -- the \code{main} program that process the \emph{video\_sample}.
 \end{itemize}
 
-\lstset{style=CStyle,caption={Select between OpenCV and \vc},label=selectList}
 
+\lstset{style=CStyle,caption={Select between OpenCV and \vc},label=selectList}
 \begin{lstlisting}
 if (this->use_opencv_lk_)
 {
@@ -370,17 +370,18 @@ else if (this->use_lk_gpu_)
 }
 \end{lstlisting}
 
+
 Listing~\ref{selectList} taken from \file{opt\_flow\_video.cpp} shows how we can choose between \code{calcOpticalFlowPyrLK()} and \code{compute\_lk\_gpu()} to compute \flow.
 
 Both functions takes the same input parameters:
 \begin{itemize}
-	\item \keyword{prev\_gray} -- firstFrame
-	\item \keyword{gray} -- secondFrame
-	\item \keyword{points[0]} -- array containing 30 initial \feat{}s (x,y) positions
-	\item \keyword{points[1]} -- array containing 30 (dx, dy) displacements
-	\item \keyword{status} -- parameter needed for the rest of the tracking
-	\item \keyword{max\_iterations} -- number of times that displacement algorithm is invoked
-	\item \keyword{cpt} -- number of frame in the \emph{video\_sample}
+	\item \keyword{prev\_gray} -- \textcolor{blue}{firstFrame}
+	\item \keyword{gray} -- \textcolor{red}{secondFrame}
+	\item \keyword{points[0]} -- array containing 30 initial \feat{}s $(x,y)$ positions: \file{int} $featuresArray[2][30]$
+	\item \keyword{points[1]} -- array containing 30 $(dx, dy)$ displacements: results from \flow{} computation on \vc
+	\item \keyword{status} -- parameter needed for the rest of the tracking: not used in the testing framework
+	\item \keyword{max\_iterations} -- number of times that displacement algorithm (Figure~\ref{algoFig}) is invoked
+	\item \keyword{cpt} -- variable to count number of frame in the \emph{video\_sample}
 \end{itemize}
 %----------------------------------------------------------------------------------------
 
@@ -388,7 +389,102 @@ Both functions takes the same input parameters:
 
 \subsection{Architecture}
 
-\subsection{invoke GPU function}
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.8\textwidth]{optFlowArchitecture}
+\caption{\file{optical\_flow\_internship} project to test the homemade \api}
+	\label{optFlowFig}
+\end{figure}
+\FloatBarrier
+
+-- To integrate the \api{} I add the \file{qpu-asm} and \file{asm} directories to the existing \file{optical\_flow\_internship} project. I also add \file{grad.c} and \file{grad.c} to \file{src} directory. Finally I modified \file{opt\_flow\_lk.cpp}, \file{opt\_flow\_video.cpp} and \file{main.cpp} to be able to run \flow{} \code{code} on \vc.
+
+-- \file{qpu-asm} is the \keyword{assembly parser} written be Pete \textsc{Warden}: Chapter~\ref{Chapter2}.
+
+-- \file{asm} directories contains all the \code{code-to-execute} on \vc. This code needs in several \file{.asm} file written in \option{assembly language}. Moreover, there is \file{binaryGenerator.sh} file, a \code{shell script} that translate all \file{.asm} files into \file{.bin} files that \vc{} will understands (Appendice~\ref{AppendixG}).
+
+-- \file{grad.h} and \file{grad.c} are the \keyword{GPU} driver. In these file there are functions to:
+\begin{itemize}
+	\item initialize GPU
+	\item map \ram{} memory and bind \emph{ARM Virtual Addresses} \& \emph{VC CPU Bus Addresses}
+	\item copy code and data in the \ram
+	\item send code pointers and variables called \uni{}s to the \qpu{}s
+	\item get back results
+\end{itemize}
+
+
+-- To run the project:
+\lstset{language=make,caption={},label=}
+\begin{lstlisting}
+cd qpu-asm && make
+cd asm && ./binaryGenerator.sh
+mkdir build && cd build
+cmake..
+make
+sudo ./optical_flow_internship /path_to_video_sample
+\end{lstlisting}
+
+
+\subsection{main.cpp}
+
+\lstset{style=CStyle,caption={main.cpp},label=mainList}
+\begin{lstlisting}
+#include <iostream>
+#include <stdio.h>
+#include <opencv2/opencv.hpp>
+#include ``opt_flow_process_directory_video.hpp''
+
+
+extern ``C'' {
+	#include ``grad.h''
+	#include ``mailbox.h''
+}
+
+
+using namespace std;
+
+int main(int argc, char** argv)
+{
+	grad_init();
+
+	OptFlowProcessDirectoryVideo directory;
+	directory.video_to_process.set_use_opencv_lk(false);
+	directory.video_to_process.set_use_lk_gpu(true);
+
+	directory.process_all_videos_folder(argv[1]);
+
+	freeMemory();
+}
+\end{lstlisting}
+
+-- After including \file{mailbox.h} and \file{grad.h}, \code{grad\_init()} does allmost every step from listings~\ref{map},~\ref{init},~\ref{arithmetic},~\ref{transfer}:
+\begin{itemize}
+	\item initialize \qpu{}s: \code{qpu\_enable()}
+	\item map \ram{} and bind \emph{ARM Virtual Addresses} with \emph{VC CPU Bus Addresses} with \code{mapmem()}
+	\item copy code and data in \ram
+	\item send code pointers and some wanted \uni{}s
+\end{itemize}
+
+This function doesn't invoke \code{execute\_qpu()}. This will be done inside \code{compute\_lk\_gpu()}. Also, we choose between \emph{OpenCV} and \keyword{GPU} by passing \option{true} or \option{false} parameters. Finally we call \code{freeMemory()} to disable \qpu{}s and flush \ram.
+
+
+\subsection{opt\_flow\_lk.cpp}
+
+This file contains the \code{compute\_lk\_gpu()} function. The source code of the function is written in Appendice~\ref{AppendixG}.
+
+This function is divided in 3 parts:
+\begin{itemize}
+	\item \option{pre-processing} -- Section ~\ref{parameters}
+		\begin{itemize}
+			\item convert \file{cv::Mat} from camera to a float-pointer on (240*360) frame values 
+			\item convert \file{cv::Mat} from camera to a float-pointer on (240*360) frame values 
+			\item convert \file{cv::Mat} from camera to a float-pointer on (240*360) frame values 
+		\end{itemize}
+	\item \option{GPU}
+	\item \option{post-processing}
+\end{itemize}
+
+\subsection{GPU driver: driver.h - driver.c}
 I followed the same method as in the previous part~\ref{GPUconclusion} invoke GPU.
 
 My driver (grad.c) will:
@@ -400,3 +496,4 @@ My driver (grad.c) will:
 	\item get back the results
 \end{itemize}
 
+\subsection{asm: code-to-execute on \vc}

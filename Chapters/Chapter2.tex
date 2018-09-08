@@ -334,7 +334,7 @@ The whole \file{driver.c} is written in Appendice~\ref{AppendixE}, but I will de
 
 
 
-\lstset{style=CStyle,caption={helloworld memory\_map}}
+\lstset{style=CStyle,caption={helloworld memory\_map}, label=map}
 \begin{lstlisting}
 struct memory_map {
     unsigned int code[MAX_CODE_SIZE];
@@ -342,14 +342,14 @@ struct memory_map {
     unsigned int msg[NUM_QPUS][2];
     unsigned int results[NUM_QPUS][16];
 };
+int code_words = loadShaderCode(argv[1], qpu_code, MAX_CODE_SIZE);
 \end{lstlisting}
 -- This defines the memory layout we’ll use and share between \keyword{CPU} and \keyword{GPU}.\\
 -- This layout will be accessed in both \emph{ARM Virtual Addresses} and \emph{VC CPU Bus Addresses} (Appencice~\ref{AppendixB}).\\
-
-\code{int code\_words = loadShaderCode(argv[1], qpu\_code, MAX\_CODE\_SIZE);}\\
 -- We use \code{loadShaderCode()} function to load \file{helloworld.bin} binary code file.\\~\\
 
-\lstset{style=CStyle,caption={init \mail{} interface}}
+
+\lstset{style=CStyle,caption={init \mail{} interface}, label=init}
 \begin{lstlisting}
     int mb = mbox_open();
     if (qpu_enable(mb, 1))
@@ -370,7 +370,6 @@ struct memory_map {
     unsigned ptr = mem_lock(mb, handle);
     void *arm\_ptr = mapmem(BUS\_TO\_PHYS(ptr + host.mem\_map), size);
 \end{lstlisting}
-
 -- Initialize the \mail{} interface and send a message to enable the \qpu{} with the \code{qpu\_enable()} \mail{}'s function\\
 -- We allocate and lock GPU memory with \code{mem\_alloc()} \mail{}'s function\\
 -- \emph{ptr} is now the base Bus Address of the GPU memory mapping\\
@@ -384,7 +383,7 @@ struct memory_map {
 -- \keyword{Physically}, \emph{ptr} and \emph{arm\_map} point on the same RAM space.
 
 
-\lstset{style=CStyle,caption={pointer arithmetic}}
+\lstset{style=CStyle,caption={pointer arithmetic},label=arithmetic}
 \begin{lstlisting}
     // assert arm_ptr ...
     struct memory_map *arm_map = (struct memory_map *)arm_ptr;
@@ -400,7 +399,7 @@ struct memory_map {
 -- Finally we copy \code{code} in memory with \code{memcpy}. So this \code{code} will accessible by \keyword{GPU} using \emph{VC CPU BUS Addresses}: \code{vc\_code}.
 
 
-\lstset{style=CStyle,caption={Transfer uniforms, code-to-execute and execute\_qpu}}
+\lstset{style=CStyle,caption={Transfer uniforms, code-to-execute and execute\_qpu},label=transfer}
 \begin{lstlisting}
     for (int i = 0; i < NUM_QPUS; i++)
     {
@@ -462,14 +461,14 @@ This project taught me the basis of \vc{} programming and laid the groundwork fo
 	\item GPU is driven by CPU program (\file{driver.c}) that:
 		\begin{itemize}
 			\item initialize GPU
-			\item map shared memory
+			\item map \ram{} memory and bind \emph{ARM Virtual Addresses} \& \emph{VC CPU Bus Addresses}
 			\item copy code and data in the \ram
 			\item send code pointers and variables called \uni{}s in the \emph{VC CPU Bus Addresses}
 			\item get back results
 		\end{itemize}
 	\item GPU and CPU communicate via \mail{}:
 		\begin{itemize}
-			\item \keyword{API} that uses low-level linux kernel functions
+			\item \api{} that uses low-level linux kernel functions
 			\item source code is available in the raspbian distribution
 		\end{itemize}
 	\item GPU processor is called \qpu{} -- Appendice~\ref{AppendixD}:
@@ -492,7 +491,7 @@ This project taught me the basis of \vc{} programming and laid the groundwork fo
 			\item \vc{} gives back in the \emph{VC CPU Bus Addresses}
 		\end{itemize}
 \end{itemize}
-To build the homemade \keyword{API} for \iBubble, I focused on:
+To build the homemade \api{} for \iBubble, I focused on:
 \begin{itemize}
 	\item improve \file{driver.c}
 	\item refactore project architecture
