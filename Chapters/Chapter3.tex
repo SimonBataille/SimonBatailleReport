@@ -250,7 +250,7 @@ Although there are 30 feat{}s, I will present the Lucas-Kanade method for one \f
 
 For the rest of this section, keep in mind Figure~\ref{framesWindowFig}.
 
-\subsection{First Frame Processing}
+\subsection{First Frame Processing}\label{gradientProcessing}
 
 When \vc{} gets $\textcolor{blue}{firstFrame_{0,0}}$, \file{int} $featuresArray[2][30]$ and $\textcolor{red}{secondFrame_{0,0}}$ he starts processing the first frame.
 
@@ -373,16 +373,20 @@ else if (this->use_lk_gpu_)
 
 Listing~\ref{selectList} taken from \file{opt\_flow\_video.cpp} shows how we can choose between \code{calcOpticalFlowPyrLK()} and \code{compute\_lk\_gpu()} to compute \flow.
 
+
+\subsubsection{Functions Parameters}\label{fctParams}
+
 Both functions takes the same input parameters:
 \begin{itemize}
-	\item \keyword{prev\_gray} -- \textcolor{blue}{firstFrame}
-	\item \keyword{gray} -- \textcolor{red}{secondFrame}
+	\item \keyword{prev\_gray} -- \textcolor{blue}{firstFrame} \file{cv::Mat} object. This is the frame format in \emph{OpenCV} library. From this object, we can access $\textcolor{blue}{firstFrame_{0,0}}$ pointer. See \code{compute\_lk\_gpu()} at Appendice~\ref{AppendixG}.
+	\item \keyword{gray} -- \textcolor{red}{secondFrame} \file{cv::Mat} object. We can access $\textcolor{red}{secondFrame_{0,0}}$ pointer.
 	\item \keyword{points[0]} -- array containing 30 initial \feat{}s $(x,y)$ positions: \file{int} $featuresArray[2][30]$
 	\item \keyword{points[1]} -- array containing 30 $(dx, dy)$ displacements: results from \flow{} computation on \vc
 	\item \keyword{status} -- parameter needed for the rest of the tracking: not used in the testing framework
 	\item \keyword{max\_iterations} -- number of times that displacement algorithm (Figure~\ref{algoFig}) is invoked
 	\item \keyword{cpt} -- variable to count number of frame in the \emph{video\_sample}
 \end{itemize}
+
 %----------------------------------------------------------------------------------------
 
 \section{Implementation on \vc}
@@ -474,14 +478,24 @@ This file contains the \code{compute\_lk\_gpu()} function. The source code of th
 
 This function is divided in 3 parts:
 \begin{itemize}
-	\item \option{pre-processing} -- Section ~\ref{parameters}
+	\item \option{pre-processing} -- Sections ~\ref{parameters}, ~\ref{fctParams}
 		\begin{itemize}
-			\item convert \file{cv::Mat} from camera to a float-pointer on (240*360) frame values 
-			\item convert \file{cv::Mat} from camera to a float-pointer on (240*360) frame values 
-			\item convert \file{cv::Mat} from camera to a float-pointer on (240*360) frame values 
+			\item provides $\textcolor{blue}{firstFrame_{0,0}}$ from \file{cv::Mat prev\_gray} -- \code{frame1\_float\_ptr} inside function
+			\item provides $\textcolor{red}{secondFrame_{0,0}}$  from \file{cv::Mat gray} -- \code{frame2\_float\_ptr}
+			\item provides \file{int} $featuresArray[2][30]$ -- \code{features\_static }
 		\end{itemize}
-	\item \option{GPU}
+	\item \option{GPU} -- Section~\ref{GPUconclusion}
+		\begin{itemize}
+			\item invokes functions from \file{grad.c}
+			\item copies $\textcolor{blue}{firstFrame}$, $\textcolor{red}{secondFrame}$ and $features\_static$ in \ram
+			\item processes first frame to get gradient values -- Section~\ref{gradientProcessing}
+			\item runs the displacement algorithm to get 30 $(d_{x}, d_{y})$ values -- Figure~\ref{algoFig}
+			\item gives back results to \cpu in \option{float} \code{d\_pos[2*30]} array
+		\end{itemize}
 	\item \option{post-processing}
+		\begin{itemize}
+			\item values from \code{d\_pos[2*30]} are pushed into an \emph{OpenCV} object for the rest of \keyword{CMT} algorithm
+		\end{itemize}
 \end{itemize}
 
 \subsection{GPU driver: driver.h - driver.c}
