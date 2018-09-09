@@ -65,7 +65,7 @@ struct grad_MemLayout
     unsigned int xtrX4code[MAX_CODE_SIZE];
 
 
-    unsigned int uniforms[NUM_QPUS][NUM_UNIS];  /*14 uniforms per QPU :
+    unsigned int uniforms[NUM_QPUS][NUM_UNIS];  /*17 uniforms per QPU :
 			                        --1st is the address of the FIRST FRAME data
 			                        --2nd is the address of the FEATUREs array
 			                        --3rd is the address of the GRADX result array

@@ -461,7 +461,7 @@ int main(int argc, char** argv)
 }
 \end{lstlisting}
 
--- After including \file{mailbox.h} and \file{grad.h}, \code{grad\_init()} does allmost every step from listings~\ref{map},~\ref{init},~\ref{arithmetic},~\ref{transfer}:
+-- After including \file{mailbox.h} and \file{grad.h}, \code{grad\_init()} does almost every step from listings~\ref{map},~\ref{init},~\ref{arithmetic},~\ref{transfer}:
 \begin{itemize}
 	\item initialize \qpu{}s: \code{qpu\_enable()}
 	\item map \ram{} and bind \emph{ARM Virtual Addresses} with \emph{VC CPU Bus Addresses} with \code{mapmem()}
@@ -490,7 +490,7 @@ This function is divided in 3 parts:
 			\item copies $\textcolor{blue}{firstFrame}$, $\textcolor{red}{secondFrame}$ and $features\_static$ in \ram
 			\item processes first frame to get gradient values -- Section~\ref{gradientProcessing}
 			\item runs the displacement algorithm to get 30 $(d_{x}, d_{y})$ values -- Figure~\ref{algoFig}
-			\item gives back results to \cpu in \option{float} \code{d\_pos[2*30]} array
+			\item gives back results to \cpu{} in \option{float} \code{d\_pos[2*30]} array
 		\end{itemize}
 	\item \option{post-processing}
 		\begin{itemize}
@@ -498,16 +498,52 @@ This function is divided in 3 parts:
 		\end{itemize}
 \end{itemize}
 
-\subsection{GPU driver: driver.h - driver.c}
-I followed the same method as in the previous part~\ref{GPUconclusion} invoke GPU.
+\subsection{GPU driver: grad.h - grad.c}
 
-My driver (grad.c) will:
+\file{grad.h} and \file{grad.c} - Appendice ~\ref{AppendixG} - contain the \code{code} that \emph{drives} the \vc. To write these files I followed the same steps as in~\ref{GPUconclusion} section.
+
+
+\subsubsection{grad.h}
+
+This file contains:
 \begin{itemize}
-	\item initialize \qpu{}s
-	\item map the \ram
-	\item copy code and data (frames 1 and 2 and featuresArray) in \ram
-	\item send code pointer and \uni{}s
-	\item get back the results
+	\item \code{MACRO} definitions - \option{lines 7 to 17} - to store values I will need througout the program
+	\item some \emph{global} variables - \option{lines 21 to 42}
+	\item \ram{} layout - \code{struct grad\_MemLayout} - that the \code{compute\_lk\_gpu()} needs to run well - \option{lines 47 to 155}
+	\item all the \code{functions} prototypes that the \api{} needs - \option{lines 159 to the end}
 \end{itemize}
 
+The \keyword{key part} of this file is \code{struct grad\_MemLayout} definition. This layout contains \ram{} memory spaces for all the data that the \vc{} will access:
+\begin{itemize}
+	\item \option{lines 57 to 65} are all the different \code{code-to-execute}s by \vc{}. These are the \file{.bin} files from \file{.asm} files
+	\item \option{lines 68 to 85} are all the \uni{}s to pass to \qpu{}s
+	\item \option{line 88} is the \code{msg} array to pass inside \code{execute\_qpu()} function
+	\item \option{lines 91 to 93} are all the input data that \vc{} needs to compute \flow: $\textcolor{blue}{firstFrame}$, $\textcolor{red}{secondFrame}$ and $features\_static$
+	\item \option{lines 97 to 155} are all the \ram{} memory spaces for \qpu{}s to store results from \code{code-to-execute}s
+\end{itemize}
+
+
+\subsubsection{grad.c}
+
+\file{grad.c} has the same structure as \file{driver.c} from \keyword{helloworld} program section~\ref{helloworldlabel}:
+\begin{itemize}
+	\item initialize \qpu{}s
+	\item map the \ram{} with the layout defined in \file{grad.h}
+	\item copy code (\file{.bin} file) and input data ($\textcolor{blue}{firstFrame}$, $\textcolor{red}{secondFrame}$ and $features\_static$) in \ram
+	\item send \code{code-to-execute} \keyword{pointers} and \uni{}s to \qpu{}s
+	\item get back the results from the \ram
+\end{itemize}
+
+With this driver, I managed to make the \api{} modular. Namely it is possible to execute different codes from different \file{.asm} files on the \vc.
+To achieve that the \keyword{key points} are:
+
+\begin{itemize}
+	\item pass different code pointer inside \code{execute\_qpu()} to choose which one to execute
+	\item pass
+	\item I defined an array containing all the adresses from memLayout in the \emph{VC CPU Bus Adresses}. Then I can pass this pointers to \qpu
+\end{itemize}
+		is that I understood how to pass different uniforms to execute one code or another. By passing different uniform such as different frames address in memory i can do a modular \api.
+I copied all the code i need in memory and i choose wich one to execute by changing the adress in vc\_message: modular \api
+I choose to init all before to save time since init function is a bit long still in discussion into my mind
 \subsection{asm: code-to-execute on \vc}
+same memory mapping so same uniforms to get
