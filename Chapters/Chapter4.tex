@@ -37,7 +37,7 @@ To test this \api{} I compute the \flow{} first using \code{calcOpticalFlowPyrLK
 	\item \file{video\_out\_vectors.json}: a \file{.json} file containing all the 30 $(d_{x},d_{y})$ values for each frame of the whole \emph{video\_sample}
 \end{itemize}
 
-Moreover the terminal displays time processing for each frame of the video. So I will compare time when using this two functions.
+Moreover the terminal displays time processing for each frame of the video. So I am able to compare time when using this two functions.
 
 
 \subsection{Time Comparison}
@@ -153,5 +153,39 @@ All videos / frames of: /home/pi/video have been processed !
 
 \section{Possibilities}
 
+As of the writing of this report, a part of the Lucas-Kanade method was still in development. This part called \emph{Gaussian Pyramids} is a way to estimate large displacement - large values of $(d_{x},d_{y})$ - between two frames.
+
+Inputs are still \textcolor{blue}{firstFrame}, \textcolor{red}{secondFrame} and \file{int} $featuresArray[2][30]$. The \emph{Gaussian Pyramids} algorithm is invoked before displacement computation section~\ref{dispComp}. This algorithm provides initial approached values of the $(d_{x},d_{y})$ for each feature. Those values are injected on the first iteration of displacement computation.
+
+\noindent\begin{minipage}{.45\textwidth}
+\[
+\begin{bmatrix}
+
+pixel_{0,0} & pixel_{0,1} & \ldots & \ldots & pixel_{0,359}\\
+
+pixel_{1,0} & \ddots & \ldots & \ldots & pixel_{1,359}\\
+
+\vdots & \ldots & \ddots & \ldots & \vdots\\
+
+\vdots & \ldots & \ldots & \ddots & \vdots\\
+
+pixel_{239,0} & \ldots & \ldots  & \ldots & pixel_{239,359}
+
+\end{bmatrix}_{240\times 360}
+\]
+\end{minipage}\hfill
+\begin{minipage}{.45\textwidth}
+\[
+\begin{bmatrix}
+
+1 & 2 & 1\\
+
+2 & 4 & 2\\
+
+1 & 2 & 1\\
+
+\end{bmatrix}_{3\times 3 kernel}
+\]
+\end{minipage}
 %----------------------------------------------------------------------------------------
 
