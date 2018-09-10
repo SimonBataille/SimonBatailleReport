@@ -593,26 +593,43 @@ sudo ./projectName
 
 \subsubsection{Project Examples}
 
-Once my standard framework was running good, I started developping several little project to run on the \rasp.
+Once this standard framework was running well, I started developping several projects to run on the \rasp. The goal was to learn more \vc{}'s features and architecture. For instance I developped programs that:
+\begin{itemize}
+	\item take two 16-word vectors from \cpu{} memory, copy and multiply them inside \ram  and give back result to \cpu
+	\item take a $(240\times 360)$-\option{float-matrix} from \cpu{} memory, copy it inside \ram{}, convoluate it by a $(3\times 3)$-kernel and give back the resulting $(238\times 358)$-matrix to \cpu{}
+\end{itemize}
 
 %----------------------------------------------------------------------------------------
 
-\section{Other Tasks}\label{FillingFile}
+\section{Other Abilities}\label{FillingFile}
 
-\subsection{gitHub}
+In addition to my research on \vc{}'s projects, I developped several other helpful skills in software development during this internship.
 
-\subsection{Linux}
 
-\subsection{Vim}
+\subsection{Linux \& Vim}
 
-Since I developped on \rasp{}, I started using \emph{Vim} editor. Nicolas \textsc{Vincent}.
+At \groupname{} the software developpment is done using Linux OS. So I had to \emph{GCC} or \emph{G++} compilers and I got immersed in Linux Architecture and Command Line, or in Makefile writting. I also needed to compile some libraries (\emph{Python, OpenCV} from scratch and face some compiling error after hours of running.
+
+Since I developped on \rasp{}, I started using \emph{Vim} editor. Nicolas \textsc{Vincent} a member of the embedded software team, conviced me to start using this very \emph{customizable} editor. He learned me the basis and how to add useful plug-ins. He was a great adviser for me and learnt me a lot of tricks.
+
+
+\subsection{git \& github}
+
+Another very helpful skill I gained during my internship is in \emph{git} and \emph{github} using. I started to use \code{git clone} to copy projects on my \rasp.
+
+Within \groupname{} I created my first professional \emph{repository} called \keyword{videocore\_samples}: \url{https://github.com/notiloPlus/videocore_samples}. In this repository I put all the projects I developped to explore the \vc.
+
+I made this repository very teaching in order to learn other people how to use \vc. To do that, I wrote my \emph{README.md} file to explain how to use this repository. I had to learn how to write \file{markdown(.md)} files.
+
+I maintained this repository using \code{git add}, \code{git commit} and \code{git push} commands.
+
 
 \subsection{\LaTeX}
 
-\subsection{Tests}
+When came time to write this report I decided to use \LaTeX{}. I found a template that I customized to fill my needs. I didn't use any IDE but I added a \LaTeX{} plug-in to \emph{Vim} to continue learning how to use this editor. It was my first major report written in \LaTeX{} so the beginning was harsh. Nevertheless, I finished without any compiling errors and the result is very stylish.
 
 %----------------------------------------------------------------------------------------
 
 \section{Conclusion}\label{Conclusion2}
 
-I was more confortable to deal with my internship subject.
+At the end of this internship work, I was more confortable to deal with my internship subject. So I started developping the \api{} to use \vc. I had more interactions with Camille to build the \flow{} project. 
