@@ -157,24 +157,28 @@ As of the writing of this report, a part of the Lucas-Kanade method was still in
 
 Inputs are still \textcolor{blue}{firstFrame}, \textcolor{red}{secondFrame} and \file{int} $featuresArray[2][30]$. The \emph{Gaussian Pyramids} algorithm is invoked before displacement computation section~\ref{dispComp}. This algorithm provides initial approached values of the $(d_{x},d_{y})$ for each feature. Those values are injected on the first iteration of displacement computation.
 
-\noindent\begin{minipage}{.45\textwidth}
+\subsection{Pyramid Algorithm}
+
+\subsubsection{First convolution}
+
+\noindent\begin{minipage}{.3\textwidth}
 \[
 \begin{bmatrix}
 
-pixel_{0,0} & pixel_{0,1} & \ldots & \ldots & pixel_{0,359}\\
+firstPixel_{0,0} & firstPixel_{0,1} & \ldots & \ldots & firstPixel_{0,359}\\
 
-pixel_{1,0} & \ddots & \ldots & \ldots & pixel_{1,359}\\
+firstPixel_{1,0} & \ddots & \ldots & \ldots & firstPixel_{1,359}\\
 
 \vdots & \ldots & \ddots & \ldots & \vdots\\
 
 \vdots & \ldots & \ldots & \ddots & \vdots\\
 
-pixel_{239,0} & \ldots & \ldots  & \ldots & pixel_{239,359}
+firstPixel_{239,0} & \ldots & \ldots  & \ldots & firstPixel_{239,359}
 
 \end{bmatrix}_{240\times 360}
 \]
 \end{minipage}\hfill
-\begin{minipage}{.45\textwidth}
+\begin{minipage}{.3\textwidth}
 \[
 \begin{bmatrix}
 
@@ -187,5 +191,82 @@ pixel_{239,0} & \ldots & \ldots  & \ldots & pixel_{239,359}
 \end{bmatrix}_{3\times 3 kernel}
 \]
 \end{minipage}
+
+
+\subsubsection{Second convolution}
+
+\noindent\begin{minipage}{.3\textwidth}
+\[
+\begin{bmatrix}
+
+secondPixel_{0,0} & secondPixel_{0,1} & \ldots & \ldots & secondPixel_{0,357}\\
+
+secondPixel_{1,0} & \ddots & \ldots & \ldots & secondPixel_{1,357}\\
+
+\vdots & \ldots & \ddots & \ldots & \vdots\\
+
+\vdots & \ldots & \ldots & \ddots & \vdots\\
+
+secondPixel_{237,0} & \ldots & \ldots  & \ldots & secondPixel_{237,357}
+
+\end{bmatrix}_{238\times 358}
+\]
+\end{minipage}\hfill
+\begin{minipage}{.3\textwidth}
+\[
+\begin{bmatrix}
+
+1 & 2 & 1\\
+
+2 & 4 & 2\\
+
+1 & 2 & 1\\
+
+\end{bmatrix}_{3\times 3 kernel}
+\]
+\end{minipage}
+
+
+\subsubsection{Extraction}
+
+\[
+\begin{bmatrix}
+
+thirdPixel_{0,0} & thirdPixel_{0,1} & \ldots & \ldots & thirdPixel_{0,355}\\
+
+thirdPixel_{1,0} & \ddots & \ldots & \ldots & thirdPixel_{1,355}\\
+
+\vdots & \ldots & \ddots & \ldots & \vdots\\
+
+\vdots & \ldots & \ldots & \ddots & \vdots\\
+
+thirdPixel_{235,0} & \ldots & \ldots  & \ldots & thirdPixel_{117,355}
+
+\end{bmatrix}_{236\times 356}
+\]
+
+
+
+\[
+\begin{bmatrix}
+
+thirdPixel_{0,0} & thirdPixel_{0,2} & \ldots & \ldots & thirdPixel_{0,354}\\
+
+thirdPixel_{2,0} & \ddots & \ldots & \ldots & thirdPixel_{2,354}\\
+
+\vdots & \ldots & \ddots & \ldots & \vdots\\
+
+\vdots & \ldots & \ldots & \ddots & \vdots\\
+
+thirdPixel_{234,0} & \ldots & \ldots  & \ldots & thirdPixel_{234,354}
+
+\end{bmatrix}_{118\times 178}
+\]
+
+\subsubsection{Optical flow algorithm}
+
+Once we get the $118\times 178$ matrix from first and second frame, we apply the \flow{} the same way as in ~\ref{Chapter3} with all values of features posions divided by two.
+
+We get 30 $d_{x},d_{y}$ approached values of the features displacement and we can start the \flow{} algorithm for the $240\times 360$ first and second frame to get the exact values of the displacement.
 %----------------------------------------------------------------------------------------
 
