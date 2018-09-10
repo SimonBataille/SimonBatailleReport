@@ -538,12 +538,152 @@ With this driver, I managed to make the \api{} modular. Namely it is possible to
 To achieve that the \keyword{key points} are:
 
 \begin{itemize}
-	\item pass different code pointer inside \code{execute\_qpu()} to choose which one to execute
-	\item pass
-	\item I defined an array containing all the adresses from memLayout in the \emph{VC CPU Bus Adresses}. Then I can pass this pointers to \qpu
+	\item \option{lines 117 to 201} - within \code{grad\_setVCptrs()} function, we fill \code{grad\_VCptrsArray[]} with all the adresses defined in \code{struct grad\_MemLayout}. These addresses are located in \emph{VC CPU Bus Adresses}.
+	\item \option{lines 226 to 366} - within \code{grad\_init()} function, we load all \file{.bin} files at the corresponding address in the \emph{VC CPU Bus adderesses}.
+	\item pass different \code{code-to-execute} \keyword{pointers} to \code{execute\_qpu()} to select which one to execute on the \vc. This is done by changing \code{arm\_map->msg[i][1]} value.
 \end{itemize}
-		is that I understood how to pass different uniforms to execute one code or another. By passing different uniform such as different frames address in memory i can do a modular \api.
-I copied all the code i need in memory and i choose wich one to execute by changing the adress in vc\_message: modular \api
-I choose to init all before to save time since init function is a bit long still in discussion into my mind
-\subsection{asm: code-to-execute on \vc}
-same memory mapping so same uniforms to get
+
+The following listings show these three steps to run \code{graX.bin} in order to compute $G_{XX}$ value:
+
+\lstset{style=CStyle,caption={Fill \code{grad\_VCptrsArray[]} with code-to-execute pointers within \code{grad\_setVCptrs()} function},label=}
+\begin{lstlisting}
+    grad_VCptrsArray[0] = vc_ptr + offsetof(struct grad_MemLayout,
+                                            gradXcode); //vc_gradXcode
+    grad_VCptrsArray[1] = vc_ptr + offsetof(struct grad_MemLayout,
+                                            gradYcode); //vc_gradYcode
+    grad_VCptrsArray[2] = vc_ptr + offsetof(struct grad_MemLayout,
+                                            gradXYcode); //vc_gradXYcode
+    grad_VCptrsArray[3] = vc_ptr + offsetof(struct grad_MemLayout,
+                                            xtrBIP2code); //vc_xtrBIP2code
+    grad_VCptrsArray[4] = vc_ptr + offsetof(struct grad_MemLayout,
+                                            computeBIP2code); //vc_computeBIP2code
+    grad_VCptrsArray[5] = vc_ptr + offsetof(struct grad_MemLayout,
+                                            dPosXYcode); //vc_dPosXYcode
+    grad_VCptrsArray[6] = vc_ptr + offsetof(struct grad_MemLayout,
+                                            convX3code); //vc_convX3code
+    grad_VCptrsArray[7] = vc_ptr + offsetof(struct grad_MemLayout,
+                                            convX6code); //vc_convX6code
+    grad_VCptrsArray[8] = vc_ptr + offsetof(struct grad_MemLayout,
+                                            xtrX4code); //vc_xtrX4code
+\end{lstlisting}
+
+
+\lstset{style=CStyle,caption={Load code-to-execute \code{gradX.bin} in \ram{} within \code{grad\_init()} function},label=}
+\begin{lstlisting}
+    /*~~~~~~~~~~~~~~~~~~*/
+    /*__GET__GRADXCODE__*/
+    /*~~~~~~~~~~~~~~~~~~*/
+    // Load gradXcode into ARM VIRTUAL Addresses
+    code_words = loadShaderCode("../src/gradX.bin", qpu_code, MAX_CODE_SIZE);
+
+    if (code_words == 0)
+    {
+        exit(0);
+    }
+    else
+    {
+        printf("Loaded %d bytes of gradXcode from %s ...\n",
+               code_words * sizeof(unsigned), "gradX.bin");
+    }
+
+    // Copy gradXcode into SHARED Memory
+    memcpy(arm_map->gradXcode, qpu_code, code_words * sizeof(unsigned int));
+    /*~~~~~~~~~~~~~~~~~~~~~~~*/
+    /*__END__GET__GRADXCODE__*/
+    /*~~~~~~~~~~~~~~~~~~~~~~~*/
+\end{lstlisting}
+
+\lstset{style=CStyle,caption={Select \code{gradX.bin} to be executed in the \code{grad\_gradXqpu()} function},label=}
+\begin{lstlisting}
+/*~~~~~~~~~~~~~~~~~*/
+/* grad_gradXqpu() */
+/*~~~~~~~~~~~~~~~~~*/
+void grad_gradXqpu(int toggle)
+{
+
+    /* Pass vc_gradXcode pointer to QPUs */
+    for (int i = 0; i < NUM_QPUS; i++)
+    {
+        arm_map->msg[i][1] = grad_VCptrsArray[0]; //vc_gradXcode
+    }
+
+
+    /* Send insructions through mailbox */
+    execute_qpu(mb, NUM_QPUS, grad_VCptrsArray[10], GPU_FFT_NO_FLUSH,
+                GPU_FFT_TIMEOUT); //vc_msg
+}
+\end{lstlisting}
+
+
+\subsection{.asm files in the asm directory}
+
+\file{.asm} files contain \code{code-to-execute} on \vc. These files are written in \option{assembly language}. Figure~\ref{optFlowFig} shows all these files:
+\begin{itemize}
+	\item \file{gradX.asm, gradY.asm, gradXY.asm} compute $G_{XX}$, $G_{YY}$, $G_{XY}$ and then $det$ on \textcolor{blue}{firstFrame}
+	\item \file{xtrBIP2.asm, computeBIP2.asm} compute \emph{bilinear interpolation} on \textcolor{red}{secondFrame}
+	\item \file{dPosXY.asm} computes 30 $(d_{x},d_{y})$ - \flow{} between \textcolor{blue}{firstFrame} and \textcolor{red}{secondFrame}
+\end{itemize}
+
+All these \file{.asm} files start the same way. The \keyword{key point} is that \qpu{}s store all the same \uni{}s at the beginning of the execution:
+
+\lstset{style=customasm,caption={Storing \uni{}s value in \qpu's registers} ,label=}
+\begin{lstlisting}
+# LOAD__UNIFORMS__ARGUMENTS
+# ~~~~~~~~~~~~~~~~~~~~~~~~~
+or rFirstFrameAddress, raReadUniform, 0; nop
+or rFeaturesAddress, raReadUniform, 0; nop
+or rGradXAddress, raReadUniform, 0; nop
+or rGXXAddress, raReadUniform, 0; nop
+or rGradYAddress, raReadUniform, 0; nop
+or rGYYAddress, raReadUniform, 0; nop
+or rGXYAddress, raReadUniform, 0; nop
+or rWhichQPU, raReadUniform, 0; nop
+or rSecondFrameAddress, raReadUniform, 0; nop
+or rXtrBIP2Address, raReadUniform, 0; nop
+or rDPosXYAddress, raReadUniform, 0; nop
+or rComputeBIP2Address, raReadUniform, 0; nop
+or rDetXYAddress, raReadUniform, 0; nop
+or rFrameX3Address, raReadUniform, 0; nop
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+##########__END__LOAD__UNIFORMS__ARGUMENTS__##########
+\end{lstlisting}
+
+Those \uni{}s are:
+\begin{itemize}
+	\item input data addresses: $\textcolor{blue}{firstFrame}$, $\textcolor{red}{secondFrame}$ and $features\_static$
+	\item addresses for \qpu{}s to store results from \code{code-to-execute}s
+	\item all these addresses are \emph{VC CPU Bus addresses}
+\end{itemize}
+
+Listing~\ref{uniram} shows how \cpu{} stores those addresses in \ram{} and then pass them to \vc{} in \code{arm\_msg[i][0]}:
+\lstset{style=CStyle,caption={Storing \uni{}s value in \ram} ,label=uniram}
+\begin{lstlisting}
+    /* Copy UNIFORMS & first MSG into SHARED Memory */
+    for (int i = 0; i < NUM_QPUS; i++)
+    {
+
+        arm_map->uniforms[i][0] = grad_VCptrsArray[11]; //vc_firstFrameShared
+        arm_map->uniforms[i][1] = grad_VCptrsArray[13]; //vc_featureXYshared
+        arm_map->uniforms[i][2] = grad_VCptrsArray[14]; //vc_gradXshared
+        arm_map->uniforms[i][3] = grad_VCptrsArray[15]; //vc_gXXshared
+        arm_map->uniforms[i][4] = grad_VCptrsArray[16]; //vc_gradYshared
+        arm_map->uniforms[i][5] = grad_VCptrsArray[17]; //vc_gYYshared
+        arm_map->uniforms[i][6] = grad_VCptrsArray[18]; //vc_gXYshared
+        arm_map->uniforms[i][7] = i; //QPU number
+        arm_map->uniforms[i][8] = grad_VCptrsArray[12]; //vc_secondFrameShared
+        arm_map->uniforms[i][9] = grad_VCptrsArray[19]; //vc_xtrBIP2shared
+        arm_map->uniforms[i][10] = grad_VCptrsArray[21]; //vc_dPosXYshared
+        arm_map->uniforms[i][11] = grad_VCptrsArray[20]; //vc_computeBIP2shared
+        arm_map->uniforms[i][12] = grad_VCptrsArray[22]; //vc_detXYshared
+        arm_map->uniforms[i][13] = grad_VCptrsArray[23]; //vc_frameX3shared
+        arm_map->uniforms[i][14] = grad_VCptrsArray[24]; //vc_frameX6shared
+        arm_map->uniforms[i][15] = grad_VCptrsArray[25]; //vc_firstFrameX4shared
+        arm_map->uniforms[i][16] = grad_VCptrsArray[26]; //vc_secondFrameX4shared
+
+        arm_map->msg[i][0] = grad_VCptrsArray[9] + i * sizeof(unsigned) *
+                             NUM_UNIS; //vc_uniforms + i*NUM_UNIS
+    }
+\end{lstlisting}
+
+
+All these file{.asm} files form the \flow{} computation on \vc{}. To write them I have been massively based on the \vc{} architecture docuentation \parencite{refVC} and \emph{pi-gemm} project.
