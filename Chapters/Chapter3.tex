@@ -17,13 +17,13 @@
 
 \section{Problematics}
 
-As I said in the previous parts, \iBubble{} includes a visual tracking system, \keyword{CMT}, to \emph{autonomously} follow divers underwater. This system currently uses \emph{openCV} libraries at a rate of \textbf{30 fps}. This speed can be improved using \emph{CUDA} technology. These feat{}s are only available on \keyword{BtB} versions of \iBubble{} fitted with \emph{Nvidia's Jetson embedded board}.
+As I said in the previous parts, \iBubble{} includes a visual tracking system - \keyword{CMT} - to \emph{autonomously} follow divers underwater. This system currently uses \emph{openCV} libraries at a rate of \textbf{30 fps}. This speed can be improved using \emph{CUDA} technology. These features are only available on \keyword{BtB} versions of \iBubble{} fitted with \emph{Nvidia's Jetson embedded board}.
 
 \keyword{BtC} versions of the drone uses \rasp{} in spite of the current \emph{Nvidia Graphics Card} wich means that \emph{CUDA} is no longer available because \vc{} is not designed with this technology.
 
 As a consequence, \vc{} is not used so the whole tracking system is running only on the \cpu{} and the system rate drops to \textbf{7 fps}.
 
-The more time-consuming part of the \keyword{CMT} is the \flow{} computation. This is a fundamental tracking algorithm in Computer Vision. It uses \keyword{Gradient Descent} and \keyword{Pyramid} algorithms to get the displacement of the points of interest between two frames.
+The more time-consuming part of the \keyword{CMT} is the \flow{} computation. This is a fundamental tracking algorithm in Computer Vision. It uses \keyword{Displacement} and \keyword{Pyramid} algorithms to get the displacement of the points of interest between two frames.
 
 Therefore if we want to use the computing power of the \vc{}, it is compulsory to make our own implementation of the \flow{} on \rasp, that was my internship subject.
 
@@ -41,20 +41,20 @@ The main difficulty is that there is no official \api{} released by \textsc{Broa
 
 \subsection{Definition}
 
-Within \iBubble{} visual tracking system - \keyword{CMT} - \flow{} is the displacement of points of interest - called \feat{}s - between two consecutive frames from a video.
+Within \iBubble{} visual tracking system (\keyword{CMT}), \flow{} is the displacement of points of interest - called \feat{}s - between two consecutive frames from a video.
 
-Computing \emph{optical flow} between two consecutive frames involves the following steps:
+Computing \flow{} between two consecutive frames involves the following steps:
 \begin{itemize}
 	\item detect \feat{}s on first image -- Figure~\ref{initFeaturesFig}
 	\item find the next \feat{}s positions on the second image -- Figure~\ref{secondFeaturesFig}
-	\item compute \emph{displacemnt} for each \feat{}s -- Figure~\ref{opticalFlowFig}
+	\item compute \emph{displacement} for each \feat{}s -- Figure~\ref{opticalFlowFig}
 \end{itemize}
 
 
 \begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=0.5\textwidth]{plongeurInitFeatures}
-	\caption{First frame of a diving video with the initial set of \feat{}s}
+	\includegraphics[width=0.3\textwidth]{plongeurInitFeatures}
+	\caption{First frame of a diving video with the initial \feat{}s position}
 	\label{initFeaturesFig}
 \end{figure}
 \FloatBarrier
@@ -63,8 +63,8 @@ Computing \emph{optical flow} between two consecutive frames involves the follow
 
 \begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=0.5\textwidth]{plongeurNextFeatures}
-	\caption{Second frame of a diving video with new \feat{}s positions}
+	\includegraphics[width=0.3\textwidth]{plongeurNextFeatures}
+	\caption{Second frame of a diving video with the second \feat{}s positions}
 	\label{secondFeaturesFig}
 \end{figure}
 \FloatBarrier
@@ -73,18 +73,18 @@ Computing \emph{optical flow} between two consecutive frames involves the follow
 
 \begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=0.5\textwidth]{plongeurOpticalFlow}
+	\includegraphics[width=0.3\textwidth]{plongeurOpticalFlow}
 	\caption{Optical flow for the initial set of \feat{}s -- \small{norm of the \textcolor{blue}{blue vectors} is overstated for better visualization}}
 	\label{opticalFlowFig}
 \end{figure}
 \FloatBarrier
 
-\emph{Optical flow} can be viewed as a \emph{vector field} representing \feat{}s displacement between two consecutive frames. It is used to do object recognition, tracking or movement detection. In \iBubble, \emph{optical flow} is compute within \keyword{CMT} to achieve diver \emph{autonomous tracking and following}.\par
+\flow{} can be viewed as a \emph{vector field} representing \feat{}s displacement between two consecutive frames. It is used to do object recognition, tracking or movement detection. In \iBubble, \flow{} is computed within \keyword{CMT} to achieve diver \emph{autonomous tracking and following}.\par
 
 
 \subsection{Images encoding}
 
-As I mentioned in~\ref{Matrices}, frames from the \rasp's camera (Figures~\ref{initFeaturesFig} to ~\ref{opticalFlowFig}) are \option{row major float-matrices}. More specifically, a frame is a ($240\times 360$) pixel array:
+As I mentioned in~\ref{Matrices}, frames from the \rasp's camera (Figures~\ref{initFeaturesFig} to ~\ref{opticalFlowFig}) are \option{row major float-matrices}. More specifically, a frame is a $(240\times 360)-pixel$ matrix:
 
 \begin{figure}[!htbp]
 \[
@@ -118,13 +118,13 @@ Moreover, \flow{} algorithm uses \emph{grayscale} images:
 \end{itemize}
 
 
-From the shared RAM point of view, a frame is a contiguous array:
+From the \ram{} point of view, a frame is a contiguous array:
 \begin{figure}[h]
 \begin{center}
 \begin{tabular}{|c|c|c|}
 
 	\hline
-	\begin{bf}$\text{@pixel}_\text{{x,y}}$\end{bf} & \begin{bf}offset\end{bf} & \begin{bf}$\text{@pixel}_\text{{x,y}}$\end{bf} \\[10pt]
+	\begin{bf}$\text{@pixel}_\text{{x,y}}$\end{bf} & \begin{bf}offset\end{bf} & \begin{bf}$\text{pixel}_\text{{x,y}}$\end{bf} \\[10pt]
 
 	\hline
 	@$pixel_{0,0}$ & @$pixel_{0,0}$ & $pixel_{0,0}$ \\
@@ -154,7 +154,7 @@ From the shared RAM point of view, a frame is a contiguous array:
 	\vdots & \vdots & \vdots \\
 
 	\hline
-	@$pixel_{x,y}$ & @$pixel_{0,0} + 239\times 360 + 359\times 4$ & $pixel_{239,359}$ \\
+	@$pixel_{239,359}$ & @$pixel_{0,0} + 239\times 360 + 359\times 4$ & $pixel_{239,359}$ \\
 
 	\hline
 
@@ -215,7 +215,7 @@ So the \flow{} program will return a \file{float} $displacementsArray[2][30]$ co
 \end{itemize}
 
 This is the \flow{} between two consecutive frames for 30 \feat{}s.
-
+\newpage
 
 \subsubsection{Summary}
 
@@ -227,7 +227,10 @@ To summarize the \flow{} computation between two consecutive frames for each fea
 			\item $\textcolor{red}{secondFrame_{0,0}}$ pointer
 			\item \file{int} $featuresArray[2][30]$
 		\end{itemize}
-	\item outputs: \file{float} $displacementsArray[2][30]$
+	\item outputs:
+		\begin{itemize}
+			\item \file{float} $displacementsArray[2][30]$
+		\end{itemize}
 \end{itemize}
 
 \begin{figure}[!htbp]
@@ -242,17 +245,17 @@ To summarize the \flow{} computation between two consecutive frames for each fea
 
 \section{Lucas-Kanade method}
 
-There are several ways to compute \flow{}. Camille selected \keyword{Lucas-Kanade} method to be implemented on \vc.
+There are several ways to compute \flow{}. Camille selected \emph{Lucas-Kanade method} to be implemented on \vc.
 
-The \emph{vision tracking} algorithm detects \keyword{30} feat{}s on each frame from the camera. Thus, our \emph{homemade} algorithm must compute \flow{} for these 30 feat{}s between two consecutive frames.
+The \emph{vision tracking} algorithm detects \keyword{30} \feat{}s on each frame from the camera. Thus, our \emph{homemade} algorithm must compute \flow{} for these 30 \feat{}s between two consecutive frames.
 
-Although there are 30 feat{}s, I will present the Lucas-Kanade method for one \feat{}, $feature_{x,y}$. The processing is the same for the rest of the feat{}s.
+Although there are 30 \feat{}s, I will present the \emph{Lucas-Kanade method} for one single \feat{}, $feature_{x,y}$. The processing is the same for the rest of the feat{}s.
 
 For the rest of this section, keep in mind Figure~\ref{framesWindowFig}.
 
 \subsection{First Frame Processing}\label{gradientProcessing}
 
-When \vc{} gets $\textcolor{blue}{firstFrame_{0,0}}$, \file{int} $featuresArray[2][30]$ and $\textcolor{red}{secondFrame_{0,0}}$ he starts processing the first frame.
+When \vc{} gets $\textcolor{blue}{firstFrame_{0,0}}$, \file{int} $featuresArray[2][30]$ and $\textcolor{red}{secondFrame_{0,0}}$, it starts processing the first frame.
 
 The goal is to get 4 values per \feat{}:
 \begin{itemize}
@@ -262,20 +265,21 @@ The goal is to get 4 values per \feat{}:
 	\item $det = \frac{1}{G_{XX}G_{YY}-G_{XY}G_{XX}}$
 \end{itemize}
 
-As shown in Figure~\ref{framesWindowFig}, we use a $21\times21$ \option{pixel window} around the feature:
+As shown in Figure~\ref{framesWindowFig}, we use a $(21\times21)-window$ around the \feat{}:
 
 $$G_{XX} = \sum_{i=1}^{21}\sum_{j=1}^{21} grad_{x}[i,j]^{2}$$
 $$G_{YY} = \sum_{i=1}^{21}\sum_{j=1}^{21} grad_{y}[i,j]^{2}$$
 $$G_{XY} = \sum_{i=1}^{21}\sum_{j=1}^{21} grad_{x}[i,j]\times grad_{y}[i,j]$$
 
-Where, for a pixel element - $firstWindow_{i,j}$ -  of the window:
+Where, for an element $\textcolor{blue}{firstWindow_{i,j}}$ within the window:
 $$grad_{x}[i,j] = \frac{\textcolor{blue}{firstWindow_{i+1,j}} - \textcolor{blue}{firstWindow_{i-1,j}}}{2}$$
 $$grad_{y}[i,j] = \frac{\textcolor{blue}{firstWindow_{i,j+1}} - \textcolor{blue}{firstWindow_{i,j-1}}}{2}$$
+\newpage
 
 
 \subsection{Displacement computation}\label{dispComp}
 
-To compute the feature displacement, we use the following algorithm:
+To compute the \feat{}'s displacement, we run the following algorithm:
 
 \begin{figure}[!htbp]
 \begin{algorithmic}
@@ -296,7 +300,9 @@ To compute the feature displacement, we use the following algorithm:
 \end{figure}
 \FloatBarrier
 
-The algorithm Figure~\ref{algoFig} is running several times to have a better precision on $d_{x}$ and $d_{y}$ values. Each time, we reinject previous $d_{x}$ and $d_{y}$ to compute $\textcolor{red}{secondWindow_{i+d_{x},j+d_{y}}}$. Results analysis shows that for a little feature displacement, 5 times is enough to have better precision than \emph{OpenCV} function.\\
+The algorithm Figure~\ref{algoFig} is running several times to have a better precision on $d_{x}$ and $d_{y}$ values. Each time, we reinject previous $d_{x}$ and $d_{y}$ to compute $\textcolor{red}{secondWindow_{i+d_{x},j+d_{y}}}$.
+
+Results analysis shows that for a little \feat{} displacement, running this algorithm 5 times is enough to have better precision than \emph{OpenCV} function.\\
 
 
 Within the displacement algorithm, $\textcolor{red}{secondWindow_{i+d_{x},j+d_{y}}}$ is a \emph{bilinear interpolation}:
@@ -304,10 +310,10 @@ Within the displacement algorithm, $\textcolor{red}{secondWindow_{i+d_{x},j+d_{y
 \begin{figure}[!htbp]
 \begin{equation*}
 	\begin{split}
-		secondWindow_{i+d_{x},j+d_{y}} = secondWindow_{floor(i+d_{x}),floor(j+d_{y})}\times (1-fract(i+d_{x}))\times (1-fract(i+d_{y}))\\
-		+ secondWindow_{floor(i+d_{x})+1,floor(j+d_{y})}\times (fract(i+d_{x}))\times (1-fract(i+d_{y}))\\
-		+ secondWindow_{floor(i+d_{x}),floor(j+d_{y})+1}\times (1-fract(i+d_{x}))\times (fract(i+d_{y}))\\
-		+ secondWindow_{floor(i+d_{x})+1,floor(j+d_{y})+1} \times (fract(i+d_{x}))\times (fract(i+d_{x}))
+		\textcolor{red}{secondWindow_{i+d_{x},j+d_{y}}} = \textcolor{red}{secondWindow_{floor(i+d_{x}),floor(j+d_{y})}}\times (1-fract(i+d_{x}))\times (1-fract(i+d_{y}))\\
+		+ \textcolor{red}{secondWindow_{floor(i+d_{x})+1,floor(j+d_{y})}}\times (fract(i+d_{x}))\times (1-fract(i+d_{y}))\\
+		+ \textcolor{red}{secondWindow_{floor(i+d_{x}),floor(j+d_{y})+1}}\times (1-fract(i+d_{x}))\times (fract(i+d_{y}))\\
+		+ \textcolor{red}{secondWindow_{floor(i+d_{x})+1,floor(j+d_{y})+1}}\times (fract(i+d_{x}))\times (fract(i+d_{x}))
 	\end{split}
 \end{equation*}
 \caption{Bilinear interpolation within second frame window}
@@ -315,10 +321,10 @@ Within the displacement algorithm, $\textcolor{red}{secondWindow_{i+d_{x},j+d_{y
 \end{figure}
 \FloatBarrier
 
-The \emph{bilinear interpolation} Figure~\ref{BIPFig} was though to achieve with the \vc{} because it needs \option{floor} and \option{fractional functions} that are not native in this \keyword{GPU}. To do so I used \code{ftoi}, \code{itof}, and \code{fsub} functions Figure~\ref{VCinstructionsFigure}.
+The \emph{bilinear interpolation} Figure~\ref{BIPFig} was really tough to achieve with the \vc{} because it needs \option{floor} and \option{fractional functions} that are not native in this \keyword{GPU}. To do so I used \code{ftoi}, \code{itof}, and \code{fsub} functions Figure~\ref{VCinstructionsFigure}.
 
 
-Camille detailed me those algorithm on a big white board (Appendice~\ref{AppendixA}) and implemented them in \keyword{C++}. Then it was easier for me to translate them into \option{assembly language}.
+Camille detailed me these algorithms on a big white board (Appendice~\ref{AppendixA}) and implemented them in \keyword{C++}. Then it was easier for me to translate them into \option{assembly language}.
 
 %----------------------------------------------------------------------------------------
 
@@ -346,11 +352,11 @@ sudo ./optical_flow_internship /path_to_video_sample
 \end{lstlisting}
 
 
-\code{cmake ..} followed by \code{make} generates \file{optical\_flow\_internship}, an \keyword{executable} file that takes a path to a \emph{video\_sample}. The program computes the \flow{} between each consecutive frames of the sample until the end of the video. The sample was an underwater video from \iBubble. Figures~\ref{initFeaturesFig} to ~\ref{opticalFlowFig} are fames from this sample.
+\code{cmake ..} followed by \code{make} generates \file{optical\_flow\_internship}, an \keyword{executable} file that takes a path to a \emph{video\_sample}. The program computes the \flow{} between each consecutive frames of the sample until the end of the video. The sample was an underwater video from \iBubble. Figures~\ref{initFeaturesFig} to ~\ref{opticalFlowFig} are fames from this \emph{video\_sample}.
 
 In this framework, 3 \file{files} concerne my \api{}:
 \begin{itemize}
-	\item \file{opt\_flow\_lk.cpp} -- where I write \code{compute\_lk\_gpu()}.
+	\item \file{opt\_flow\_lk.cpp} -- where I wrote \code{compute\_lk\_gpu()}.
 	\item \file{opt\_flow\_video.cpp} -- where \code{compute\_lk\_gpu()} is invoked.
 	\item \file{main.cpp} -- the \code{main} program that process the \emph{video\_sample}.
 \end{itemize}
@@ -371,7 +377,7 @@ else if (this->use_lk_gpu_)
 \end{lstlisting}
 
 
-Listing~\ref{selectList} taken from \file{opt\_flow\_video.cpp} shows how we can choose between \code{calcOpticalFlowPyrLK()} and \code{compute\_lk\_gpu()} to compute \flow.
+Listing~\ref{selectList} taken from \file{opt\_flow\_video.cpp} shows how we can choose between \code{calcOpticalFlowPyrLK()} and \code{compute\_lk\_gpu()} to compute the \flow{} between each consecutive frames of the \emph{video\_sample}.
 
 
 \subsubsection{Functions Parameters}\label{fctParams}
@@ -401,18 +407,19 @@ Both functions takes the same input parameters:
 \end{figure}
 \FloatBarrier
 
--- To integrate the \api{} I add the \file{qpu-asm} and \file{asm} directories to the existing \file{optical\_flow\_internship} project. I also add \file{grad.c} and \file{grad.c} to \file{src} directory. Finally I modified \file{opt\_flow\_lk.cpp}, \file{opt\_flow\_video.cpp} and \file{main.cpp} to be able to run \flow{} \code{code} on \vc.
+-- To integrate the \api{} I add the \file{qpu-asm} and \file{asm} directories to the existing \file{optical\_flow\_internship} project. I also add \file{grad.c} and \file{grad.c} to \file{src} directory. Finally I modified \file{opt\_flow\_lk.cpp}, \file{opt\_flow\_video.cpp} and \file{main.cpp} to be able to run \flow{} \code{program} on \vc.
 
--- \file{qpu-asm} is the \keyword{assembly parser} written be Pete \textsc{Warden}: Chapter~\ref{Chapter2}.
+-- \file{qpu-asm} is the \code{assembly parser} written be Pete \textsc{Warden} - Chapter~\ref{Chapter2}.
 
--- \file{asm} directories contains all the \code{code-to-execute} on \vc. This code needs in several \file{.asm} file written in \option{assembly language}. Moreover, there is \file{binaryGenerator.sh} file, a \code{shell script} that translate all \file{.asm} files into \file{.bin} files that \vc{} will understands (Appendice~\ref{AppendixG}).
+-- \file{asm} directories contains all the \code{code-to-execute} on \vc. This code consists of several \file{.asm} files written in \option{assembly language}.\\
+There is also \file{binaryGenerator.sh}, a \code{shell script} that translate every \enquote{\file{.asm}} file into a \enquote{\file{.bin}} file that \vc{} will understands - Appendice~\ref{AppendixG}.
 
 -- \file{grad.h} and \file{grad.c} are the \keyword{GPU} driver. In these file there are functions to:
 \begin{itemize}
 	\item initialize GPU
 	\item map \ram{} memory and bind \emph{ARM Virtual Addresses} \& \emph{VC CPU Bus Addresses}
-	\item copy code and data in the \ram
-	\item send code pointers and variables called \uni{}s to the \qpu{}s
+	\item copy \code{code-to-execute} and data in the \ram
+	\item send \code{code-to-execute} \keyword{pointers} and variables called \uni{}s to the \qpu{}s
 	\item get back results
 \end{itemize}
 
@@ -463,13 +470,13 @@ int main(int argc, char** argv)
 
 -- After including \file{mailbox.h} and \file{grad.h}, \code{grad\_init()} does almost every step from listings~\ref{map},~\ref{init},~\ref{arithmetic},~\ref{transfer}:
 \begin{itemize}
-	\item initialize \qpu{}s: \code{qpu\_enable()}
+	\item initialize \qpu{}s with \code{qpu\_enable()}
 	\item map \ram{} and bind \emph{ARM Virtual Addresses} with \emph{VC CPU Bus Addresses} with \code{mapmem()}
 	\item copy code and data in \ram
 	\item send code pointers and some wanted \uni{}s
 \end{itemize}
 
-This function doesn't invoke \code{execute\_qpu()}. This will be done inside \code{compute\_lk\_gpu()}. Also, we choose between \emph{OpenCV} and \keyword{GPU} by passing \option{true} or \option{false} parameters. Finally we call \code{freeMemory()} to disable \qpu{}s and flush \ram.
+This function doesn't invoke \code{execute\_qpu()}. This will be done inside \code{compute\_lk\_gpu()}. Also, we choose between \emph{OpenCV} and \api{} by passing \option{true} or \option{false} parameters. Finally we call \code{freeMemory()} to disable \qpu{}s and flush \ram.
 
 
 \subsection{opt\_flow\_lk.cpp}
@@ -490,7 +497,7 @@ This function is divided in 3 parts:
 			\item copies $\textcolor{blue}{firstFrame}$, $\textcolor{red}{secondFrame}$ and $features\_static$ in \ram
 			\item processes first frame to get gradient values -- Section~\ref{gradientProcessing}
 			\item runs the displacement algorithm to get 30 $(d_{x}, d_{y})$ values -- Figure~\ref{algoFig}
-			\item gives back results to \cpu{} in \option{float} \code{d\_pos[2*30]} array
+			\item gives back results to \cpu{} in \code{float d\_pos[2*30]} array
 		\end{itemize}
 	\item \option{post-processing}
 		\begin{itemize}
@@ -509,7 +516,7 @@ This file contains:
 \begin{itemize}
 	\item \code{MACRO} definitions - \option{lines 7 to 17} - to store values I will need througout the program
 	\item some \emph{global} variables - \option{lines 21 to 42}
-	\item \ram{} layout - \code{struct grad\_MemLayout} - that the \code{compute\_lk\_gpu()} needs to run well - \option{lines 47 to 155}
+	\item \ram{} layout - \code{struct grad\_MemLayout} - that the \code{compute\_lk\_gpu()} will rely on - \option{lines 47 to 155}
 	\item all the \code{functions} prototypes that the \api{} needs - \option{lines 159 to the end}
 \end{itemize}
 
@@ -519,7 +526,7 @@ The \keyword{key part} of this file is \code{struct grad\_MemLayout} definition.
 	\item \option{lines 68 to 85} are all the \uni{}s to pass to \qpu{}s
 	\item \option{line 88} is the \code{msg} array to pass inside \code{execute\_qpu()} function
 	\item \option{lines 91 to 93} are all the input data that \vc{} needs to compute \flow: $\textcolor{blue}{firstFrame}$, $\textcolor{red}{secondFrame}$ and $features\_static$
-	\item \option{lines 97 to 155} are all the \ram{} memory spaces for \qpu{}s to store results from \code{code-to-execute}s
+	\item \option{lines 97 to 155} are all the \ram{} memory spaces for \qpu{}s to store results from each \enquote{\file{.bin}} file execution
 \end{itemize}
 
 
@@ -538,7 +545,7 @@ With this driver, I managed to make the \api{} modular. Namely it is possible to
 To achieve that the \keyword{key points} are:
 
 \begin{itemize}
-	\item \option{lines 117 to 201} - within \code{grad\_setVCptrs()} function, we fill \code{grad\_VCptrsArray[]} with all the adresses defined in \code{struct grad\_MemLayout}. These addresses are located in \emph{VC CPU Bus Adresses}.
+	\item \option{lines 117 to 201} - within \code{grad\_setVCptrs()} function, we fill \code{grad\_VCptrsArray[]} with all the adresses defined in \code{struct grad\_MemLayout}. These addresses are \emph{VC CPU Bus Adresses}.
 	\item \option{lines 226 to 366} - within \code{grad\_init()} function, we load all \file{.bin} files at the corresponding address in the \emph{VC CPU Bus adderesses}.
 	\item pass different \code{code-to-execute} \keyword{pointers} to \code{execute\_qpu()} to select which one to execute on the \vc. This is done by changing \code{arm\_map->msg[i][1]} value.
 \end{itemize}
@@ -566,6 +573,7 @@ The following listings show these three steps to run \code{graX.bin} in order to
     grad_VCptrsArray[8] = vc_ptr + offsetof(struct grad_MemLayout,
                                             xtrX4code); //vc_xtrX4code
 \end{lstlisting}
+\newpage
 
 
 \lstset{style=CStyle,caption={Load code-to-execute \code{gradX.bin} in \ram{} within \code{grad\_init()} function},label=}
@@ -615,16 +623,17 @@ void grad_gradXqpu(int toggle)
 \end{lstlisting}
 
 
-\subsection{.asm files from \enquote{asm} directory}
+\subsection{\enquote{.asm} files from asm directory}
 
 \file{.asm} files contain \code{code-to-execute} on \vc. These files are written in \option{assembly language} and are listed figure~\ref{optFlowFig}:
 \begin{itemize}
-	\item \file{gradX.asm, gradY.asm, gradXY.asm}: compute $G_{XX}$, $G_{YY}$, $G_{XY}$ and then $det$ on \textcolor{blue}{firstFrame}
-	\item \file{xtrBIP2.asm, computeBIP2.asm}: compute \emph{bilinear interpolation} on \textcolor{red}{secondFrame}
-	\item \file{dPosXY.asm}: computes \flow{} - 30 $(d_{x},d_{y})$ - between \textcolor{blue}{firstFrame} and \textcolor{red}{secondFrame}
+	\item \file{gradX.asm, gradY.asm, gradXY.asm} - compute $G_{XX}$, $G_{YY}$, $G_{XY}$ and then $det$ on \textcolor{blue}{firstFrame}
+	\item \file{xtrBIP2.asm, computeBIP2.asm} - compute \emph{bilinear interpolation} on \textcolor{red}{secondFrame}
+	\item \file{dPosXY.asm} - computes \flow{} - 30 $(d_{x},d_{y})$ - between \textcolor{blue}{firstFrame} and \textcolor{red}{secondFrame}
 \end{itemize}
 
 \file{gradX.asm} is reproduced appendice~\ref{AppendixG}. The \keyword{key point} is that all \qpu{}s store the same \uni{}s at the beginning of the execution, so every \file{.asm} file start the same way:
+\newpage
 
 \lstset{style=customasm,caption={Storing \uni{}s value in \qpu's registers} ,label=}
 \begin{lstlisting}
