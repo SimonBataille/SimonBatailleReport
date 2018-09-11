@@ -615,16 +615,16 @@ void grad_gradXqpu(int toggle)
 \end{lstlisting}
 
 
-\subsection{.asm files in the asm directory}
+\subsection{.asm files from \enquote{asm} directory}
 
-\file{.asm} files contain \code{code-to-execute} on \vc. These files are written in \option{assembly language}. Figure~\ref{optFlowFig} shows all these files:
+\file{.asm} files contain \code{code-to-execute} on \vc. These files are written in \option{assembly language} and are listed figure~\ref{optFlowFig}:
 \begin{itemize}
-	\item \file{gradX.asm, gradY.asm, gradXY.asm} compute $G_{XX}$, $G_{YY}$, $G_{XY}$ and then $det$ on \textcolor{blue}{firstFrame}
-	\item \file{xtrBIP2.asm, computeBIP2.asm} compute \emph{bilinear interpolation} on \textcolor{red}{secondFrame}
-	\item \file{dPosXY.asm} computes 30 $(d_{x},d_{y})$ - \flow{} between \textcolor{blue}{firstFrame} and \textcolor{red}{secondFrame}
+	\item \file{gradX.asm, gradY.asm, gradXY.asm}: compute $G_{XX}$, $G_{YY}$, $G_{XY}$ and then $det$ on \textcolor{blue}{firstFrame}
+	\item \file{xtrBIP2.asm, computeBIP2.asm}: compute \emph{bilinear interpolation} on \textcolor{red}{secondFrame}
+	\item \file{dPosXY.asm}: computes \flow{} - 30 $(d_{x},d_{y})$ - between \textcolor{blue}{firstFrame} and \textcolor{red}{secondFrame}
 \end{itemize}
 
-All these \file{.asm} files start the same way. The \keyword{key point} is that \qpu{}s store all the same \uni{}s at the beginning of the execution:
+\file{gradX.asm} is reproduced appendice~\ref{AppendixG}. The \keyword{key point} is that all \qpu{}s store the same \uni{}s at the beginning of the execution, so every \file{.asm} file start the same way:
 
 \lstset{style=customasm,caption={Storing \uni{}s value in \qpu's registers} ,label=}
 \begin{lstlisting}
@@ -648,7 +648,7 @@ or rFrameX3Address, raReadUniform, 0; nop
 ##########__END__LOAD__UNIFORMS__ARGUMENTS__##########
 \end{lstlisting}
 
-Those \uni{}s are:
+These \uni{}s are:
 \begin{itemize}
 	\item input data addresses: $\textcolor{blue}{firstFrame}$, $\textcolor{red}{secondFrame}$ and $features\_static$
 	\item addresses for \qpu{}s to store results from \code{code-to-execute}s
@@ -686,4 +686,4 @@ Listing~\ref{uniram} shows how \cpu{} stores those addresses in \ram{} and then 
 \end{lstlisting}
 
 
-All these file{.asm} files form the \flow{} computation on \vc{}. To write them I have been massively based on the \vc{} architecture docuentation \parencite{refVC} and \emph{pi-gemm} project.
+All these \file{.asm} files form every step of the \flow{} algorithm on the \vc{}. To write them I have been massively based on the \vc{} architecture docuentation \parencite{refVC} and \emph{pi-gemm} project.

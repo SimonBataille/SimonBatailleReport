@@ -19,43 +19,44 @@
 %\newcommand{\bcm}{\textcolor{mdtRed}{\textsc{BCM2837}}}
 %\newcommand{\qpu}{\textcolor{mdtRed}{\textsc{QPU}}}
 %\newcommand{\code}[1]{\texttt{\hl{#1}}}
+\definecolor{mGreen}{rgb}{0,0.6,0}
+\definecolor{mGray}{rgb}{0.5,0.5,0.5}
+\definecolor{mPurple}{rgb}{0.58,0,0.82}
+\definecolor{backgroundColour}{rgb}{0.95,0.95,0.92}
 
 %----------------------------------------------------------------------------------------
 
 \section{State of the Art}
 
-When arriving at \groupname{}, my first task was to write a \emph{State-of-the-Art} report about the \vc{}. The goal was to list interesting projects using this \keyword{GPU} and know what was possible to do with it.
-\definecolor{mGreen}{rgb}{0,0.6,0}
-\definecolor{mGray}{rgb}{0.5,0.5,0.5}
-\definecolor{mPurple}{rgb}{0.58,0,0.82}
-\definecolor{backgroundColour}{rgb}{0.95,0.95,0.92}
-So I spent my first two weeks surfing on the internet to gather every information I found about \vc. I wrote a report containing general information and every accurate project for the rest of my internship.
+When arriving at \groupname{}, my first task was to write a \emph{State-of-the-Art} report about the \vc{}. The goal was to list interesting projects using this \keyword{GPU} and know what was possible to do with it. I spent my first two weeks surfing on the internet to gather every information I found about \vc. I wrote a report containing general information and every accurate project for the rest of my internship.
 
-Finally I had a meeting with \supname{} where I explained to him which direction I wanted to explore. We decided that I should start with a \emph{\enquote{helloworld}} project that let me understand the basics of the \vc{} and start developping on a \rasp.
+Finally I had a meeting with \supname{} where I explained to him which direction I wanted to explore. We decided that I should start with a \emph{\enquote{helloworld}} program that made me understand the basics of the \vc{} and start developping on a \rasp.
 
 %----------------------------------------------------------------------------------------
 
 \section{Raspberry Pi Playground}
 
-\emph{Raspberry Pi Playground} \parencite{refRpiPlayground} is the first project I focused on to better understand the \vc. It is associated with a \enquote{\file{github}} repository, here : \url{//github.com/elorimer/rpi-playground}
+\emph{Raspberry Pi Playground} \parencite{refRpiPlayground} is the first project I focused on to better understand the \vc. It is associated with a \enquote{\file{github}} repository: \url{//github.com/elorimer/rpi-playground}
 
-It is the most important project I studied during my internship because it contains a \enquote{\file{helloworld}} program that helped me to understand the preliminary basis of the \vc{} architecture and above all how to use this \keyword{GPU}. I followed every step of this project permanantly reading the \vc{} documention \parencite{refVC}. I detail this program because all the rest of my internship is based on it.
+It is the most important project I studied during my internship because it contains a \enquote{\file{helloworld}} program that helped me to understand the preliminary basis of the \vc{} architecture and above all, how to use this \keyword{GPU}. I followed every step of this project permanantly reading the \vc{} documention \parencite{refVC}. I detail this program because all the rest of my internship is based on it.
 
 
 \subsection{GPU Programming}
 \label{concepts}
-Before describing what the \file{helloworld} project does, I will highlight some \keyword{key points} in \vc{} programming that I understood with \parencite{refRpiPlayground}.
+Before describing what the \file{helloworld} project does, I highlight some \keyword{key points} in \vc{} programming that I understood with \parencite{refRpiPlayground}:
 
 \begin{itemize}
 	\item GPU is a CPU peripheral
 	\item GPU and CPU share the same RAM memory
 \end{itemize}
 
-The first \keyword{key thing} to understand is that a \keyword{GPU} is driven by a host \keyword{CPU}. In the case of \bcm, the \vc{} is driven by an \cpu{}(ARM Cortex A53).
+\vspace{0.5cm}
 
-The second \keyword{key thing} is that they share the same \keyword{RAM} memory.
+The first \keyword{key thing} to understand is that a \keyword{GPU} is driven by a host \keyword{CPU}. In the case of \bcm, the \vc{} is driven by an \cpu{}.
 
-So to run \code{code} on \keyword{GPU}, the host \keyword{CPU} must \emph{map} a shared memory space between both processors. Then \keyword{CPU} send instructions and data using \emph{VC CPU Bus Addresses} and \keyword{GPU} give back results using \emph{ARM Virtual Adresses}.
+The second \keyword{key thing} is they share the same \keyword{RAM} memory.
+
+Thus to run \code{code} on \keyword{GPU}, the host \keyword{CPU} must \emph{define \& map} a shared memory space between both processors. Then \keyword{CPU} send instructions and data using \emph{VC CPU Bus Addresses} and \keyword{GPU} give back results also using \emph{VC CPU Bus Addresses}.
 Appendice~\ref{AppendixB} taken from the \bcm{} documentation \parencite{refBCM} shows this different address spaces.
 
 These are really two crucial \keyword{concepts} to keep in mind for the rest of the report. It took me time to understand them although it is the heart of \vc{} programming.
