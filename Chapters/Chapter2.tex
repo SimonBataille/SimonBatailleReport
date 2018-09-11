@@ -28,7 +28,9 @@
 
 \section{State of the Art}
 
-When arriving at \groupname{}, my first task was to write a \emph{State-of-the-Art} report about the \vc{}. The goal was to list interesting projects using this \keyword{GPU} and know what was possible to do with it. I spent my first two weeks surfing on the internet to gather every information I found about \vc. I wrote a report containing general information and every accurate project for the rest of my internship.
+When arriving at \groupname{}, my first task was to write a \emph{State-of-the-Art} report about the \vc{}. The goal was to list interesting projects using this \keyword{GPU} and know what was possible to do with it.
+
+I spent my first two weeks surfing on the internet to gather every information I found about \vc. I wrote a report containing general information and every accurate project for the rest of my internship.
 
 Finally I had a meeting with \supname{} where I explained to him which direction I wanted to explore. We decided that I should start with a \emph{\enquote{helloworld}} program that made me understand the basics of the \vc{} and start developping on a \rasp.
 
@@ -38,33 +40,40 @@ Finally I had a meeting with \supname{} where I explained to him which direction
 
 \emph{Raspberry Pi Playground} \parencite{refRpiPlayground} is the first project I focused on to better understand the \vc. It is associated with a \enquote{\file{github}} repository: \url{//github.com/elorimer/rpi-playground}
 
-It is the most important project I studied during my internship because it contains a \enquote{\file{helloworld}} program that helped me to understand the preliminary basis of the \vc{} architecture and above all, how to use this \keyword{GPU}. I followed every step of this project permanantly reading the \vc{} documention \parencite{refVC}. I detail this program because all the rest of my internship is based on it.
+It is the most important project I studied during my internship because it contains a \enquote{\file{helloworld}} program that helped me to understand the preliminary basis of the \vc{} architecture and above all, how to use this \keyword{GPU}.
 
+I followed every step of this project permanantly reading the \vc{} documention \parencite{refVC}. I detail this program because all the rest of my internship is based on it.
 
 \subsection{GPU Programming}
 \label{concepts}
-Before describing what the \file{helloworld} project does, I highlight some \keyword{key points} in \vc{} programming that I understood with \parencite{refRpiPlayground}:
+Before describing what the \file{helloworld} project does, I will highlight some \keyword{key points} in \vc{} programming that I understood with \parencite{refRpiPlayground}:
 
 \begin{itemize}
 	\item GPU is a CPU peripheral
 	\item GPU and CPU share the same RAM memory
 \end{itemize}
 
-\vspace{0.5cm}
+-- \keyword{First key thing} to understand is that a \keyword{GPU} is driven by a host \keyword{CPU}. In the case of \bcm, the \vc{} is driven by an \cpu{}.
 
-The first \keyword{key thing} to understand is that a \keyword{GPU} is driven by a host \keyword{CPU}. In the case of \bcm, the \vc{} is driven by an \cpu{}.
-
-The second \keyword{key thing} is they share the same \keyword{RAM} memory.
-
-Thus to run \code{code} on \keyword{GPU}, the host \keyword{CPU} must \emph{define \& map} a shared memory space between both processors. Then \keyword{CPU} send instructions and data using \emph{VC CPU Bus Addresses} and \keyword{GPU} give back results also using \emph{VC CPU Bus Addresses}.
-Appendice~\ref{AppendixB} taken from the \bcm{} documentation \parencite{refBCM} shows this different address spaces.
+-- \keyword{Second key thing} is that they share the same \keyword{RAM} memory.
 
 These are really two crucial \keyword{concepts} to keep in mind for the rest of the report. It took me time to understand them although it is the heart of \vc{} programming.
+
+\vspace{5mm}
+Thus to run \code{code} on \keyword{GPU}, the host \keyword{CPU}:
+\begin{itemize}
+	\item \code{define} \& \code{map} a \ram{} memory space between both processors
+	\item \code{send} instructions and data using \emph{VC CPU Bus Addresses}
+	\item \code{get back} results from \keyword{GPU} also using \emph{VC CPU Bus Addresses}
+\end{itemize}
+
+Appendice~\ref{AppendixB} taken from the \bcm{} documentation \parencite{refBCM} shows these different address spaces.
+
 
 
 \subsection{\file{helloworld} Program}
 
-As a consequence of \ref{concepts}, in the case of \keyword{GPU} programing, a \file{helloworld} is not a trivial exercice because a lot of parts are involved. To run \code{code} on \vc, we must write a \cpu{} program (in \keyword{C} language) that will:
+As a consequence of \ref{concepts}, in the case of \keyword{GPU} programing, a \file{helloworld} is not a trivial exercice because a lot of parts are involved. To run \code{code} on \vc, we must write a \cpu{} program \option{in c language} that will:
 \begin{itemize}
 	\item initialize the GPU
 	\item map \ram{} memory space
@@ -72,20 +81,20 @@ As a consequence of \ref{concepts}, in the case of \keyword{GPU} programing, a \
 	\item send data and code to the GPU
 	\item get back resutls
 \end{itemize}
-\vspace{10 mm}
+\vspace{5 mm}
 
 Within the \file{rpi-playground} project, \file{helloworld} program will:
 
 \begin{itemize}
 	\item initialize the \vc
-	\item map the RAM memory shared by the \vc{} and the \cpu
+	\item map the \ram{} memory space between the \vc{} and the \cpu
 	\item transfer a single input value - \keyword{100} - from \cpu{} to \vc
 	\item use the \vc{} to add constant  - \keyword{0x1234} - to this input value
 	\item get back the result from \vc{} to \cpu
 \end{itemize}
 
-
-\subsubsection{Run \file{helloworld} and see its output}
+\newpage
+\subsubsection{Run helloworld and see its output}
 
 To execute \file{helloworld}, we run \code{sudo ./helloworld helloworld.bin 100}.
 
@@ -127,15 +136,13 @@ Done.
 
 
 
-Appendice~\ref{AppendixC} taken from \parencite{refVC} shows an architecture overview of the \vc. \keyword{GPU} parts involved in \file{helloworld} program are highlighted with \textcolor{blue}{blue} rectangles:
-
-
+Appendice~\ref{AppendixC} taken from \parencite{refVC} shows an architecture overview of the \vc. \keyword{GPU}'s parts involved in \file{helloworld} program are highlighted with \textcolor{blue}{blue rectangles}:
 
 
 \begin{itemize}
 	\item \keyword{AXI ARB} -- bus that connects \vc{} to \ram{} and \cpu
-	\item \keyword{Uniforms Cache (QUC)} -- cache containning variables transferred from \cpu{} to \vc
-	\item \keyword{Icache (QIC)} -- cache containning code-to-execute transferred from \cpu{} to \vc
+	\item \keyword{Uniforms Cache (QUC)} -- cache containning \code{variables} transferred from \cpu{} to \vc
+	\item \keyword{Icache (QIC)} -- cache containning \code{code-to-execute} transferred from \cpu{} to \vc
 	\item \keyword{Quad Processor Unit (QPU)} -- \vc{} internal processor
 	\item \keyword{Vertex Pipe Memory (VPM)} -- \vc{} internal memory buffer
 	\item \keyword{VPM DMA Writer (VDM)} -- writes DATA from VPM to \ram{}
@@ -145,10 +152,10 @@ Appendice~\ref{AppendixC} taken from \parencite{refVC} shows an architecture ove
 
 \cpu{} and \vc{} communicate through \keyword{AXI ARB} bus. Within \file{helloworld} program, we will use \cpu{} to:
 \begin{itemize}
-	\item initialize and allocate \ram{} in both \keyword{ARM Virtual Adresses} and \keyword{ARM Virtual Adresses} (Appendice~\ref{AppendixB})
-	\item transfer variables to the \keyword{QUC}
-	\item transfer code-to-execute to the \keyword{QIC}
-	\item execute code with \keyword{QPU}
+	\item initialize and allocate \ram{} accessible in both \emph{ARM Virtual Adresses} and \emph{VC CPU Bus Adresses} - Appendice~\ref{AppendixB}
+	\item transfer \code{variables} to the \keyword{QUC}
+	\item transfer \code{code-to-execute} to the \keyword{QIC}
+	\item execute \code{code} with \keyword{QPU}
 	\item store result into \keyword{VPM}
 	\item write back results into \ram{} through \keyword{VDM}
 \end{itemize}
@@ -158,13 +165,6 @@ Appendice~\ref{AppendixC} taken from \parencite{refVC} shows an architecture ove
 
 \qpu{} is the \vc{} internal processor. It is the \keyword{key component}. Appendice~\ref{AppendixD} taken from \parencite{refVC} shows its pipeline.
 
-%\begin{figure}[!htbp]
-%	\centering
-%	\includegraphics[width=0.9\textwidth]{QPU}
-%	\caption{\qpu{} pipeline}
-%	\label{qpuFigure}
-%\end{figure}
-%\FloatBarrier
 
 \qpu{} is a \keyword{SIMD} vector processor developed by \textsc{Broadcom} with instructions that operate on 16-element vectors of 32-bit integer or floating point values. For example, given two 16-element vectors:\\
 
@@ -178,7 +178,7 @@ and
 	20&21&22&23&24&25&26&27&28&29&30&31&32&33&34&35
 \end{tabular}\\
 
-The QPU's \code{integer-add} (Figure~\ref{VCinstructionsFigure}) instruction computes a third vector:
+The \qpu's \code{integer-add} instruction - Figure~\ref{VCinstructionsFigure} - computes a third vector:
 
 \begin{tabular}{cccc|cccc|cccc|cccc}
 	30&32&34&36&38&40&42&44&46&48&50&52&54&56&58&60
@@ -189,7 +189,7 @@ where each element in the output is the sum of the corresponding two elements in
 Each 16-element vector is comprised of four quads. This is where the name ``Quad Processing Unit'' comes from: a QPU processes one quad per clock cycle, and a QPU instruction takes four consecutive clock cycles to deliver a full 16-element result vector.
 
 \rasp{} contains 12 \qpu{}s in total, each running at 250MHz. That's a max throughput of 750M vector instructions per second (250M cycles divided by 4 cycles-per-instruction times 12 QPUs). Or: 12B operations per second (750M instructions times 16 vector elements). \qpu{} instructions can in some cases deliver two results at a time, so the Pi's QPUs are often advertised at 24 GFLOPS.
-
+\newpage
 
 
 \subsection{\file{rpi-playground} Architecture}
@@ -203,19 +203,19 @@ Each 16-element vector is comprised of four quads. This is where the name ``Quad
 \FloatBarrier
 
 Figure~\ref{rpiPlaygroundFigure} shows the architecture of the \file{rpi-playground} project once cloned from the \file{github} repository: \code{git clone git@github.com:elorimer/rpi-playground.git}
+
 The project is made of two directories:
 \begin{itemize}
 \item \keyword{assembler} directory contains:
 	\begin{itemize}
-		\item \file{assemble.cpp} -- \keyword{assembly parser} of \vc{} instructions set
+		\item \file{assemble.cpp} -- \code{assembly parser} of \vc{} instructions set
 	\end{itemize}
 \item \keyword{helloworld} directory contains:
 	\begin{itemize}
 		\item \file{helloworld.asm} -- \code{code-to-execute} on the \vc
-		\item \file{driver.c} -- code that \code{drives} the \vc
+		\item \file{driver.c} -- program that \code{drives} the \vc
 	\end{itemize}
 \end{itemize}
-
 
 
 \subsection{\keyword{assembler} directory}
@@ -223,9 +223,11 @@ The project is made of two directories:
 
 \subsubsection{assemble.cpp}
 
-\file{assemble.cpp} is the \keyword{assembly parser} written by Eric \textsc{Lorimer} the author of \file{rpi-playground} project. This code translates instuctions written in \file{helloworld.asm} (Figure~\ref{rpiPlaygroundFigure}) into \file{helloworld.bin}, a binary file that the \vc{} will understand.
+\file{assemble.cpp} is the \code{assembly parser} written by Eric \textsc{Lorimer}, the author of \file{rpi-playground} project.
 
-Figure~\ref{VCinstructionsFigure} taken from \parencite{refVC} shows the miscellaneous \enquote{\code{add}} operations of the \qpu. \vc{} has also \enquote{\code{mul}}, \enquote{\code{load}}, \enquote{\code{branch}} or \enquote{\code{semaphore}} instructions.
+This program translates instuctions written in \file{helloworld.asm} - from \file{helloworld} directory figure~\ref{rpiPlaygroundFigure} - into a binary file - \file{helloworld.bin} - that the \vc{} will understand.
+
+Figure~\ref{VCinstructionsFigure} taken from \parencite{refVC} shows the miscellaneous \enquote{\code{add}} operations of the \qpu's instructions set. \vc{} has also \enquote{\code{mul}}, \enquote{\code{load}}, \enquote{\code{branch}} or \enquote{\code{semaphore}} instructions.
 
 \begin{figure}[!htbp]
 	\centering
@@ -234,10 +236,11 @@ Figure~\ref{VCinstructionsFigure} taken from \parencite{refVC} shows the miscell
 	\label{VCinstructionsFigure}
 \end{figure}
 \FloatBarrier
+\vspace{5mm}
+
 
 In \file{assemble.cpp}, these instructions are declared with the following \keyword{C++} code:
 
-%\lstset{language=C,caption={Declaration of \enquote{\code{add operations}} in \file{assemble.cpp}},captionpos=t,label=addLabel}
 \lstset{style=CStyle,caption={Declaration of \code{add} operations in \file{assemble.cpp}},captionpos=t,label=addLabel}
 \begin{lstlisting}
 static string addOps[] = {
@@ -248,7 +251,6 @@ static string addOps[] = {
 \end{lstlisting}
 
 
-
 \subsubsection{Makefile}
 
 \lstset{language=make,caption={Makefile from assembler directory},captionpos=t,label=assMakefileLabel}
@@ -257,28 +259,25 @@ qpu-assembler: assemble.cpp
 	g++ -g -o qpu-assembler assemble.cpp
 \end{lstlisting}
 
-This \file{Makefile} contains only one instruction. So running the \code{make} command inside the \keyword{assembler} directory generates \file{qpu-assembler}, an \keyword{executable} file.
-\vspace{5 mm}
+This \file{Makefile} contains only one instruction. So running the \code{make} command inside the \keyword{assembler} directory generates an \keyword{executable} file: \file{qpu-assembler}.
+\vspace{10mm}
 
-Then, this \keyword{executable} is used in the \keyword{helloworld} directory to generate \file{helloworld.bin}:
-
+Then, this \keyword{executable} is used in the \file{helloworld} directory to generate \file{helloworld.bin}:
+\begin{center}
 \code{../assembler/qpu-assembler -o helloworld.bin < helloworld.asm}
-\vspace{5 mm}
+\end{center}
+\newpage
 
-
-
-\subsection{\keyword{helloworld} directory}
+\subsection{helloworld directory}
 
 \subsubsection{qpu.h/qpu.c}
 
-In these files we define a \code{MACRO} function, \code{BUS\_TO\_PHYS()}, to convert \keyword{VC CPU Bus Addresses} into \keyword{ARM Virtual Addresses} (Appendice~\ref{AppendixB}).
+In these files we define \code{BUS\_TO\_PHYS()}, a \code{MACRO} function to convert \emph{VC CPU Bus Addresses} into \emph{ARM Virtual Addresses} - Appendice~\ref{AppendixB}.
 
-Then we use \code{MACROS} to define \keyword{VC CPU Bus Addresses} of \vc{} peripherals.
+Then we use \code{MACROS} to define the \emph{VC CPU Bus Addresses}'s of \vc{} peripherals.
 
 Finally, we declare \code{gpu\_fft\_get\_host\_info()} to get \rasp{} information.
 
-
-%\lstset{language=C,caption={qpu.h}}
 \lstset{style=CStyle,caption={qpu.h}}
 \begin{lstlisting}
 #define BUS_TO_PHYS(x) ((x)&~0xC0000000)
@@ -298,19 +297,20 @@ int gpu_fft_get_host_info(struct GPU_FFT_HOST *info);
 
 \subsubsection{helloworld.asm}
 
-\file{helloworld.asm} is the \code{code-to-execute} by the \vc. It is written in \keyword{assembly language} using the \vc{}'s instructions set. Let's explain line by line:\\
+\file{helloworld.asm} is the \code{code-to-execute} by the \vc. It is written in \option{assembly language} using the \vc{}'s instructions set. Let's explain this \file{file} line by line:\\
 
 \code{\# Load the value we want to add to the input into a register\\ldi ra1, 0x1234}\\
 -- First, we load the 32-bit immediate value \emph{0x1234} into \emph{ra1} register.\\
 -- This value is replicated 16 ways accross the entire SIMD array of the \emph{QPU 0,0} processor.\\
 
 \code{\# Configure the VPM for writing\\ldi rb49, 0xa0}\\
--- QPU register address map in \parencite{refVC} pages 37-38 shows writting to \emph{rb49} is \code{VPMVCD\_WR\_SETUP}: we configure \keyword{VPM} memory to store results from \emph{QPU 0,0}.\\
+-- \qpu{} register address map in \parencite{refVC} pages 37-38 shows writting to \emph{rb49} is \code{VPMVCD\_WR\_SETUP}: we configure \keyword{VPM} memory to store results from \emph{QPU 0,0}.\\
 
 \code{\# Add the input value (first uniform - rb32)\\ \# and the register with the hard-coded constant into the VPM.\\add rb48, ra1, rb32; nop}\\
 -- \emph{rb48} is the register to write into, in order to write results from the \emph{QPU 0,0} to the \keyword{VPM} the way we just configured it.\\
 -- \emph{rb32/ra32} is the address we read from to fetch \keyword{100} -- \keyword{uniform} value.\\
 
+\newpage
 \code{\# Move 16 words (1 vector) back to the host (DMA)\\ldi rb49, 0x88010000}\\
 -- From \parencite{refVC} page 58, we configure the \emph{VPM DMA storing} by writing \emph{rb49} register : \code{VPMVCD\_WR\_SETUP}.\\
 -- We configure the \emph{DMA} transfer of 16-word vector from \emph{VPM buffer} to the \ram{} memory.\\
@@ -326,13 +326,11 @@ int gpu_fft_get_host_info(struct GPU_FFT_HOST *info);
 
 \subsubsection{driver.c}\label{helloworldlabel}
 
-The whole \file{driver.c} is written in Appendice~\ref{AppendixE}, but I will detail the \keyword{key parts}:\\
-
+The whole \file{driver.c} program is written in Appendice~\ref{AppendixE}. Here I detail the \keyword{key parts}:
 
 \code{\#include ``mailbox.h''}\\
--- We use \mail{} interface to communicate between \vc{} and \cpu.\\
--- This interface uses low-level linux kernel functions that enable \keyword{CPU} to send \code{code-to-execute} and \code{input data} - \keyword{uniforms} - to \keyword{GPU}, and then get back results.\\
-
+-- We use the \mail{} interface to communicate between \vc{} and \cpu.\\
+-- This interface uses low-level linux kernel functions that enable \keyword{CPU} to send \code{code-to-execute} and \code{input data} called \uni{}s to \keyword{GPU}, and then get back \code{results} from \keyword{GPU}.\\
 
 
 \lstset{style=CStyle,caption={helloworld memory\_map}, label=map}
@@ -346,11 +344,12 @@ struct memory_map {
 int code_words = loadShaderCode(argv[1], qpu_code, MAX_CODE_SIZE);
 \end{lstlisting}
 -- This defines the memory layout we’ll use and share between \keyword{CPU} and \keyword{GPU}.\\
--- This layout will be accessed in both \emph{ARM Virtual Addresses} and \emph{VC CPU Bus Addresses} (Appencice~\ref{AppendixB}).\\
--- We use \code{loadShaderCode()} function to load \file{helloworld.bin} binary code file.\\~\\
+-- This layout will be accessed in both \emph{ARM Virtual Addresses} and \emph{VC CPU Bus Addresses} - Appencice~\ref{AppendixB}.\\
+-- We use \code{loadShaderCode()} function to load \file{helloworld.bin} in the \ram. This is the binary file containing the \code{code-to-execute}.
+\newpage
 
 
-\lstset{style=CStyle,caption={init \mail{} interface}, label=init}
+\lstset{style=CStyle,caption={initialize \mail{} interface}, label=init}
 \begin{lstlisting}
     int mb = mbox_open();
     if (qpu_enable(mb, 1))
@@ -371,17 +370,20 @@ int code_words = loadShaderCode(argv[1], qpu_code, MAX_CODE_SIZE);
     unsigned ptr = mem_lock(mb, handle);
     void *arm\_ptr = mapmem(BUS\_TO\_PHYS(ptr + host.mem\_map), size);
 \end{lstlisting}
--- Initialize the \mail{} interface and send a message to enable the \qpu{} with the \code{qpu\_enable()} \mail{}'s function\\
--- We allocate and lock GPU memory with \code{mem\_alloc()} \mail{}'s function\\
--- \emph{ptr} is now the base Bus Address of the GPU memory mapping\\
--- \emph{ptr} is located inside \emph{VC CPU BUS Addresses} (Appendice~\ref{AppendixB})\\
--- Last line is a \keyword{key step} in our driver. Keep in mind that \vc{} is an \cpu{} peripheral so, to bind both \emph{VC CPU BUS Addresses} and \emph{ARM Virtual Addresses} we use both \code{mapmem() \& BUS\_TO\_PHYS()} functions.\\
--- Now we have two addresses (Appendice~\ref{AppendixB}) to refer to the memory:
+-- We initialize the \mail{} interface and send a message to enable the \qpu{} with \code{qpu\_enable()} \mail{} function\\
+-- We allocate and lock GPU memory with \code{mem\_alloc()} and \code{mem\_lock()} \mail{} functions:
 \begin{itemize}
-	\item \emph{ptr} is address that the \vc{} understands in \emph{VC CPU Bus Addresses}. When passing pointers to \keyword{GPU} from \keyword{CPU} we need to use \keyword{ptr}.
-	\item \emph{arm\_map} is used when accessing \cpu{} memory in \emph{ARM Virtual Addresses}. This is the address that \keyword{CPU} understands.
+	\item \emph{ptr} is now the base Bus Address of the GPU memory mapping
+	\item \emph{ptr} is a \emph{VC CPU BUS Addresses} - Appendice~\ref{AppendixB}
 \end{itemize}
--- \keyword{Physically}, \emph{ptr} and \emph{arm\_map} point on the same RAM space.
+-- Last line is a \keyword{key step} in our driver. Keep in mind that \vc{} is an \cpu{} peripheral so, to bind both \emph{VC CPU BUS Addresses} and \emph{ARM Virtual Addresses} we use both \code{mapmem() \& BUS\_TO\_PHYS()} functions.\\
+-- Now we have two addresses - Appendice~\ref{AppendixB} - to refer to the memory:
+\begin{itemize}
+	\item \emph{ptr} is the address that the \vc{} understands in \emph{VC CPU Bus Addresses}. \keyword{When passing pointers from CPU to GPU  we need to use \enquote{ptr}}.
+	\item \emph{arm\_ptr} is used when accessing \cpu{} memory in \emph{ARM Virtual Addresses}. \keyword{\enquote{arm\_map} the address that CPU understands}.
+\end{itemize}
+-- \keyword{Physically, \emph{ptr} and \emph{arm\_ptr} point on the same RAM space}.
+\vspace{5mm}
 
 
 \lstset{style=CStyle,caption={pointer arithmetic},label=arithmetic}
@@ -396,11 +398,13 @@ int code_words = loadShaderCode(argv[1], qpu_code, MAX_CODE_SIZE);
     unsigned vc_results = ptr + offsetof(struct memory_map, results);
     memcpy(arm_map->code, qpu_code, code_words * sizeof(unsigned int));
 \end{lstlisting}
--- We make pointer arithmetic to create the same mapping inside \emph{VC CPU Bus Addresses} to communicate with the \keyword{GPU}\\
--- Finally we copy \code{code} in memory with \code{memcpy}. So this \code{code} will accessible by \keyword{GPU} using \emph{VC CPU BUS Addresses}: \code{vc\_code}.
+-- We make pointer arithmetic to bind the same memory layout as \code{memory\_map} - Listing~\ref{map} -  within \emph{VC CPU Bus Addresses} \\
+-- Finally we copy \code{code} in memory with \code{memcpy()}. \code{code} is actually \code{helloworld.bin}.
+-- So this \code{helloworld.bin} will be accessible by \keyword{GPU} using \emph{VC CPU BUS Addresses}: \code{vc\_code}.
+\newpage
 
 
-\lstset{style=CStyle,caption={Transfer uniforms, code-to-execute and execute\_qpu},label=transfer}
+\lstset{style=CStyle,caption={Copy uniforms and transfer pointers with execute\_qpu()},label=transfer}
 \begin{lstlisting}
     for (int i = 0; i < NUM_QPUS; i++)
     {
@@ -413,7 +417,7 @@ int code_words = loadShaderCode(argv[1], qpu_code, MAX_CODE_SIZE);
     unsigned ret = execute_qpu(mb, NUM_QPUS, vc_msg, GPU_FFT_NO_FLUSH,
                                GPU_FFT_TIMEOUT);
 \end{lstlisting}
--- To execute a \qpu{} program on the \keyword{GPU}, we pass an array of message structures \emph{vc\_msg}, through \code{execute\_qpu()} function from the \mail{} interface. This array contains:
+-- To execute a \qpu{} program on the \keyword{GPU}, we pass an array of message structures \emph{vc\_msg}, through \code{execute\_qpu()} \mail{} function. This array contains:
 \begin{itemize}
 	\item First - \emph{vc\_uniforms} - a pointer to all the \uni{}s to bind to the QPU program:
 	\begin{itemize}
@@ -438,13 +442,13 @@ int code_words = loadShaderCode(argv[1], qpu_code, MAX_CODE_SIZE);
 Figure~\ref{flowFigure} sums up the \file{helloworld} program execution:
 
 \begin{itemize}
-	\item We use two \uni{}s to transfer an \emph{input value} (100) and a pointer to \emph{results array address} (results[NUM\_QPUS][16]), from the host \cpu{} to the \emph{QPU 0,0}
+	\item We use two \uni{}s to transfer an \emph{input value} (100) and a pointer to \emph{results array address} - \code{results[NUM\_QPUS][16]} - from the host \cpu{} to the \emph{QPU 0,0}
 	\item We send them with \code{execute\_qpu()}, a \mail{} function.
 	\item These 2 uniforms will be load into \emph{QUC : Uniforms Cache}.
-	\item We also use the \mail{} to tranfer a pointer to the \code{code-to-execute} from \keyword{CPU} to \keyword{GPU}.
+	\item We also tranfer a pointer to the \code{code-to-execute} on \keyword{GPU}.
 	\item \code{code-to-execute} is then load into \emph{QIC : Icache (Instructions cache)}.
 	\item \emph{QPU 0,0} adds \emph{100} to \emph{0x1234}.
-	\item First, the result (16-word vector) is write back to \keyword{VPM} (Vertex Pipe Memory).
+	\item First, the result (16-word vector) is write back to \keyword{VPM}.
 	\item Then, the result (16-word vector) is write back from \keyword{VPM} to \ram{} memory through \keyword{DMA} transfer.
 \end{itemize}
 
@@ -457,7 +461,7 @@ This project taught me the basis of \vc{} programming and laid the groundwork fo
 		\begin{itemize}
 			\item CPU sends code \keyword{pointers} and variables called \uni{}s in the \emph{VC CPU Bus Addresses}
 			\item GPU gives back results in \emph{VC CPU Bus Addresses}
-			\item CPU gets results as: \emph{ARM Virtual Addresses} and \emph{VC CPU Bus Addresses} are bind together with \code{mapmem()}
+			\item CPU gets results since \emph{ARM Virtual Addresses} and \emph{VC CPU Bus Addresses} are bind together with \code{mapmem()}
 		\end{itemize}
 	\item GPU is driven by CPU program (\file{driver.c}) that:
 		\begin{itemize}
@@ -496,7 +500,7 @@ To build the homemade \api{} for \iBubble, I focused on:
 \begin{itemize}
 	\item improve \file{driver.c}
 	\item refactore project architecture
-	\item use a more comprehensive \keyword{assembly parser} than \file{assemble.cpp}
+	\item use a more comprehensive \code{assembly parser} than \file{assemble.cpp}
 	\item find new \vc{} features
 	\item include my source code in \keyword{C++} project
 \end{itemize}
@@ -511,17 +515,19 @@ To build the homemade \api{} for \iBubble, I focused on:
 
 This project is interesting for several reasons:
 \begin{itemize}
-	\item the author wrote an improved \keyword{assembly parser} -- \file{qpu-asm.cpp}
-	\item \file{pi-gemm} introduces the \keyword{TMU} -- Appendice~\ref{AppendixC}
+	\item the author wrote an improved \code{assembly parser} -- \file{qpu-asm.cpp}
+	\item \emph{pi-gemm} introduces the \keyword{TMU} -- Appendice~\ref{AppendixC}
 	\item multiply matrix is massively used in \flow{} processing
-	\item \file{pi-gemm} algorithm is called in a \file{main.cpp} file -- as our homemade \api
-	\item \file{pi-gemm} \file{Makefile} is more generic
+	\item \emph{pi-gemm} algorithm is called in a \file{main.cpp} file -- as our homemade \api
+	\item \emph{pi-gemm} \file{Makefile} is more generic
 \end{itemize}
 
 
 \subsection{Texture Memory Unit and Matrices}\label{Matrices}
 
-\emph{pi-gemm} introduced \keyword{TMU}, a new crucial component of \vc{} and how to use matrices. \keyword{TMU} enables \qpu{} to directly access data from the \ram{}. We just have to pass data pointer from the \emph{VC CPU Bus Addresses} in some \keyword{uniforms} variables to load the values containing at this address.
+\emph{pi-gemm} introduces the way to use matrices and \keyword{TMU}, a new crucial component of \vc{}.
+
+\keyword{TMU} enables \qpu{} to directly access data from the \ram{}. We just have to pass data pointer from the \emph{VC CPU Bus Addresses} in some \keyword{uniforms} variables to load the values containing at this address.
 
 For instance, matrices which are stored in the \ram{} can be accessed knowing the pointer of the first element. I also noticed that matrices are stored in \emph{row-major} order (Figure~\ref{rowcolumnarrays}). That means row values are contiguous in \ram{} memory. This is a \keyword{key point} to know because frames from the \rasp{} camera are stored as \option{float-matrices} in memory and to compute the \flow{} we have to access data from those frames.
 
@@ -536,7 +542,7 @@ For instance, matrices which are stored in the \ram{} can be accessed knowing th
 
 \subsection{Refactoring projects}
 
-My goal while studying \file{pi-gemm} project was to create a standard framework to develop my own projects. I finally came with a mix between both \file{helloworld} and \file{pi-gemm} projects. Figure~\ref{projectArchitectureFigure} shows the project architecture:
+My goal while studying \emph{pi-gemm} project was to create a standard framework to develop my own projects. I finally came with a mix between both \file{helloworld} and \file{pi-gemm} projects. Figure~\ref{projectArchitectureFigure} shows my project architecture:
 
 \begin{figure}[!htbp]
 	\centering
@@ -551,7 +557,7 @@ My goal while studying \file{pi-gemm} project was to create a standard framework
 
 This directory contains 3 files: \file{qpu-asm.cpp}, \file{Makefile}, and \file{qpu-asm}.
 
-\file{qpu-asm.cpp} is the \keyword{assembly parser} from \file{pi-gemm} written by Pete \textsc{Warden}. It is more comprhensive because it features more instructions of the \vc.
+\file{qpu-asm.cpp} is the \code{assembly parser} from \file{pi-gemm} written by Pete \textsc{Warden}. It is more comprhensive because it features more instructions of the \vc.
 
 \lstset{language=make,caption={},captionpos=t,label=}
 \begin{lstlisting}
@@ -560,7 +566,9 @@ qpu-assembler: assemble.cpp
 \end{lstlisting}
 
 Run the \code{make} command will generate \file{qpu-asm}, an \keyword{executable} file and then:\\
+\begin{center}
 \code{./qpu-asm -o projectName.bin < projectName.asm}
+\end{center}
 
 
 \subsubsection{Include}
@@ -596,9 +604,10 @@ sudo ./projectName
 
 Once this standard framework was running well, I started developping several projects to run on the \rasp. The goal was to learn more \vc{}'s features and architecture. For instance I developped programs that:
 \begin{itemize}
-	\item take two 16-word vectors from \cpu{} memory, copy and multiply them inside \ram  and give back result to \cpu
-	\item take a $(240\times 360)$-\option{float-matrix} from \cpu{} memory, copy it inside \ram{}, convoluate it by a $(3\times 3)$-kernel and give back the resulting $(238\times 358)$-matrix to \cpu{}
+	\item take two 16-word vectors from \cpu{} memory, copy and multiply them inside \ram{} and give back result to \cpu
+	\item take a $(240\times 360)float-matrix$ from \cpu{} memory, copy it inside \ram{}, convoluate it by a $(3\times 3)kernel$ and give back the resulting $(238\times 358)float-matrix$ to \cpu
 \end{itemize}
+\newpage
 
 %----------------------------------------------------------------------------------------
 
@@ -609,9 +618,9 @@ In addition to my research on \vc{}'s projects, I developped several other helpf
 
 \subsection{Linux \& Vim}
 
-At \groupname{} the software developpment is done using Linux OS. So I had to \emph{GCC} or \emph{G++} compilers and I got immersed in Linux Architecture and Command Line, or in Makefile writting. I also needed to compile some libraries (\emph{Python, OpenCV} from scratch and face some compiling error after hours of running.
+At \groupname{} the software developpment is done using GNU/Linux OS. Thus I used \emph{GCC} or \emph{G++} compilers and I got immersed in Linux Architecture, Command Line or in Makefile writting. I also needed to compile some libraries (\emph{Python, OpenCV} from scratch and face some compiling error after hours of running.
 
-Since I developped on \rasp{}, I started using \emph{Vim} editor. Nicolas \textsc{Vincent} a member of the embedded software team, conviced me to start using this very \emph{customizable} editor. He learned me the basis and how to add useful plug-ins. He was a great adviser for me and learnt me a lot of tricks.
+Since I developped on \rasp{}, I started using \emph{Vim} editor. Nicolas \textsc{Vincent} a member of the embedded software team, conviced me to start using this very \emph{customizable} editor. He learned me the basis and how to add useful plug-ins. He was a great adviser for me and taught me a lot of tricks.
 
 
 \subsection{git \& github}

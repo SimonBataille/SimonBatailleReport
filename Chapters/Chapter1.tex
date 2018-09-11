@@ -81,15 +81,15 @@ The vision system is globally composed of two parts: a \emph{machine learning de
 
 The vision algorithms mentionned in~\ref{Vision} are well-known and can be parallelize very efficiently on \keyword{GPU}s to improve compute speed. Therefore there are a lot of implementations on \keyword{GPU}s of these algorithms especially with the growth of \emph{Nvidia's CUDA GPGPU cores} on embedded chip (for instance the Jetson TX2 board).
 
-However, \groupname{} chose \rasp\footnote{Raspberry Pi: https://www.raspberrypi.org/} as the central embedded computer for \iBubble. Indeed, this board is far less expensive than \emph{CUDA} systems, reasonably powerful and very well-documented with a huge community of developers.\par
+However, \groupname{} chose \rasp\footnote{Raspberry Pi: \url{https://www.raspberrypi.org/}} as the central embedded computer for \iBubble. Indeed, this board is far less expensive than \emph{CUDA} systems, reasonably powerful and very well-documented with a huge community of developers.\par
 
-The \keyword{SoC} used in the \rasp{} is a \keyword{\textsc{Broadcom}} \bcm{}\footnote{BCM2837: \url{https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf}} fitted with:
+The \keyword{SoC} used in the \rasp{} is a \keyword{\textsc{Broadcom}} \bcm{}\footnote{BCM2837: \url{https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals}} fitted with:
 \begin{itemize}
 \item \keyword{CPU} -- \keyword{ARM Cortex A53} (ARMv8) cluster
 \item \keyword{GPU} -- \vc{}
 \end{itemize}
 
-Furthermore, the current vision system (\emph{detector \& tracker}~\ref{Vision}) uses state-of-the-art algorithm \keyword{CMT}\footnote{CMT algorithm: \url{https://www.gnebehay.com/cmt/}}, developed with \keyword{OpenCV}\footnote{OpenCV: https://opencv.org/} the main library used in Computer Vision.
+Furthermore, the current vision system (\emph{detector \& tracker}~\ref{Vision}) uses state-of-the-art algorithm \keyword{CMT}\footnote{CMT algorithm: \url{https://www.gnebehay.com/cmt/}}, developed with \keyword{OpenCV}\footnote{OpenCV: \url{https://opencv.org/}} the main library used in Computer Vision.
 
 The main issue is that the \bcm{} is not designed with a \emph{CUDA} architecture and there is no reliable implementation of the algorithms on the \rasp. As a consequence, the \vc{} can't be used and the whole \emph{tracking system} is running only on the \rasp's \keyword{CPU}, resulting in slow computing time and poor performances. Since all the vision system will be integrated on the \rasp, the difficulty is to achieve correct quality with a real-time processing on a such device.
 
