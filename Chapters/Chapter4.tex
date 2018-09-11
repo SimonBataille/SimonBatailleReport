@@ -34,7 +34,7 @@ To test this \api{} I compute the \flow{} first using \code{calcOpticalFlowPyrLK
 \begin{itemize}
 	\item \file{video\_out\_init\_features.jpg}: an image containing the initial \feat{}s positions - Figure~\ref{initFeaturesFig}
 	\item \file{video\_out\_opt\_flow\_vectors.avi}: a video where \flow{} between each consecutive frames is representing by \textcolor{blue}{blue vectors} - Figure~\ref{opticalFlowFig}
-	\item \file{video\_out\_vectors.json}: a \file{.json} file containing all the 30 $(d_{x},d_{y})$ values for each frame of the whole \emph{video\_sample}
+	\item \file{video\_out\_vectors.json}: a \file{json} file containing all the 30 $(d_{x},d_{y})$ values for each frame of the whole \emph{video\_sample}
 \end{itemize}
 
 Moreover the terminal displays time processing for each frame of the video. So I am able to compare time when using this two functions.
@@ -42,7 +42,7 @@ Moreover the terminal displays time processing for each frame of the video. So I
 
 \subsection{Time Comparison}
 
-\lstset{language=bash,caption={\code{calcOpticalFlowPyrLK} terminal output},basicstyle=\tiny,label=}
+\lstset{language=bash,caption={\code{calcOpticalFlowPyrLK} terminal output},basicstyle=\tiny,label=timeOpenCV}
 \begin{lstlisting}
 mean time per frame: 0.00538982 for 24 frames.
 JSON file of vectors of each features at each frames can be found at: /home/pi/video/video_out/video_out_vectors.json
@@ -56,7 +56,7 @@ All videos / frames of: /home/pi/video have been processed !
 \end{lstlisting}
 
 
-\lstset{language=bash,caption={\code{calcOpticalFlowPyrLK} terminal output},basicstyle=\tiny,label=}
+\lstset{language=bash,caption={\code{compute\_lk\_gpu} terminal output},basicstyle=\tiny,label=timeGPU}
 \begin{lstlisting}
 mean time per frame: 0.0119438 for 24 frames.
 JSON file of vectors of each features at each frames can be found at: /home/pi/video/video_out/video_out_vectors.json
@@ -75,76 +75,74 @@ All videos / frames of: /home/pi/video have been processed !
 
 \noindent\begin{minipage}{.45\textwidth}
 \begin{lstlisting}[caption={\code{calcOpticalFlowPyrLK} values},frame=tlrb,basicstyle=\tiny]{Name}
-"number": "9",
+"number": "1",
 "vectors": {
-	"feature 1": "[0.00437927, 1.01498]",
-	"feature 2": "[0.0429688, 0.984863]",
-	"feature 3": "[-0.00196838, 0.985191]",
-	"feature 4": "[0.013916, 0.999466]",
-	"feature 5": "[-0.00466919, 1.02369]",
-	"feature 6": "[0.00923157, 1.59529]",
-	"feature 7": "[0.136581, 1.39946]",
-	"feature 8": "[0.320084, 1.5918]",
-	"feature 9": "[0.0149536, 1.03059]",
-	"feature 10": "[-0.0966644, 1.72192]",
-	"feature 11": "[0.00205994, 0.997665]",
-	"feature 12": "[0.175995, 1.14218]",
-	"feature 13": "[-0.0109406, 1.09407]",
-	"feature 14": "[0.0992737, 1.05608]",
-	"feature 15": "[0.205734, 1.56096]",
-	"feature 16": "[0.0429688, 1.02802]",
-	"feature 17": "[0.243973, 1.51352]",
-	"feature 18": "[0.0153656, 1.83011]",
-	"feature 19": "[0.0600433, 1.05858]",
-	"feature 20": "[-0.000396729, 1.00053]",
-	"feature 21": "[0.0501404, 1.38897]",
-	"feature 22": "[0.12709, 1.79247]",
-	"feature 23": "[0.289734, 2.45174]",
-	"feature 24": "[0.0285187, 0.95536]",
-	"feature 25": "[0.161499, 1.30433]",
-	"feature 26": "[0.12973, 1.23988]",
-	"feature 27": "[0.108826, 0.860413]",
+	"feature 1": "[0.0529022, 1.44458]",
+	"feature 2": "[0.0597687, 1.52913]",
+	"feature 3": "[0.0342407, 1.41058]",
+	"feature 4": "[0.112976, 1.22267]",
+	"feature 5": "[0.0827942, 1.44588]",
+	"feature 6": "[0.248459, 1.40508]",
+	"feature 7": "[-0.015213, 1.4809]",
+	"feature 8": "[0, 0]",
+	"feature 9": "[0.0228882, 1.63636]",
+	"feature 10": "[0.0141602, 1.18526]",
+	"feature 11": "[0.168091, 1.44987]",
+	"feature 12": "[0.13475, 1.66971]",
+	"feature 13": "[0, 0]",
+	"feature 14": "[0.00767517, 1.44165]",
+	"feature 15": "[0, 0]",
+	"feature 16": "[0.0722351, 1.42871]",
+	"feature 17": "[0.102554, 1.21632]",
+	"feature 18": "[-0.010025, 1.1138]",
+	"feature 19": "[0, 0]",
+	"feature 20": "[0.0588074, 1.37506]",
+	"feature 21": "[0, 0]",
+	"feature 22": "[0, 0]",
+	"feature 23": "[0, 0]",
+	"feature 24": "[0, 0]",
+	"feature 25": "[0, 0]",
+	"feature 26": "[0, 0]",
+	"feature 27": "[-0.0355682, 1.50957]",
 	"feature 28": "[0, 0]",
 	"feature 29": "[0, 0]",
 	"feature 30": "[0, 0]"
-}
 \end{lstlisting}
 \end{minipage}\hfill
 \begin{minipage}{.45\textwidth}
-	\begin{lstlisting}[caption={\code{compute\_lk\_gpu} values},frame=tlrb,basicstyle=\tiny]{Name}
-"number": "9",
+\begin{lstlisting}[caption={\code{compute\_lk\_gpu} values},frame=tlrb,basicstyle=\tiny]{Name}
+"number": "1",
 "vectors": {
-	"feature 1": "[0.0307007, 1.05986]",
-	"feature 2": "[0.0518036, 1.08145]",
-	"feature 3": "[0.00424194, 1.06021]",
-	"feature 4": "[0.015625, 1.01106]",
-	"feature 5": "[0.00361633, 0.998215]",
-	"feature 6": "[-0.0257874, 1.5815]",
-	"feature 7": "[0.249847, 1.38773]",
-	"feature 8": "[0.265816, 1.47562]",
-	"feature 9": "[0.00706482, 0.996964]",
-	"feature 10": "[-0.0304565, 1.66684]",
-	"feature 11": "[0.0141449, 0.985558]",
-	"feature 12": "[0.0645599, 1.18579]",
-	"feature 13": "[0.0774689, 1.00171]",
-	"feature 14": "[0.0397186, 1.09403]",
-	"feature 15": "[-0.0235443, 1.05531]",
-	"feature 16": "[0.0857086, 1.01047]",
-	"feature 17": "[0.14328, 1.62175]",
-	"feature 18": "[-0.0360718, 1.74749]",
-	"feature 19": "[0.0405731, 1.0332]",
-	"feature 20": "[-0.0058136, 0.991623]",
-	"feature 21": "[0.0559845, 1.42413]",
-	"feature 22": "[0.00138855, 1.08983]",
-	"feature 23": "[0.00791931, 0.980244]",
-	"feature 24": "[-0.0236969, 1.04613]",
-	"feature 25": "[-0.0176392, 1.65675]",
-	"feature 26": "[0.0956726, 1.2908]",
-	"feature 27": "[0.0596008, 1.01413]",
-	"feature 28": "[0.00686646, 0.994537]",
-	"feature 29": "[-0.0133667, 1.12775]",
-	"feature 30": "[-0.00701904, 2.02641]"
-}
+	"feature 1": "[0.051239, 1.49907]",
+	"feature 2": "[0.0566864, 1.49538]",
+	"feature 3": "[0.0485229, 1.35619]",
+	"feature 4": "[0.117294, 1.25969]",
+	"feature 5": "[0.0852509, 1.44672]",
+	"feature 6": "[0.166031, 1.45792]",
+	"feature 7": "[0.0622253, 1.5038]",
+	"feature 8": "[0.0437317, 1.45819]",
+	"feature 9": "[0.117691, 1.69427]",
+	"feature 10": "[0.00265503, 1.25769]",
+	"feature 11": "[0.241287, 1.31388]",
+	"feature 12": "[0.139465, 1.62927]",
+	"feature 13": "[0.129959, 1.47935]",
+	"feature 14": "[0.12989, 1.47667]",
+	"feature 15": "[0.0406952, 1.49666]",
+	"feature 16": "[0.094986, 1.3511]",
+	"feature 17": "[0.0591583, 1.27177]",
+	"feature 18": "[0.0367737, 1.13118]",
+	"feature 19": "[0.0540619, 1.21773]",
+	"feature 20": "[0.158203, 1.45867]",
+	"feature 21": "[0.0509186, 1.89022]",
+	"feature 22": "[0.0492096, 1.49521]",
+	"feature 23": "[0.295776, 1.60911]",
+	"feature 24": "[0.17981, 1.46049]",
+	"feature 25": "[0.0469666, 1.3327]",
+	"feature 26": "[0.105698, 1.47306]",
+	"feature 27": "[0.115067, 1.43921]",
+	"feature 28": "[0.0691986, 1.4396]",
+	"feature 29": "[0.0128326, 1.17252]",
+	"feature 30": "[-0.0117493, 1.12878]"
 \end{lstlisting}
 \end{minipage}
 
@@ -155,30 +153,37 @@ All videos / frames of: /home/pi/video have been processed !
 
 As of the writing of this report, a part of the Lucas-Kanade method was still in development. This part called \emph{Gaussian Pyramids} is a way to estimate large displacement - large values of $(d_{x},d_{y})$ - between two frames.
 
-Inputs are still \textcolor{blue}{firstFrame}, \textcolor{red}{secondFrame} and \file{int} $featuresArray[2][30]$. The \emph{Gaussian Pyramids} algorithm is invoked before displacement computation section~\ref{dispComp}. This algorithm provides initial approached values of the $(d_{x},d_{y})$ for each feature. Those values are injected on the first iteration of displacement computation.
+Inputs are still \textcolor{blue}{firstFrame}, \textcolor{red}{secondFrame} and \file{int} $featuresArray[2][30]$. The \emph{Gaussian Pyramids} algorithm is invoked before displacement computation section~\ref{dispComp}. This algorithm provides approached values of $(d_{x},d_{y})$ for each feature. Those values are injected on the first iteration of displacement computation - Figure~\ref{algoFig}.
 
 \subsection{Pyramid Algorithm}
 
-\subsubsection{First convolution}
+This algorithm is applied to both \textcolor{blue}{firstFrame} and \textcolor{red}{secondFrame}. At the end we get two $(118\times 178)$ matrices.
+
+
+\subsubsection{First step: first convolution}
+
+The first step is to convolve the input $(240\times 360)$ frame by a $(3\times 3)$ kernel. The result is a $(238\times 358)$ convoluted frame:
 
 \noindent\begin{minipage}{.3\textwidth}
+Initial frame
 \[
 \begin{bmatrix}
 
-firstPixel_{0,0} & firstPixel_{0,1} & \ldots & \ldots & firstPixel_{0,359}\\
+initVal_{0,0} & initVal_{0,1} & \ldots & \ldots & initVal_{0,359}\\
 
-firstPixel_{1,0} & \ddots & \ldots & \ldots & firstPixel_{1,359}\\
+initVal_{1,0} & \ddots & \ldots & \ldots & initVal_{1,359}\\
 
 \vdots & \ldots & \ddots & \ldots & \vdots\\
 
 \vdots & \ldots & \ldots & \ddots & \vdots\\
 
-firstPixel_{239,0} & \ldots & \ldots  & \ldots & firstPixel_{239,359}
+initVal_{239,0} & \ldots & \ldots  & \ldots & initVal_{239,359}
 
 \end{bmatrix}_{240\times 360}
 \]
 \end{minipage}\hfill
 \begin{minipage}{.3\textwidth}
+Gaussian~$3\times 3$ kernel
 \[
 \begin{bmatrix}
 
@@ -192,27 +197,54 @@ firstPixel_{239,0} & \ldots & \ldots  & \ldots & firstPixel_{239,359}
 \]
 \end{minipage}
 
+\vspace{10mm}
 
-\subsubsection{Second convolution}
-
-\noindent\begin{minipage}{.3\textwidth}
+Resulting convoluted frame
 \[
 \begin{bmatrix}
 
-secondPixel_{0,0} & secondPixel_{0,1} & \ldots & \ldots & secondPixel_{0,357}\\
+ConvVal_{0,0} & ConvVal_{0,1} & \ldots & \ldots & ConvVal_{0,357}\\
 
-secondPixel_{1,0} & \ddots & \ldots & \ldots & secondPixel_{1,357}\\
+ConvVal_{1,0} & \ddots & \ldots & \ldots & ConvVal_{1,357}\\
 
 \vdots & \ldots & \ddots & \ldots & \vdots\\
 
 \vdots & \ldots & \ldots & \ddots & \vdots\\
 
-secondPixel_{237,0} & \ldots & \ldots  & \ldots & secondPixel_{237,357}
+ConvVal_{237,0} & \ldots & \ldots  & \ldots & ConvVal_{237,357}
+
+\end{bmatrix}_{238\times 358}
+\]
+
+
+
+
+\subsubsection{Second step: double convolution}
+
+The second step is to convolve the convoluted $(238\times 358)$ frame by the same $(3\times 3)$ kernel. The result is a $(236\times 356)$ double convoluted frame:
+
+\vspace{10mm}
+
+\noindent\begin{minipage}{.3\textwidth}
+Convoluted frame
+\[
+\begin{bmatrix}
+
+ConvVal_{0,0} & ConvVal_{0,1} & \ldots & \ldots & ConvVal_{0,357}\\
+
+ConvVal_{1,0} & \ddots & \ldots & \ldots & ConvVal_{1,357}\\
+
+\vdots & \ldots & \ddots & \ldots & \vdots\\
+
+\vdots & \ldots & \ldots & \ddots & \vdots\\
+
+ConvVal_{237,0} & \ldots & \ldots  & \ldots & ConvVal_{237,357}
 
 \end{bmatrix}_{238\times 358}
 \]
 \end{minipage}\hfill
 \begin{minipage}{.3\textwidth}
+Gaussian~$3\times 3$ kernel
 \[
 \begin{bmatrix}
 
@@ -226,47 +258,64 @@ secondPixel_{237,0} & \ldots & \ldots  & \ldots & secondPixel_{237,357}
 \]
 \end{minipage}
 
+\vspace{10mm}
 
-\subsubsection{Extraction}
 
+Resulting double convoluted frame
 \[
 \begin{bmatrix}
 
-thirdPixel_{0,0} & thirdPixel_{0,1} & \ldots & \ldots & thirdPixel_{0,355}\\
+doubleConvVal_{0,0} & doubleConvVal_{0,1} & \ldots & \ldots & doubleConvVal_{0,355}\\
 
-thirdPixel_{1,0} & \ddots & \ldots & \ldots & thirdPixel_{1,355}\\
+doubleConvVal_{1,0} & \ddots & \ldots & \ldots & doubleConvVal_{1,355}\\
 
 \vdots & \ldots & \ddots & \ldots & \vdots\\
 
 \vdots & \ldots & \ldots & \ddots & \vdots\\
 
-thirdPixel_{235,0} & \ldots & \ldots  & \ldots & thirdPixel_{117,355}
+doubleConvVal_{235,0} & \ldots & \ldots  & \ldots & doubleConvVal_{117,355}
 
 \end{bmatrix}_{236\times 356}
 \]
 
 
 
+\subsubsection{Final step: extraction}
+
+The final step is to extract a $(118\times 178)$ frame from the double $(236\times 356)$ convoluted frame:
+
+\vspace{10mm}
+Final extracted frame from double convoluted frame
 \[
 \begin{bmatrix}
 
-thirdPixel_{0,0} & thirdPixel_{0,2} & \ldots & \ldots & thirdPixel_{0,354}\\
+doubleConvVal_{0,0} & doubleConvVal_{0,2} & \ldots & \ldots & doubleConvVal_{0,354}\\
 
-thirdPixel_{2,0} & \ddots & \ldots & \ldots & thirdPixel_{2,354}\\
+doubleConvVal_{2,0} & \ddots & \ldots & \ldots & doubleConvVal_{2,354}\\
 
 \vdots & \ldots & \ddots & \ldots & \vdots\\
 
 \vdots & \ldots & \ldots & \ddots & \vdots\\
 
-thirdPixel_{234,0} & \ldots & \ldots  & \ldots & thirdPixel_{234,354}
+doubleConvVal_{234,0} & \ldots & \ldots  & \ldots & doubleConvVal_{234,354}
 
 \end{bmatrix}_{118\times 178}
 \]
 
-\subsubsection{Optical flow algorithm}
 
-Once we get the $118\times 178$ matrix from first and second frame, we apply the \flow{} the same way as in ~\ref{Chapter3} with all values of features posions divided by two.
+\subsection{Optical flow algorithm}
 
-We get 30 $d_{x},d_{y}$ approached values of the features displacement and we can start the \flow{} algorithm for the $240\times 360$ first and second frame to get the exact values of the displacement.
+Once we get the two $(118\times 178) extracted-matrices$ from \textcolor{blue}{firstFrame} and \textcolor{red}{secondFrame}, we apply the \flow{} algorithm to these $extracted-matrices$ the same way as in Chapter~\ref{Chapter3}, but with all values from $int featuresArray[2][30]$ divided by two. We get 30 $(d_{x},d_{y})$ approached values of each feature displacement.
+
+Finally we can run the \flow{} algorithm on the $(240\times 360)$ \textcolor{blue}{firstFrame} and \textcolor{red}{secondFrame}. The difference is we start with the approached 30 $(d_{x},d_{y})$ values on the first iteration - Figure~\ref{algoFig}. As a result we can't manage \flow{} computation for large movements with less iterations and get accurate values.
+
+
+\subsection{Ongoing status}
+
+At the time of concluding this report all the memory layout - \emph{grad\_MemLayout} - was in place to integrate the \emph{Pyramid Algorithm}.
+
+In \file{grad.h} file - Appendice~\ref{AppendixG} - I defined \ram{} memory spaces for \code{convolution} and \code{extraction} code, additionnal \uni{}s and results from \qpu{}s. All those new addresses are stored inside \code{grad\_VCptrsArray[]} section~\ref{gradClbl}. I also wrote all the new functions prototypes.
+
+The last part will be to write \file{.asm} files containing the \code{convolution}, \code{extraction} and \code{optical flow} code for the convolved frames.
 %----------------------------------------------------------------------------------------
 
