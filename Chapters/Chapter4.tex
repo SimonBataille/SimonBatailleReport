@@ -30,11 +30,11 @@
 
 \section{Results}
 
-To test this \api{} I compute the \flow{} first using \code{calcOpticalFlowPyrLK()} and then using \code{compute\_lk\_gpu()}: listing~\ref{mainLst}. Running the project with \code{sudo ./optical\_flow\_internship /home/pi/video/video\_out.avi} generates a directory containing three files:
+To test this \api{} I compute the \flow{} first using \code{calcOpticalFlowPyrLK()} and then using \code{compute\_lk\_gpu()} - listing~\ref{mainLst}. Running the project with \code{sudo ./optical\_flow\_internship /home/pi/video/video\_out.avi} generates a directory containing three files:
 \begin{itemize}
-	\item \file{video\_out\_init\_features.jpg}: an image containing the initial \feat{}s positions - Figure~\ref{initFeaturesFig}
-	\item \file{video\_out\_opt\_flow\_vectors.avi}: a video where \flow{} between each consecutive frames is representing by \textcolor{blue}{blue vectors} - Figure~\ref{opticalFlowFig}
-	\item \file{video\_out\_vectors.json}: a \file{json} file containing all the 30 $(d_{x},d_{y})$ values for each frame of the whole \emph{video\_sample}
+	\item \file{video\_out\_init\_features.jpg} - an image with the initial \feat{}s positions - Figure~\ref{initFeaturesFig}
+	\item \file{video\_out\_opt\_flow\_vectors.avi} - a video where \flow{} between each consecutive frames is representing by \textcolor{blue}{blue vectors} - Figure~\ref{opticalFlowFig}
+	\item \file{video\_out\_vectors.json} - a \file{json} file containing all the 30 $(d_{x},d_{y})$ values for each frame of the whole \emph{video\_sample}
 \end{itemize}
 
 Moreover the terminal displays time processing for each frame of the video. So I am able to compare time when using this two functions.
@@ -75,7 +75,7 @@ Listings~\ref{timeOpenCV} and~\ref{timeGPU} display the \emph{mean time per fram
 	\item \option{0.0119s} with \code{compute\_lk\_gpu()}
 \end{itemize}
 
-Using \vc{} is twice slower than \emph{OpenCV} function but this will release \keyword{CPU} ressources and theoretically \option{0.0119s} per frame could carry a ratio around \keyword{80 frames per second} which is promising for \iBubble{} visual tracking system.
+Using \vc{} is twice slower than \emph{OpenCV} function but this will release \keyword{CPU} ressources and theoretically \option{0.0119s} per frame could carry a ratio around \keyword{80 frames per second} which is promising for \iBubble{}'s visual tracking system.
 
 
 \subsection{Values Comparison}
@@ -168,16 +168,16 @@ The displacement between those figures is mainly \option{vertical} - Figure~\ref
 
 As of the writing of this report, a part of the Lucas-Kanade method was still in development. This part called \emph{Gaussian Pyramid} is a way to estimate large displacement - large values of $(d_{x},d_{y})$ - between two frames.
 
-Inputs are still \textcolor{blue}{firstFrame}, \textcolor{red}{secondFrame} and \file{int} $featuresArray[2][30]$. The \emph{Gaussian Pyramid} algorithm is invoked before displacement computation section~\ref{dispComp}. This algorithm provides approached values of $(d_{x},d_{y})$ for each feature. Those values are then injected on the first iteration of displacement computation - Figure~\ref{algoFig}.
+Inputs are still \textcolor{blue}{$firstFrame$}, \textcolor{red}{$secondFrame$} and \file{int} $featuresArray[2][30]$. The \emph{Gaussian Pyramid} algorithm is invoked before displacement computation section~\ref{dispComp}. This algorithm provides approached values of $(d_{x},d_{y})$ for each feature. Those values are then injected on the first iteration of displacement computation - Figure~\ref{algoFig}.
 
 \subsection{Pyramid Algorithm}
 
-This algorithm is applied to both \textcolor{blue}{firstFrame} and \textcolor{red}{secondFrame}. At the end we get two $(118\times 178)$ matrices.
+This algorithm is applied to both \textcolor{blue}{firstFrame} and \textcolor{red}{secondFrame}. At the end we get two $(118\times 178) matrices$.
 
 
 \subsubsection{First step: first convolution}
 
-The first step is to convolve the input $(240\times 360)$ frame by a $(3\times 3)$ kernel. The result is a $(238\times 358)$ convolved frame:
+The first step is to convolve the input $(240\times 360) frame$ by a $(3\times 3) kernel$. The result is a $(238\times 358) convolved$ frame:
 
 \vspace{5mm}
 
@@ -239,7 +239,7 @@ ConvVal_{237,0} & \ldots & \ldots  & \ldots & ConvVal_{237,357}
 
 \subsubsection{Second step: double convolution}
 
-The second step is to convolve the convolved $(238\times 358)$ frame by the same $(3\times 3)$ kernel. The result is a $(236\times 356)$ double convolved frame:
+The second step is to convolve the $(238\times 358) convolved$ frame by the same $(3\times 3) kernel$. The result is a $(236\times 356)double-convolved$ frame:
 
 \vspace{5mm}
 
@@ -279,7 +279,7 @@ ConvVal_{237,0} & \ldots & \ldots  & \ldots & ConvVal_{237,357}
 \vspace{5mm}
 
 
-\option{Resulting double convolved frame}
+\option{Resulting double-convolved frame}
 \[
 \begin{bmatrix}
 
@@ -302,10 +302,10 @@ doubleConvVal_{235,0} & \ldots & \ldots  & \ldots & doubleConvVal_{117,355}
 
 \subsubsection{Final step: extraction}
 
-The final step is to extract a $(118\times 178)$ frame from the double $(236\times 356)$ convolved frame:
+The final step is to get a $(118\times 178)extracted$-frame from the $(236\times 356)double-convolved$ frame:
 
 \vspace{5mm}
-\option{Final extracted frame from double convolved frame}
+\option{Final extracted-frame from double-convolved frame}
 \[
 \begin{bmatrix}
 
@@ -325,17 +325,24 @@ doubleConvVal_{234,0} & \ldots & \ldots  & \ldots & doubleConvVal_{234,354}
 
 \subsection{Optical flow algorithm}
 
-Once we get the two $(118\times 178)extracted-matrices$ from \textcolor{blue}{firstFrame} and \textcolor{red}{secondFrame}, we apply the \flow{} algorithm to these $(118\times 178)extracted-matrices$ the same way as in Chapter~\ref{Chapter3}, but with all values from $int featuresArray[2][30]$ divided by two. We get 30 $(d_{x},d_{y})$ approached values of each feature displacement.
+Once we get the two $(118\times 178)extracted$-matrices from \textcolor{blue}{firstFrame} and \textcolor{red}{secondFrame}, we apply the \flow{} algorithm to these $(118\times 178)extracted$-matrices the same way as in Chapter~\ref{Chapter3}, but with all values from $int featuresArray[2][30]$ divided by two. We get 30 $(d_{x},d_{y})$ approached values of each feature displacement.
 
-Finally we can run the \flow{} algorithm on the $(240\times 360)$ \textcolor{blue}{firstFrame} and \textcolor{red}{secondFrame}. The difference is we start with the approached 30 $(d_{x},d_{y})$ values on the first iteration - Figure~\ref{algoFig}. As a result we can't manage \flow{} computation for large movements with less iterations and get accurate values.
+Finally we can run the \flow{} algorithm on the $(240\times 360)\textcolor{blue}{firstFrame}$ and $(240\times 360)\textcolor{red}{secondFrame}$. The difference is we start with the approached 30 $(d_{x},d_{y})$ values on the first iteration - Figure~\ref{algoFig}. As a result we can manage \flow{} computation for large movements with less iterations and get accurate values.
 
 
 \subsection{Ongoing status}
 
 At the time of concluding this report all the memory layout - \emph{grad\_MemLayout} - was in place to integrate the \emph{Pyramid Algorithm}.
 
-In \file{grad.h} file - Appendice~\ref{AppendixG} - I defined \ram{} memory spaces for \code{convolution} and \code{extraction} code, additionnal \uni{}s and results from \qpu{}s. All those new addresses are stored inside \code{grad\_VCptrsArray[]} section~\ref{gradClbl}. I also wrote all the new functions prototypes.
+In \file{grad.h} file - Appendice~\ref{AppendixG} - I defined \ram{} memory spaces for:
+\begin{itemize}
+	\item \code{convolution} and \code{extraction} \enquote{\file{.bin files}}
+	\item additionnal \uni{}s
+	\item results from \enquote{\file{.bin files}} execution on \qpu{}s
+	\item all these new addresses are stored inside \code{grad\_VCptrsArray[]} section~\ref{gradClbl}
+	\item I also wrote all the new functions prototypes
+\end{itemize}
 
-The last part will be to write \file{.asm} files containing the \code{convolution}, \code{extraction} and \code{optical flow} code-to-execute on \vc{} in order to get these approached $(d_{x},d_{y})$.
+The last part will be to write \enquote{\file{.asm}} files containing the \code{convolution}, \code{extraction} and \code{optical flow} code-to-execute on \vc{} in order to get these approached $(d_{x},d_{y})$ values.
 %----------------------------------------------------------------------------------------
 
