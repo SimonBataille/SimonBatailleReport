@@ -24,7 +24,7 @@
 
 \documentclass[
 11pt, % The default document font size, options: 10pt, 11pt, 12pt
-oneside, % Two side (alternating margins) for binding by default, uncomment to switch to one side
+%oneside, % Two side (alternating margins) for binding by default, uncomment to switch to one side
 english, % ngerman for German
 singlespacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
 %draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
@@ -115,6 +115,17 @@ headsepline, % Uncomment to get a line under the header
 \usepackage{algpseudocode}
 \usepackage{parcolumns}
 \usepackage{lipsum}
+
+%\usepackage[printwatermark]{xwatermark}
+%\newwatermark[allpages,color=red!50,angle=45,scale=3,xpos=0,ypos=0]{DRAFT}
+
+\usepackage{draftwatermark}
+\SetWatermarkText{Confidential}
+\SetWatermarkScale{0.9}
+\SetWatermarkColor[rgb]{0.5,0,0}
+\SetWatermarkLightness{.9}
+
+\usepackage{mdframed}
 %----------------------------------------------------------------------------------------
 %	MARGIN SETTINGS
 %----------------------------------------------------------------------------------------

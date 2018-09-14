@@ -198,7 +198,7 @@ A pixel from window in firstFrame will be noted $\textcolor{blue}{firstWindow_{x
 A pixel from window in secondFrame will be noted $\textcolor{red}{secondWindow_{x,y}}$.\\
 A feature \keyword{row number} will be noted $\textcolor{blue}{x_{1}}$ on \textcolor{blue}{firstFrame} and $\textcolor{red}{x_{2}}$ on \textcolor{red}{secondFrame}.\\
 A feature \keyword{column number} will be noted $\textcolor{blue}{x_{1}}$ on \textcolor{blue}{firstFrame} and $\textcolor{red}{x_{2}}$ on \textcolor{red}{secondFrame}.\\
-Finally, the \keyword{same feature} will be noted $feature_{\textcolor{blue}{y_{1},y_{1}}}$ on \textcolor{blue}{firstFrame} and $feature_{\textcolor{red}{x_{1},y_{1}}}$ on \textcolor{red}{secondFrame}.
+Finally, the \keyword{same feature} will be noted $feature_{\textcolor{blue}{y_{1},y_{1}}}$ on \textcolor{blue}{firstFrame} and $feature_{\textcolor{red}{x_{2},y_{2}}}$ on \textcolor{red}{secondFrame}.
 
 \subsubsection{Expected Outcomes}
 
@@ -236,7 +236,7 @@ To summarize the \flow{} computation between two consecutive frames for each fea
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=0.8\textwidth]{framesWindow}
-	\caption{Optical flow between \textcolor{blue}{first frame} and \textcolor{red}{second frame} for one feature}
+	\caption{Estimated optical flow between \textcolor{blue}{first frame} and \textcolor{red}{second frame} after an iteration for one feature}
 	\label{framesWindowFig}
 \end{figure}
 \FloatBarrier
@@ -265,7 +265,7 @@ The goal is to get 4 values per \feat{}:
 	\item $det = \frac{1}{G_{XX}G_{YY}-G_{XY}G_{XX}}$
 \end{itemize}
 
-As shown in Figure~\ref{framesWindowFig}, we use a $(21\times21)-window$ around the \feat{}:
+As shown in Figure~\ref{framesWindowFig}, we use a $(21\times21)-pixels$ window around the \feat{}:
 
 $$G_{XX} = \sum_{i=1}^{21}\sum_{j=1}^{21} grad_{x}[i,j]^{2}$$
 $$G_{YY} = \sum_{i=1}^{21}\sum_{j=1}^{21} grad_{y}[i,j]^{2}$$
@@ -282,6 +282,7 @@ $$grad_{y}[i,j] = \frac{\textcolor{blue}{firstWindow_{i,j+1}} - \textcolor{blue}
 To compute the \feat{}'s displacement, we run the following algorithm:
 
 \begin{figure}[!htbp]
+\begin{mdframed}
 \begin{algorithmic}
 	\ForAll {$\textcolor{blue}{firstWindow_{i,j}}$ and $\textcolor{red}{secondWindow_{i,j}}$}
 
@@ -295,27 +296,36 @@ To compute the \feat{}'s displacement, we run the following algorithm:
 	\State $d_{x} = det\times (G_{YY}\times frames\_mismatch.x - G_{XY}\times frames\_mismatch.y)$
 	\State $d_{y} = det\times (G_{XX}\times frames\_mismatch.y - G_{XY}\times frames\_mismatch.x)$
 \end{algorithmic}
+\end{mdframed}
 \caption{Displacement algorithm for one feature}
 \label{algoFig}
 \end{figure}
 \FloatBarrier
 
-The algorithm Figure~\ref{algoFig} is running several times to have a better precision on $d_{x}$ and $d_{y}$ values. Each time, we reinject previous $d_{x}$ and $d_{y}$ to compute $\textcolor{red}{secondWindow_{i+d_{x},j+d_{y}}}$.
+The algorithm Figure~\ref{algoFig} is running several times to have a better precision on $d_{x}$ and $d_{y}$ values. Each iteration we reinject previous $(d_{x},d_{y})$. Thus:
+\begin{itemize}
+	\item we get new $\textcolor{red}{x_{2}} = \textcolor{blue}{x{1}}+d_{x}$ and $\textcolor{red}{y_{2}} = \textcolor{blue}{y_{1}}+d_{y}$ for \feat{}'s position on $\textcolor{red}{secondFrame}$
+	\item then we get new $\textcolor{red}{secondWindow_{0,0}}$
+	\item and finally we can compute $\textcolor{red}{secondWindow_{i+d_{x},j+d_{y}}}$
+\end{itemize}
 
-Results analysis shows that for a little \feat{} displacement, running this algorithm 5 times is enough to have better precision than \emph{OpenCV} function.\\
+Figure~\ref{framesWindowFig} shows \feat{}'s position after an iteration. Results analysis shows that for a little \feat{} displacement, running this algorithm 5 times is enough to have better precision on $(d_{x},d_{y})$ than \emph{OpenCV} function.\\
 
 
 Within the displacement algorithm, $\textcolor{red}{secondWindow_{i+d_{x},j+d_{y}}}$ is a \emph{bilinear interpolation}:
 
 \begin{figure}[!htbp]
+\begin{mdframed}
 \begin{equation*}
 	\begin{split}
-		\textcolor{red}{secondWindow_{i+d_{x},j+d_{y}}} = \textcolor{red}{secondWindow_{floor(i+d_{x}),floor(j+d_{y})}}\times (1-fract(i+d_{x}))\times (1-fract(i+d_{y}))\\
+		\textcolor{red}{secondWindow_{i+d_{x},j+d_{y}}} =\\
+		\textcolor{red}{secondWindow_{floor(i+d_{x}),floor(j+d_{y})}}\times (1-fract(i+d_{x}))\times (1-fract(i+d_{y}))\\
 		+ \textcolor{red}{secondWindow_{floor(i+d_{x})+1,floor(j+d_{y})}}\times (fract(i+d_{x}))\times (1-fract(i+d_{y}))\\
 		+ \textcolor{red}{secondWindow_{floor(i+d_{x}),floor(j+d_{y})+1}}\times (1-fract(i+d_{x}))\times (fract(i+d_{y}))\\
 		+ \textcolor{red}{secondWindow_{floor(i+d_{x})+1,floor(j+d_{y})+1}}\times (fract(i+d_{x}))\times (fract(i+d_{x}))
 	\end{split}
 \end{equation*}
+\end{mdframed}
 \caption{Bilinear interpolation within second frame window}
 \label{BIPFig}
 \end{figure}
@@ -325,6 +335,7 @@ The \emph{bilinear interpolation} Figure~\ref{BIPFig} was really tough to achiev
 
 
 Camille detailed me these algorithms on a big white board (Appendice~\ref{AppendixA}) and implemented them in \keyword{C++}. Then it was easier for me to translate them into \option{assembly language}.
+\newpage
 
 %----------------------------------------------------------------------------------------
 
@@ -378,7 +389,6 @@ else if (this->use_lk_gpu_)
 
 
 Listing~\ref{selectList} taken from \file{opt\_flow\_video.cpp} shows how we can choose between \code{calcOpticalFlowPyrLK()} and \code{compute\_lk\_gpu()} to compute the \flow{} between each consecutive frames of the \emph{video\_sample}.
-
 
 \subsubsection{Functions Parameters}\label{fctParams}
 
@@ -550,6 +560,7 @@ To achieve that the \keyword{key points} are:
 	\item pass different \code{code-to-execute}'s \keyword{pointers} to \code{execute\_qpu()} to select which one to execute on the \vc. This is done by changing \code{arm\_map->msg[i][1]} value.
 \end{itemize}
 
+\newpage
 The following listings show these three steps to run \code{graX.bin} in order to compute $G_{XX}$ value:
 
 \lstset{style=CStyle,caption={Fill \code{grad\_VCptrsArray[]} with code-to-execute pointers within \code{grad\_setVCptrs()} function},label=}
@@ -573,7 +584,6 @@ The following listings show these three steps to run \code{graX.bin} in order to
     grad_VCptrsArray[8] = vc_ptr + offsetof(struct grad_MemLayout,
                                             xtrX4code); //vc_xtrX4code
 \end{lstlisting}
-\newpage
 
 
 \lstset{style=CStyle,caption={Load code-to-execute \code{gradX.bin} in \ram{} within \code{grad\_init()} function},label=}
@@ -632,8 +642,7 @@ void grad_gradXqpu(int toggle)
 	\item \file{dPosXY.asm} - computes \flow{} - 30 $(d_{x},d_{y})$ - between \textcolor{blue}{firstFrame} and \textcolor{red}{secondFrame}
 \end{itemize}
 
-\file{gradX.asm} is reproduced appendice~\ref{AppendixG}. The \keyword{key point} is that every \qpu{} store the same \uni{}s at the beginning of the execution, so every \enquote{\file{.asm} file} start the same way:
-\newpage
+The \keyword{key point} is that every \qpu{} store the same \uni{}s at the beginning of the execution, so every \enquote{\file{.asm} file} start the same way:
 
 \lstset{style=customasm,caption={Storing \uni{}s value in \qpu's registers} ,label=}
 \begin{lstlisting}
@@ -664,6 +673,7 @@ These \uni{}s are:
 	\item all these addresses are \emph{VC CPU Bus addresses}
 \end{itemize}
 
+\newpage
 Listing~\ref{uniram} shows how \cpu{} stores these addresses in \ram{} and then pass them to \vc{} in \code{arm\_msg[i][0]}:
 \lstset{style=CStyle,caption={Storing \uni{}s value in \ram} ,label=uniram}
 \begin{lstlisting}
