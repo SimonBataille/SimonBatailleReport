@@ -8,7 +8,7 @@
 
 
 
-\title[Titre version courte]{Implémentation embarquée d'un algorithme de calcul de flux optique sur un dr\^one sous-marin autonome}
+\title[Calcul du flux optique sur Raspbery Pi]{Implémentation embarquée d'un algorithme de calcul de flux optique sur un dr\^one sous-marin autonome}
 % Titre du diaporama
 
 \subtitle{Processeur Graphique \textsc{VideoCore IV 3D}}
@@ -57,6 +57,101 @@
   % possibilité d'ajouter l'option [pausesections]
 \end{frame}
 
+
+
+
+\section{Introduction}
+	\subsection{Notilo+}
+
+\begin{frame}{Notilo+}
+\end{frame}
+
+	\subsection{iBubble}
+\begin{frame}{iBubble}
+\begin{block}{Bloc simple}
+\begin{itemize}
+\item Dr\^one aquatique et autonome
+\item Repérage Acoustique
+\item Système de suivi visuel autonome
+\end{itemize}
+\end{block}
+\end{frame}
+
+	\subsection{Problématique}
+\begin{frame}{Problématique}
+\begin{block}{Bloc simple}
+\begin{itemize}
+\item CMT - Flux Optique: partie consomme et parallèlisable
+\item Aucune API officielle
+\item Jeu d'instructions
+\item Vecteurs de 16 mots
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+
+
+\section{Sujet}
+	\subsection{Flux Optique}
+
+\begin{frame}{Flux Optique}
+\end{frame}
+
+	\subsection{Méthode de Lucas-Kanade}
+\begin{frame}{Algorithme}
+\end{frame}
+
+	\subsection{VideoCore IV 3D}
+\begin{frame}{Architecture}
+\begin{block}{Bloc simple}
+\begin{itemize}
+\item Documentation Officielle
+\item Aucune API officielle
+\item Jeu d'instructions
+\item Vecteurs de 16 mots
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Programmation}
+\begin{block}{Bloc simple}
+\begin{itemize}
+\item Piloter par un CPU: interface mailbox
+\item Mémoire RAM partagée entre CPU \& GPU: 2 espaces d'adresses
+\item Vecteurs de 16 mots
+\item Projet helloworld et pi-gemm github
+\item Initialiser la mémoire partagée
+\item Copier données et les variables
+\item Transmettre les pointeurs
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+
+\section{Solution}
+	\subsection{Bibliothèque interne}
+
+\begin{frame}{Architecture}
+\end{frame}
+
+	\subsection{Resultats}
+\begin{frame}{iBubble}
+\end{frame}
+
+	\subsection{Perspectives}
+\begin{frame}{Pyramide}
+\end{frame}
+
+
+
+
+\section{Conclusion}
+
+\begin{frame}{Conclusion}
+\end{frame}
 
 
 
