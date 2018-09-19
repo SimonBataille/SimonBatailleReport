@@ -64,38 +64,118 @@
 	\subsection{Notilo+}
 
 \begin{frame}{Notilo+}
-\begin{block}{Bloc simple}
+
+\begin{block}{Entreprise d'accueil}
 \begin{itemize}
-\item Start-up basée à Lyon
+\item Jeune start-up créée à Lyon en 2016
 \item Développement d'un dr\^one sous-marin autonome: iBubble
-\item Stage trouvé avec Thibault Anquetil
+\begin{figure}
+\centering
+\includegraphics[scale=0.05]{images/iBubble3.png}
+\caption{iBubble}
+\end{figure}
+\item Environ 25 personnes réparties en 2 équipes:
+	\begin{itemize}
+	\item équipe commerciale
+	\item équipe technique
+	\end{itemize}
+\item Tuteur: Filip Novotny -- responsable de la partie vision
+\item Thibault Anquetil -- ancien élève à l'ESIX
 \end{itemize}
 \end{block}
 
 \end{frame}
+
+
+
 
 	\subsection{iBubble}
 \begin{frame}{iBubble}
-\begin{block}{Bloc simple}
+
+\begin{block}{Caractéristiques}
 \begin{itemize}
-\item Hardware - Embarquée - Informatique haut niveau
-\item Dr\^one aquatique et autonome
+\item Aquatique et Autonome
 \item Repérage Acoustique
-\item Système de suivi visuel autonome
+\item Système de Suivi Visuel
 \end{itemize}
 \end{block}
+
+\begin{block}{Développement}
+\begin{itemize}
+\item Hardware: mécanique et conception électronique
+\item Embarquée: logiciel pilotant iBubble
+\item Informatique haut niveau: algorithmes de suivi par vision
+\end{itemize}
+\end{block}
+
 \end{frame}
+
+
+
+
 
 	\subsection{Problématique}
 \begin{frame}{Problématique}
-\begin{block}{Bloc simple}
+
+\begin{block}{Algorithme de tracking visuel}
 \begin{itemize}
-\item CMT - Flux Optique: partie consomme et parallèlisable
-\item Jetson: CUDA
-\item Raspberry Pi: BCM2837
-\item Réimplémenter Flux Optique sur Raspberry Pi
+\item CMT -- algorithme de suivi visuel bien connu
+\item Initialement, iBubble développé avec une carte Jetson
+\begin{itemize}
+\item GPGPU à architecture CUDA
+\item Optimisation du CMT à 30 images par seconde
+\end{itemize}
 \end{itemize}
 \end{block}
+
+\begin{block}{Raspberry Pi}
+\begin{itemize}
+\item Carte embarquée sur la version commerciale de iBubble
+\item SoC BCM2837 -- BROADCOM
+\begin{itemize}
+\item CPU -- ARM
+\item GPU VideoCore IV 3D -- BROADCOM
+\end{itemize}
+\item Pas une architecture CUDA
+\begin{itemize}
+	\item Pas d'optimation du CMT
+	\item VideoCore inutilisé
+	\item 7 images par seconde
+\end{itemize}
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+	\subsection{Réponse}
+\begin{frame}{Réponse}
+\begin{block}{Flux optique}
+\begin{itemize}
+\item Calcul du Flux Optique
+\begin{itemize}
+	\item Partie du CMT qui consomme le plus de ressources
+	\item Parallèlisable sur GPU
+\end{itemize}
+\item Implémentation interne du calcul du Flux Optique
+\item Utilisation du GPU de la Rasperry Pi pour certains calculs
+\end{itemize}
+\end{block}
+
+\begin{exampleblock}{Tâches}
+\begin{itemize}
+\item Comprendre l'archtecture du VideoCore IV 3D
+\item Apprendre à programmer le VideoCore IV 3D
+\item Implémenter le calcul du Flux Optique sur Raspberry Pi
+\end{itemize}
+\end{exampleblock}
+
+\begin{alertblock}{Difficultés}
+\begin{itemize}
+\item Aucune API officielle éxistante pour l'utilisation du VideoCore IV 3D
+\item Programmation en assembleur à partir de projets non-officiels
+\end{itemize}
+\end{alertblock}
+
 \end{frame}
 
 
@@ -104,15 +184,15 @@
 \section{Sujet}
 	\subsection{Flux Optique}
 
-\begin{frame}{Flux Optique}
+\begin{frame}{Flux Optique entre 2 images successives}
 
 \begin{columns}
 
 \begin{column}{0.3\textwidth}
 \begin{figure}
 \centering
-\includegraphics[scale=0.5]{images/architecturebretonne_wikipedia.jpg}
-\caption{Éléments d'architecture bretonne typique du Sud de la France. (\href{http://commons.wikimedia.org/wiki/File:Colmar_-_Alsace.jpg}{Wikipédia.fr} CC-By-Sa)}
+\includegraphics[scale=0.3]{images/plongeurInitFeatures.jpeg}
+\caption{Première image avec FEATURES}
 \end{figure}
 \end{column}
 
@@ -120,20 +200,22 @@
 \begin{column}{0.3\textwidth}
 \begin{figure}
 \centering
-\includegraphics[scale=0.5]{images/architecturebretonne_wikipedia.jpg}
-\caption{Éléments d'architecture bretonne typique du Sud de la France. (\href{http://commons.wikimedia.org/wiki/File:Colmar_-_Alsace.jpg}{Wikipédia.fr} CC-By-Sa)}
-\end{figure}
-\end{column}
-
-\begin{column}{0.3\textwidth}
-\begin{figure}
-\centering
-\includegraphics[scale=0.5]{images/architecturebretonne_wikipedia.jpg}
-\caption{Éléments d'architecture bretonne typique du Sud de la France. (\href{http://commons.wikimedia.org/wiki/File:Colmar_-_Alsace.jpg}{Wikipédia.fr} CC-By-Sa)}
+\includegraphics[scale=0.3]{images/plongeurNextFeatures.jpeg}
+\caption{Deuxième image avec FEATURES}
 \end{figure}
 \end{column}
 
 \end{columns}
+
+%\begin{column}{0.3\textwidth}
+\begin{figure}
+\centering
+\includegraphics[scale=0.3]{images/plongeurOpticalFlow.jpeg}
+\caption{Flux optique entre les 2 images}
+\end{figure}
+%\end{column}
+
+%\end{columns}
 
 \end{frame}
 
