@@ -219,12 +219,67 @@
 
 \end{frame}
 
-\begin{frame}{Image et feature}
-	que traite-t-on ?
-$240\times 360$
+
+
+\begin{frame}{Données entrantes: que traite-t-on ?}
+
+\begin{columns}
+
+\begin{column}{0.6\textwidth}
+\begin{block}{Images issues de la RaspiCam}
+\begin{itemize}
+\item Matrices $240\times 360$ -- floats 32 bits $\in \left[0;1\right]$
+\item Lignes contigues en RAM
+\end{itemize}
+\end{block}
+\end{column}
+
+\begin{column}{0.4\textwidth}
+\begin{figure}
+\centering
+\includegraphics[scale=0.2]{images/rowcolumnarrays.jpg}
+\caption{Stockage des pixels en RAM}
+\end{figure}
+\end{column}
+
+\end{columns}
+
+\begin{block}{Features}
+\begin{itemize}
+\item Points d'intér\^ets encadrants le plongeur
+\item Utiliser dans le CMT pour suivre le plongeur
+\item Repérées par le couple $(x,y)$:
+	\begin{itemize}
+		\item $x$ -- ligne de la feature $\in \left[0;240\right]$
+		\item $y$ -- colonne de la feature $\in \left[0;360\right]$
+	\end{itemize}
+\end{itemize}
+\end{block}
+
 \end{frame}
 
+
+
 \begin{frame}{Déplacement d'une feature}
+
+\begin{alertblock}{Flux Optique}
+Déplacement de ces features entre 2 images consécutives d'une vidéo
+\begin{itemize}
+	\item $d_{x}$: déplacement de la feature suivant les lignes
+	\item $d_{y}$: déplacement de la feature suivant les colonnes
+	\item Déplacements mesurés en pixels
+\end{itemize}
+\end{alertblock}
+
+\end{frame}
+
+\begin{frame}
+\begin{figure}
+%\centering
+\includegraphics[scale=0.3]{images/framesWindow.pdf}
+\caption{Stockage des pixels en RAM}
+\end{figure}
+
 \end{frame}
 
 
