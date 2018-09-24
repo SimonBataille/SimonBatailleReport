@@ -2,8 +2,48 @@
 \documentclass{bredelebeamer}
 
 
+\usepackage{amsmath}
 
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{parcolumns}
+\usepackage{lipsum}
 
+\usepackage{listings}
+
+\lstdefinestyle{CStyle}{
+    backgroundcolor=\color{backgroundColour},
+    commentstyle=\color{mGreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{mGray},
+    stringstyle=\color{mPurple},
+    basicstyle=\scriptsize,
+    %basicstyle=\tiny,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=t,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=C
+}
+
+\lstdefinestyle{customasm}{
+  belowcaptionskip=1\baselineskip,
+  frame=L,
+  xleftmargin=\parindent,
+  language=[x86masm]Assembler,
+  basicstyle=\footnotesize\ttfamily,
+  commentstyle=\itshape\color{purple!40!black},
+}
+
+\usepackage{placeins}
+
+\usepackage{parskip}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -60,8 +100,16 @@
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Introduction}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 	\subsection{Notilo+}
+
+%-----------------------------------------------------------------------------
 
 \begin{frame}{Notilo+}
 
@@ -86,10 +134,16 @@
 
 \end{frame}
 
+%-----------------------------------------------------------------------------
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 	\subsection{iBubble}
+
+%-----------------------------------------------------------------------------
+
 \begin{frame}{iBubble}
 
 \begin{block}{Caractéristiques}
@@ -110,11 +164,17 @@
 
 \end{frame}
 
+%-----------------------------------------------------------------------------
 
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 	\subsection{Problématique}
+
+%-----------------------------------------------------------------------------
+
 \begin{frame}{Problématique}
 
 \begin{block}{Algorithme de tracking visuel}
@@ -147,7 +207,16 @@
 
 \end{frame}
 
+%-----------------------------------------------------------------------------
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 	\subsection{Réponse}
+
+%-----------------------------------------------------------------------------
+
 \begin{frame}{Réponse}
 \begin{block}{Flux optique}
 \begin{itemize}
@@ -178,11 +247,89 @@
 
 \end{frame}
 
+%-----------------------------------------------------------------------------
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Sujet}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 	\subsection{Flux Optique}
+
+
+%-----------------------------------------------------------------------------
+
+\begin{frame}{Données entrantes: que traite-t-on ?}
+
+
+\begin{block}{Images issues de la RaspiCam}
+\begin{itemize}
+\item Matrices $240\times 360$ -- floats 32-bit $\in \left[0;1\right]$
+\item Lignes contigues en RAM -- Row-major
+\item Adressage 32-bit
+\end{itemize}
+\end{block}
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.2]{images/rowcolumnarrays.jpg}
+\caption{Stockage des pixels en RAM}
+\end{figure}
+
+
+\end{frame}
+
+%-----------------------------------------------------------------------------
+
+\begin{frame}{Données entrantes: que traite-t-on ?}
+
+
+\begin{block}{Features}
+\begin{itemize}
+\item Points d'intér\^ets encadrants le plongeur
+\item Utiliser dans le CMT pour suivre le plongeur
+\item Repérées par le couple $(x,y)$:
+	\begin{itemize}
+		\item $x$ -- ligne de la feature $\in \left[0;240\right]$
+		\item $y$ -- colonne de la feature $\in \left[0;360\right]$
+	\end{itemize}
+\end{itemize}
+\end{block}
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.5]{images/plongeurInitFeatures.jpeg}
+\end{figure}
+
+
+\end{frame}
+
+%-----------------------------------------------------------------------------
+
+\begin{frame}{Flux Optique}
+
+\begin{alertblock}{Flux Optique}
+Déplacement de ces features entre 2 images consécutives d'une vidéo
+\begin{itemize}
+	\item $d_{x}$: déplacement de la feature suivant les lignes
+	\item $d_{y}$: déplacement de la feature suivant les colonnes
+	\item Déplacements mesurés en pixels
+\end{itemize}
+\end{alertblock}
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.4]{images/plongeurOpticalFlow.jpeg}
+\caption{Flux optique entre les 2 images}
+\end{figure}
+
+\end{frame}
+
+%-----------------------------------------------------------------------------
 
 \begin{frame}{Flux Optique entre 2 images successives}
 
@@ -192,7 +339,7 @@
 \begin{figure}
 \centering
 \includegraphics[scale=0.3]{images/plongeurInitFeatures.jpeg}
-\caption{Première image avec FEATURES}
+\caption{FEATURES sur la première image}
 \end{figure}
 \end{column}
 
@@ -201,7 +348,7 @@
 \begin{figure}
 \centering
 \includegraphics[scale=0.3]{images/plongeurNextFeatures.jpeg}
-\caption{Deuxième image avec FEATURES}
+\caption{FEATURES sur la deuxième image}
 \end{figure}
 \end{column}
 
@@ -219,75 +366,130 @@
 
 \end{frame}
 
+%-----------------------------------------------------------------------------
 
+\begin{frame}{Flux Optique d'une seule FEATURE entre 2 images successives}
 
-\begin{frame}{Données entrantes: que traite-t-on ?}
-
-\begin{columns}
-
-\begin{column}{0.6\textwidth}
-\begin{block}{Images issues de la RaspiCam}
-\begin{itemize}
-\item Matrices $240\times 360$ -- floats 32 bits $\in \left[0;1\right]$
-\item Lignes contigues en RAM
-\end{itemize}
-\end{block}
-\end{column}
-
-\begin{column}{0.4\textwidth}
-\begin{figure}
-\centering
-\includegraphics[scale=0.2]{images/rowcolumnarrays.jpg}
-\caption{Stockage des pixels en RAM}
-\end{figure}
-\end{column}
-
-\end{columns}
-
-\begin{block}{Features}
-\begin{itemize}
-\item Points d'intér\^ets encadrants le plongeur
-\item Utiliser dans le CMT pour suivre le plongeur
-\item Repérées par le couple $(x,y)$:
-	\begin{itemize}
-		\item $x$ -- ligne de la feature $\in \left[0;240\right]$
-		\item $y$ -- colonne de la feature $\in \left[0;360\right]$
-	\end{itemize}
-\end{itemize}
-\end{block}
-
-\end{frame}
-
-
-
-\begin{frame}{Déplacement d'une feature}
-
-\begin{alertblock}{Flux Optique}
-Déplacement de ces features entre 2 images consécutives d'une vidéo
-\begin{itemize}
-	\item $d_{x}$: déplacement de la feature suivant les lignes
-	\item $d_{y}$: déplacement de la feature suivant les colonnes
-	\item Déplacements mesurés en pixels
-\end{itemize}
-\end{alertblock}
-
-\end{frame}
-
-\begin{frame}
 \begin{figure}
 %\centering
 \includegraphics[scale=0.3]{images/framesWindow.pdf}
-\caption{Stockage des pixels en RAM}
 \end{figure}
 
 \end{frame}
 
+%-----------------------------------------------------------------------------
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\subsection{Méthode de Lucas-Kanade}
-\begin{frame}{Algorithme}
+
+%-----------------------------------------------------------------------------
+
+\begin{frame}{Méthode de Lucas-Kanade}
+
+\begin{block}{Estimation du Flux Optique pour chaque FEATURE}
+\begin{itemize}
+	\item Plusieurs algorithmes permettant le calcul
+	\item Camille a sélectionné la Méthode de Lucas-Kanade -- Algorithme bien connu
+	\item Entre 2 images successives
+\end{itemize}
+\end{block}
+
+\begin{exampleblock}{2 Etapes}
+\begin{itemize}
+	\item Première étape dite de Gradient sur la première image
+	\item Deuxième étape du calcul effectif du fluxa optique pour chaque FEATURE
+	\item 30 FEATURES sur l'image -- 1 seule FEATURE
+\end{itemize}
+\end{exampleblock}
+
 \end{frame}
 
+%-----------------------------------------------------------------------------
 
+\begin{frame}{Gradient sur la première image pour une FEATURE}
+
+	\begin{block}{4 Valeurs à calculer}
+\begin{itemize}
+	\item $G_{XX}$ -- gradient vertical de la FEATURE
+	\item $G_{YY}$ -- gradient horizontal de la FEATURE
+	\item $G_{XY}$ -- gradient croisé de la FEATURE
+	\item $det = \frac{1}{G_{XX}G_{YY}-G_{XY}G_{XX}}$
+\end{itemize}
+\end{block}
+
+
+\boitejaune{
+	$$G_{YY} = \sum_{i=1}^{21}\sum_{j=1}^{21} grad_{y}[i,j]^{2}$$\\
+	$$G_{XY} = \sum_{i=1}^{21}\sum_{j=1}^{21} grad_{x}[i,j]\times grad_{y}[i,j]$$\\
+	$$G_{XX} = \sum_{i=1}^{21}\sum_{j=1}^{21} grad_{x}[i,j]^{2}$$
+}
+
+\end{frame}
+
+%-----------------------------------------------------------------------------
+
+\begin{frame}{Gradient sur la première image pour une FEATURE}
+
+	\begin{block}{Fen\^etre autour de la FEATURE}
+ $$grad_{x}[i,j] = \frac{\textcolor{blue}{firstWindow_{i+1,j}} - \textcolor{blue}{firstWindow_{i-1,j}}}{2}$$
+ $$grad_{y}[i,j] = \frac{\textcolor{blue}{firstWindow_{i,j+1}} - \textcolor{blue}{firstWindow_{i,j-1}}}{2}$$
+\end{block}
+
+\begin{figure}
+%\centering
+\includegraphics[scale=0.3]{images/firstFrameWindow.pdf}
+\end{figure}
+
+\end{frame}
+
+%-----------------------------------------------------------------------------
+
+\begin{frame}{Flux Optique: $d_{x}, d_{y}$}
+
+	\begin{block}{Algorithme de calcul du déplacement}
+\begin{algorithmic}
+	\ForAll {$\textcolor{blue}{firstWindow_{i,j}}$ and $\textcolor{red}{secondWindow_{i,j}}$}
+
+	\State $diff\_frames = \textcolor{blue}{firstWindow_{i,j}} - \textcolor{red}{secondWindow_{i+d_{x},j+d_{y}}}$
+
+	\State $frames\_mismatch.x = diff\_frames\times grad_{x}[i,j]$
+	\State $frames\_mismatch.y = diff\_frames\times grad_{y}[i,j]$
+
+	\EndFor
+
+	\State $d_{x} = det\times (G_{YY}\times frames\_mismatch.x - G_{XY}\times frames\_mismatch.y)$
+	\State $d_{y} = det\times (G_{XX}\times frames\_mismatch.y - G_{XY}\times frames\_mismatch.x)$
+\end{algorithmic}
+\end{block}
+
+	\begin{alertblock}{Interpolation Bilinéaire}
+\begin{equation*}
+	\begin{split}
+		\textcolor{red}{secondWindow_{i+d_{x},j+d_{y}}} =\\
+		\textcolor{red}{secondWindow_{floor(i+d_{x}),floor(j+d_{y})}}\times (1-fract(i+d_{x}))\times (1-fract(i+d_{y}))\\
+		+ \textcolor{red}{secondWindow_{floor(i+d_{x})+1,floor(j+d_{y})}}\times (fract(i+d_{x}))\times (1-fract(i+d_{y}))\\
+		+ \textcolor{red}{secondWindow_{floor(i+d_{x}),floor(j+d_{y})+1}}\times (1-fract(i+d_{x}))\times (fract(i+d_{y}))\\
+		+ \textcolor{red}{secondWindow_{floor(i+d_{x})+1,floor(j+d_{y})+1}}\times (fract(i+d_{x}))\times (fract(i+d_{x}))
+	\end{split}
+\end{equation*}
+	\end{alertblock}
+
+\end{frame}
+
+%-----------------------------------------------------------------------------
+
+\begin{frame}{Flux Optique d'une seule FEATURE entre 2 images successives}
+
+\begin{figure}
+%\centering
+\includegraphics[scale=0.3]{images/framesWindow.pdf}
+\end{figure}
+
+\end{frame}
+
+%-----------------------------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\subsection{VideoCore IV 3D}
 \begin{frame}{Architecture}
 \begin{block}{Bloc simple}
@@ -317,16 +519,21 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Solution}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\subsection{Bibliothèque interne}
 
 \begin{frame}{Architecture}
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\subsection{Resultats}
 \begin{frame}{iBubble}
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\subsection{Perspectives}
 \begin{frame}{Pyramide}
 \end{frame}
@@ -334,6 +541,8 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusion}
 
 \begin{frame}{Conclusion}
