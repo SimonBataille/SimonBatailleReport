@@ -136,8 +136,6 @@
 
 %-----------------------------------------------------------------------------
 
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 	\subsection{iBubble}
@@ -368,7 +366,7 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 %-----------------------------------------------------------------------------
 
-\begin{frame}{Flux Optique d'une seule FEATURE entre 2 images successives}
+\begin{frame}{Flux Optique : $x_{2}=x_{1}+d_{x}$, $y_{2}=y_{1}+d_{y}$}
 
 \begin{figure}
 %\centering
@@ -380,7 +378,8 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 %-----------------------------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	\subsection{Méthode de Lucas-Kanade}
+
+\subsection{Méthode de Lucas-Kanade}
 
 %-----------------------------------------------------------------------------
 
@@ -478,10 +477,10 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 %-----------------------------------------------------------------------------
 
-\begin{frame}{Flux Optique d'une seule FEATURE entre 2 images successives}
+\begin{frame}{Flux Optique entre 2 images successives pour une seule FEATURE }
 
 \begin{figure}
-%\centering
+\centering
 \includegraphics[scale=0.3]{images/framesWindow.pdf}
 \end{figure}
 
@@ -490,40 +489,118 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 %-----------------------------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	\subsection{VideoCore IV 3D}
-\begin{frame}{Architecture}
-\begin{block}{Bloc simple}
+
+\subsection{VideoCore IV 3D}
+
+%-----------------------------------------------------------------------------
+
+\begin{frame}{VideoCore IV 3D}
+
+\begin{block}{Documentation \& Caractérisques}
 \begin{itemize}
-\item Documentation Officielle
-\item Aucune API officielle
-\item Jeu d'instructions
-\item Vecteurs de 16 mots
+\item Succès de la Raspberry Pi -- Documentation Officielle Broadcom
+\item Vecteurs de 16 mots -- integer/float 32-bit
+\item Jeu d'instructions -- add/fadd, mul24/fmul, branch, load, semaphore etc \ldots
 \end{itemize}
+\end{block}
+
+\begin{alertblock}{Projets indépendants}
+\begin{itemize}
+\item Aucune API officielle
+\item Projets indépendants sur github -- helloworld et pi-gemm github
+\item Parseurs d'assembleur -- Programmation en assembleur
+\end{itemize}
+\end{alertblock}
+
+\end{frame}
+
+%-----------------------------------------------------------------------------
+
+\begin{frame}{VideoCore IV 3D}
+
+\begin{alertblock}{Principes de programmation}
+\begin{itemize}
+\item GPU piloté par un CPU: interface mailbox
+\item Mémoire RAM partagée entre CPU \& GPU: 2 espaces d'adresses
+\end{itemize}
+\end{alertblock}
+
+\begin{block}{Etapes de programmation}
+\begin{enumerate}
+\item Initialiser la mémoire partagée
+\item Copier données et les variables
+\item Transmettre les pointeurs
+\end{enumerate}
 \end{block}
 
 \end{frame}
 
-\begin{frame}{Programmation}
-\begin{block}{Bloc simple}
+%-----------------------------------------------------------------------------
+
+\begin{frame}{VideoCore IV 3D}
+
+\begin{alertblock}{Architecture d'un projet}
 \begin{itemize}
-\item Piloter par un CPU: interface mailbox
+\item GPU piloté par un CPU: interface mailbox
 \item Mémoire RAM partagée entre CPU \& GPU: 2 espaces d'adresses
-\item Vecteurs de 16 mots
-\item Projet helloworld et pi-gemm github
+\end{itemize}
+\end{alertblock}
+
+\begin{block}{Mémoire partagée \& fonctionnalité du GPU}
+\begin{itemize}
 \item Initialiser la mémoire partagée
 \item Copier données et les variables
 \item Transmettre les pointeurs
 \end{itemize}
 \end{block}
+
 \end{frame}
 
+%-----------------------------------------------------------------------------
+
+\begin{frame}{Architecture du GPU}
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.3]{images/archOverview.pdf}
+\end{figure}
+
+\end{frame}
+
+%-----------------------------------------------------------------------------
+
+\begin{frame}{Architecture d'un projet}
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.3]{images/optFlowArchitecture.pdf}
+\end{figure}
+
+\end{frame}
+
+%-----------------------------------------------------------------------------
+
+\begin{frame}{Mémoire RAM partagée}
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.3]{images/RAMptrs.pdf}
+\end{figure}
+
+\end{frame}
+
+%-----------------------------------------------------------------------------
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Solution}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	\subsection{Bibliothèque interne}
+
+\subsection{Bibliothèque interne}
 
 \begin{frame}{Architecture}
 \end{frame}
