@@ -1,6 +1,17 @@
 
 \documentclass{bredelebeamer}
 
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage{soul}
+\definecolor{mGreen}{rgb}{0,0.6,0}
+\definecolor{mGray}{rgb}{0.5,0.5,0.5}
+\definecolor{mPurple}{rgb}{0.58,0,0.82}
+\definecolor{backgroundColour}{rgb}{0.95,0.95,0.92}
+\usepackage{colortbl}
+\definecolor{Light}{gray}{.90}
+\sethlcolor{Light}
+
 
 \usepackage{amsmath}
 
@@ -109,7 +120,7 @@
 
 	\subsection{Notilo+}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 \begin{frame}{Notilo+}
 
@@ -134,13 +145,13 @@
 
 \end{frame}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 	\subsection{iBubble}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 \begin{frame}{iBubble}
 
@@ -162,7 +173,7 @@
 
 \end{frame}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 
 
@@ -171,7 +182,7 @@
 
 	\subsection{Problématique}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 \begin{frame}{Problématique}
 
@@ -205,7 +216,7 @@
 
 \end{frame}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 
 
@@ -213,7 +224,7 @@
 
 	\subsection{Réponse}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 \begin{frame}{Réponse}
 \begin{block}{Flux optique}
@@ -245,7 +256,7 @@
 
 \end{frame}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 
 
@@ -259,7 +270,7 @@
 	\subsection{Flux Optique}
 
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 \begin{frame}{Données entrantes: que traite-t-on ?}
 
@@ -281,7 +292,7 @@
 
 \end{frame}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 \begin{frame}{Données entrantes: que traite-t-on ?}
 
@@ -306,7 +317,7 @@
 
 \end{frame}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 \begin{frame}{Flux Optique}
 
@@ -327,7 +338,7 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 \end{frame}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 \begin{frame}{Flux Optique entre 2 images successives}
 
@@ -364,7 +375,7 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 \end{frame}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 \begin{frame}{Flux Optique : $x_{2}=x_{1}+d_{x}$, $y_{2}=y_{1}+d_{y}$}
 
@@ -375,13 +386,13 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 \end{frame}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Méthode de Lucas-Kanade}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 \begin{frame}{Méthode de Lucas-Kanade}
 
@@ -403,7 +414,7 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 \end{frame}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 \begin{frame}{Gradient sur la première image pour une FEATURE}
 
@@ -425,7 +436,7 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 \end{frame}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 \begin{frame}{Gradient sur la première image pour une FEATURE}
 
@@ -441,7 +452,7 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 \end{frame}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 \begin{frame}{Flux Optique: $d_{x}, d_{y}$}
 
@@ -475,7 +486,7 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 \end{frame}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 \begin{frame}{Flux Optique entre 2 images successives pour une seule FEATURE }
 
@@ -486,15 +497,15 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 \end{frame}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{VideoCore IV 3D}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
-\begin{frame}{VideoCore IV 3D}
+\begin{frame}{GPU de la Raspberry Pi : VideoCore IV 3D}
 
 \begin{block}{Documentation \& Caractérisques}
 \begin{itemize}
@@ -504,81 +515,38 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 \end{itemize}
 \end{block}
 
-\begin{alertblock}{Projets indépendants}
+\begin{block}{Apprentissage}
 \begin{itemize}
 \item Aucune API officielle
-\item Projets indépendants sur github -- helloworld et pi-gemm github
+\item Projets indépendants sur github -- helloworld et pi-gemm
 \item Parseurs d'assembleur -- Programmation en assembleur
 \end{itemize}
-\end{alertblock}
+\end{block}
 
 \end{frame}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
-\begin{frame}{VideoCore IV 3D}
+\begin{frame}{Programmation du VideoCore IV 3D}
 
 \begin{alertblock}{Principes de programmation}
 \begin{itemize}
-\item GPU piloté par un CPU: interface mailbox
-\item Mémoire RAM partagée entre CPU \& GPU: 2 espaces d'adresses
+\item GPU piloté par un CPU -- interface mailbox disponible sur le noyau Linux
+	\begin{itemize}
+		\item code à éxécuter sur GPU en assembleur puis parser
+		\item driver en langage C éxécuter sur CPU pour envoyer le code et les variables
+	\end{itemize}
+\item Mémoire RAM partagée entre CPU \& GPUs -- 2 espaces d'adresses
+	\begin{itemize}
+		\item ARM Virtual Adresses -- CPU
+		\item VC CPU Bus Adresses -- GPU
+	\end{itemize}
 \end{itemize}
 \end{alertblock}
 
-\begin{block}{Etapes de programmation}
-\begin{enumerate}
-\item Initialiser la mémoire partagée
-\item Copier données et les variables
-\item Transmettre les pointeurs
-\end{enumerate}
-\end{block}
-
 \end{frame}
 
-%-----------------------------------------------------------------------------
-
-\begin{frame}{VideoCore IV 3D}
-
-\begin{alertblock}{Architecture d'un projet}
-\begin{itemize}
-\item GPU piloté par un CPU: interface mailbox
-\item Mémoire RAM partagée entre CPU \& GPU: 2 espaces d'adresses
-\end{itemize}
-\end{alertblock}
-
-\begin{block}{Mémoire partagée \& fonctionnalité du GPU}
-\begin{itemize}
-\item Initialiser la mémoire partagée
-\item Copier données et les variables
-\item Transmettre les pointeurs
-\end{itemize}
-\end{block}
-
-\end{frame}
-
-%-----------------------------------------------------------------------------
-
-\begin{frame}{Architecture du GPU}
-
-\begin{figure}
-\centering
-\includegraphics[scale=0.3]{images/archOverview.pdf}
-\end{figure}
-
-\end{frame}
-
-%-----------------------------------------------------------------------------
-
-\begin{frame}{Architecture d'un projet}
-
-\begin{figure}
-\centering
-\includegraphics[scale=0.3]{images/optFlowArchitecture.pdf}
-\end{figure}
-
-\end{frame}
-
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
 \begin{frame}{Mémoire RAM partagée}
 
@@ -589,9 +557,40 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 \end{frame}
 
-%-----------------------------------------------------------------------------
+%--------------------------------------------------------------------
 
+\begin{frame}{Etapes de programmation}
 
+\begin{block}{GPU}
+\begin{enumerate}
+\item Ecrire le code à éxécuter en assembleur
+\item Parser ce code pour obtenir un fichier binaire compréhensible par le GPU
+\end{enumerate}
+\end{block}
+
+\begin{block}{CPU}
+\begin{enumerate}
+\item Initialiser la RAM partagée
+\item Copier en RAM le code à exécuter et les données entrantes (images et FEATURES)
+\item Transmettre les pointeurs au GPU
+\item Récupérer les résultats en RAM partagée
+\end{enumerate}
+\end{block}
+
+\end{frame}
+
+%-------------------------------------------------------------------
+
+\begin{frame}{Architecture du GPU}
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.2]{images/archOverview.pdf}
+\end{figure}
+
+\end{frame}
+
+%--------------------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -602,8 +601,76 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 \subsection{Bibliothèque interne}
 
-\begin{frame}{Architecture}
+%--------------------------------------------------------------------
+
+\begin{frame}{Architecture du projet}
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.3]{images/optFlowArchitecture.pdf}
+\end{figure}
+
 \end{frame}
+
+%--------------------------------------------------------------------
+
+\begin{frame}{grad.h / grad.c -- driver GPU}
+
+\begin{block}{driver GPU en langage C}
+\begin{itemize}
+\item Initialiser la RAM partagée
+\item Copier en RAM le code à exécuter et les données entrantes (images et FEATURES)
+\item Transmettre les pointeurs au GPU
+\item Récupérer les résultats en RAM partagée
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+%--------------------------------------------------------------------
+
+\begin{frame}[fragile]{Initialiser la RAM partagée}
+
+\begin{block}{driver GPU en langage C}
+\lstset{style=CStyle}
+\begin{lstlisting}
+memcpy(arm\_map->gradXcode, qpu\_code, code\_words * sizeof(unsigned int));
+\end{lstlisting}
+\end{block}
+
+\end{frame}
+
+%--------------------------------------------------------------------
+
+\begin{frame}{Copie du code et des données en RAM}
+
+\begin{block}{driver GPU en langage C}
+\begin{itemize}
+\item Initialiser la RAM partagée
+\item Copier en RAM le code à exécuter et les données entrantes (images et FEATURES)
+\item Transmettre les pointeurs au GPU
+\item Récupérer les résultats en RAM partagée
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+%--------------------------------------------------------------------
+
+\begin{frame}{Transmission des pointeurs}
+
+\begin{block}{driver GPU en langage C}
+\begin{itemize}
+\item Initialiser la RAM partagée
+\item Copier en RAM le code à exécuter et les données entrantes (images et FEATURES)
+\item Transmettre les pointeurs au GPU
+\item Récupérer les résultats en RAM partagée
+\end{itemize}
+\end{block}
+
+\end{frame}
+
+%--------------------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\subsection{Resultats}
