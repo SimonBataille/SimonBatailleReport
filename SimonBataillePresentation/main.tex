@@ -323,7 +323,7 @@
 \begin{frame}{Flux Optique}
 
 \begin{alertblock}{Flux Optique}
-Déplacement de ces features entre 2 images consécutives d'une vidéo
+Déplacemensubt de ces features entre 2 images consécutives d'une vidéo
 \begin{itemize}
 	\item $d_{x}$: déplacement de la feature suivant les lignes
 	\item $d_{y}$: déplacement de la feature suivant les colonnes
@@ -344,7 +344,7 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 \begin{frame}{Flux Optique entre 2 images successives}
 
 \begin{columns}
-
+sub
 \begin{column}{0.3\textwidth}
 \begin{figure}
 \centering
@@ -593,6 +593,8 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 %--------------------------------------------------------------------
 
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -742,7 +744,7 @@ void grad_init()
 
 \lstset{style=CStyle,caption={Extrait de grad.c},label=}
 \begin{lstlisting}
-void grad_gradXqpu(int toggle)
+void grad_gradXqpu()
 {
     /* Address of UNIFORMS array */
     vc_uniforms = vc_ptr + offsetof(struct grad_MemLayout, uniforms);
@@ -765,7 +767,7 @@ void grad_gradXqpu(int toggle)
 \item L'adresse où sont stockées les variables -- msg[0]
 	\begin{itemize}
 		\item Première et deuxième images -- firstFrameShared, secondFrameShared
-		\item Tableau contenant la position $(x,y)$ des FEATURES -- featureXYshared
+		\item Tableau contenant la position $(x,y)$ des FEATURES -- featureXYsharedsub
 		\item Adresse où écrire le résultat -- gXXshared
 	\end{itemize}
 \end{itemize}
@@ -801,10 +803,70 @@ or rGXXAddress, raReadUniform, 0; nop
 
 %--------------------------------------------------------------------
 
+\begin{frame}[fragile]{compute\_lk\_gpu()}
+
+\lstset{style=CStyle,caption={Extrait de compute\_lk\_gpu()},label=}
+\begin{lstlisting}
+void compute_lk_gpu(Mat &frame1, Mat &frame2, vector<> &featuresArray, vector<> &results){
+
+	[...]
+
+	/* Get 240*360 float values for each frame */
+	frame1.convertTo(frame1_float, CV_32FC1, 1 / 255.0f);
+	frame2.convertTo(frame2_float, CV_32FC1, 1 / 255.0f);
+	float *frame1_float_ptr = (float *) frame1_float.data;
+	float *frame2_float_ptr = (float *) frame2_float.data;
+
+	/* Get FEATURES (x,y) positions */
+	for (int i = 0; i < 30; i++){
+	features_static[i] = (unsigned int)featuresArray.at(i).y;
+	features_static[i + 30] = (unsigned int)featuresArray.at(i).x;
+
+	/* Initialize memory and copy data */
+	memory_init();
+	grad_init();
+
+	/* Invoke GPU to do some computing */
+	grad_gradXqpu();
+
+	/* Get results from SHARED memory */
+	grad_gXXsharedCpy(float *results);
+
+	[...]
+}
+\end{lstlisting}
+
+\end{frame}
+
+%--------------------------------------------------------------------
+
+\begin{frame}{Résumé}
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.3]{images/projectResume.pdf}
+\end{figure}
+
+\end{frame}
+
+%--------------------------------------------------------------------
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	\subsection{Resultats}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Resultats}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Précision}
+
+%--------------------------------------------------------------------
+
 \begin{frame}{iBubble}
 \end{frame}
+
+%--------------------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\subsection{Perspectives}
