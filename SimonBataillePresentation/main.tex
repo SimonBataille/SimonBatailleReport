@@ -119,13 +119,12 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-	\subsection{Notilo+}
+	\subsection{Notilo+ \& iBubble}
 
 %--------------------------------------------------------------------
 
-\begin{frame}{Notilo+}
+\begin{frame}{Entreprise d'accueil : Notilo+}
 
-\begin{block}{Entreprise d'accueil}
 \begin{itemize}
 \item Jeune start-up créée à Lyon en 2016
 \item Développement d'un dr\^one sous-marin autonome: iBubble
@@ -142,15 +141,8 @@
 \item Tuteur: Filip Novotny -- responsable de la partie vision
 \item Thibault Anquetil -- ancien élève à l'ESIX
 \end{itemize}
-\end{block}
 
 \end{frame}
-
-%--------------------------------------------------------------------
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-	\subsection{iBubble}
 
 %--------------------------------------------------------------------
 
@@ -176,12 +168,9 @@
 
 %--------------------------------------------------------------------
 
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-	\subsection{Problématique}
+	\subsection{Problématique \& Réponse}
 
 %--------------------------------------------------------------------
 
@@ -216,14 +205,6 @@
 \end{block}
 
 \end{frame}
-
-%--------------------------------------------------------------------
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-	\subsection{Réponse}
 
 %--------------------------------------------------------------------
 
@@ -447,7 +428,7 @@ sub
 \end{block}
 
 \begin{figure}
-%\centering
+\centering
 \includegraphics[scale=0.3]{images/firstFrameWindow.pdf}
 \end{figure}
 
@@ -586,7 +567,7 @@ sub
 
 \begin{figure}
 \centering
-\includegraphics[scale=0.2]{images/archOverview.pdf}
+\includegraphics[scale=0.4]{images/archOverview.pdf}
 \end{figure}
 
 \end{frame}
@@ -614,6 +595,12 @@ sub
 \end{figure}
 
 \end{frame}
+
+%--------------------------------------------------------------------
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Partie CPU}
 
 %--------------------------------------------------------------------
 
@@ -777,7 +764,13 @@ void grad_gradXqpu()
 
 %--------------------------------------------------------------------
 
-\begin{frame}[fragile]{gradX.asm / qpu-asm -- Assembleur et Parseur}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Partie GPU}
+
+%--------------------------------------------------------------------
+
+\begin{frame}[fragile]{gradX.asm / qpu-asm -- Assembleur / Parseur}
 
 \lstset{style=customasm,caption={Extrait de gradX.asm},label=}
 \begin{lstlisting}
@@ -803,10 +796,17 @@ or rGXXAddress, raReadUniform, 0; nop
 
 %--------------------------------------------------------------------
 
-\begin{frame}[fragile]{compute\_lk\_gpu()}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Appel au GPU \& Résumé}
+
+%--------------------------------------------------------------------
+
+\begin{frame}[fragile]{Appel au GPU}
 
 \lstset{style=CStyle,caption={Extrait de compute\_lk\_gpu()},label=}
 \begin{lstlisting}
+
 void compute_lk_gpu(Mat &frame1, Mat &frame2, vector<> &featuresArray, vector<> &results){
 
 	[...]
@@ -820,7 +820,7 @@ void compute_lk_gpu(Mat &frame1, Mat &frame2, vector<> &featuresArray, vector<> 
 	/* Get FEATURES (x,y) positions */
 	for (int i = 0; i < 30; i++){
 	features_static[i] = (unsigned int)featuresArray.at(i).y;
-	features_static[i + 30] = (unsigned int)featuresArray.at(i).x;
+	features_static[i + 30] = (unsigned int)featuresArray.at(i).x;}
 
 	/* Initialize memory and copy data */
 	memory_init();
@@ -855,24 +855,175 @@ void compute_lk_gpu(Mat &frame1, Mat &frame2, vector<> &featuresArray, vector<> 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Resultats}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Précision}
+\subsection{Précision \& Temps}
 
 %--------------------------------------------------------------------
 
-\begin{frame}{iBubble}
+\begin{frame}[fragile]{Temps}
+
+\lstset{style=CStyle,caption={Utilisation de la fonction OpenCV},label=}
+\begin{lstlisting}
+mean time per frame: 0.00538982 for 24 frames.
+JSON file of vectors of each features at each frames can be found at: /home/pi/video/video_out/video_out_vectors.json
+
+Video with vector representing optical flow has been written at : /home/pi/video/video_out/video_out_opt_flow_vectors.avi
+
+**********************************************************************
+**********************************************************************
+All videos / frames of: /home/pi/video have been processed !
+**********************************************************************
+\end{lstlisting}
+
+\lstset{style=CStyle,caption={Utilisation du VideoCore IV 3D},label=}
+\begin{lstlisting}
+mean time per frame: 0.0119438 for 24 frames.
+JSON file of vectors of each features at each frames can be found at: /home/pi/video/video_out/video_out_vectors.json
+
+Video with vector representing optical flow has been written at : /home/pi/video/video_out/video_out_opt_flow_vectors.avi
+
+**********************************************************************
+**********************************************************************
+All videos / frames of: /home/pi/video have been processed !
+**********************************************************************
+\end{lstlisting}
+
+\end{frame}
+
+%--------------------------------------------------------------------
+
+\begin{frame}{Précision}
+
+\begin{columns}
+
+\begin{column}{0.2\textwidth}
+\begin{tcolorbox}[tabgris,tabularx={|Y|}, boxrule=0.5pt, fontupper=\tiny, fontlower=\tiny]
+feature\\
+feature 1:\\
+feature 2:\\
+feature 3:\\
+feature 4:\\
+feature 5:\\
+feature 6:\\
+feature 7:\\
+feature 8:\\
+feature 9:\\
+feature 10:\\
+feature 11:\\
+feature 12:\\
+feature 13:\\
+feature 14:\\
+feature 15:\\
+feature 16:\\
+feature 17:\\
+feature 18:\\
+feature 19:\\
+feature 20:\\
+feature 21:\\
+feature 22:\\
+feature 23:\\
+feature 24:\\
+feature 25:\\
+feature 26:\\
+feature 27:\\
+feature 28:\\
+feature 29:\\
+feature 30:\\
+\end{tcolorbox}
+\end{column}
+
+\begin{column}{0.4\textwidth}
+\begin{tcolorbox}[tabgris,tabularx={Y||Y}, boxrule=0.5pt, fontupper=\tiny, fontlower=\tiny]
+$d_{y}$ & $d_{x}$\\
+0.0529022 & 1.44458\\
+0.0597687 & 1.52913\\
+0.0342407 & 1.41058\\
+0.112976 & 1.22267\\
+0.0827942 & 1.44588\\
+0.248459 & 1.40508\\
+-0.015213 & 1.4809\\
+0 & 0\\
+0.0228882 & 1.63636\\
+0.0141602 & 1.18526\\
+0.168091 & 1.44987\\
+0.13475 & 1.66971\\
+0 & 0\\
+0.00767517 & 1.44165\\
+0 & 0\\
+0.0722351 & 1.42871\\
+0.102554 & 1.21632\\
+-0.010025 & 1.1138\\
+0 & 0\\
+0.0588074 & 1.37506\\
+0 & 0\\
+0 & 0\\
+0 & 0\\
+0 & 0\\
+0 & 0\\
+0 & 0\\
+-0.0355682 & 1.50957\\
+0 & 0\\
+0 & 0\\
+0 & 0
+\end{tcolorbox}
+\end{column}
+
+\begin{column}{0.4\textwidth}
+\begin{tcolorbox}[tabgris,tabularx={Y||Y}, boxrule=0.5pt, fontupper=\tiny, fontlower=\tiny]
+$d_{y}$ & $d_{x}$\\
+0.051239  & 1.49907\\
+0.0566864  & 1.49538\\
+0.0485229  & 1.35619\\
+0.117294  & 1.25969\\
+0.0852509  & 1.44672\\
+0.166031  & 1.45792\\
+0.0622253  & 1.5038\\
+0.0437317  & 1.45819\\
+0.117691  & 1.69427\\
+0.00265503  & 1.25769\\
+0.241287  & 1.31388\\
+0.139465  & 1.62927\\
+0.129959  & 1.47935\\
+0.12989  & 1.47667\\
+0.0406952  & 1.49666\\
+0.094986  & 1.3511\\
+0.0591583  & 1.27177\\
+0.0367737  & 1.13118\\
+0.0540619  & 1.21773\\
+0.158203  & 1.45867\\
+0.0509186  & 1.89022\\
+0.0492096  & 1.49521\\
+0.295776  & 1.60911\\
+0.17981  & 1.46049\\
+0.0469666  & 1.3327\\
+0.105698  & 1.47306\\
+0.115067  & 1.43921\\
+0.0691986  & 1.4396\\
+0.0128326  & 1.17252\\
+-0.0117493  & 1.12878
+\end{tcolorbox}
+\end{column}
+
+\end{columns}
+
 \end{frame}
 
 %--------------------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	\subsection{Perspectives}
+
+\subsection{Perspectives}
+
+%--------------------------------------------------------------------
+
 \begin{frame}{Pyramide}
 \end{frame}
 
+%--------------------------------------------------------------------
 
 
 
@@ -880,8 +1031,12 @@ void compute_lk_gpu(Mat &frame1, Mat &frame2, vector<> &featuresArray, vector<> 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusion}
 
+%--------------------------------------------------------------------
+
 \begin{frame}{Conclusion}
 \end{frame}
+
+%--------------------------------------------------------------------
 
 
 
