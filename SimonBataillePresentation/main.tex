@@ -44,6 +44,7 @@
 }
 
 \lstdefinestyle{customasm}{
+  backgroundcolor=\color{backgroundColour},
   belowcaptionskip=1\baselineskip,
   frame=L,
   xleftmargin=\parindent,
@@ -614,12 +615,25 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 %--------------------------------------------------------------------
 
-\begin{frame}{grad.h / grad.c -- driver GPU}
+\begin{frame}{grad.h / grad.c}
 
-\begin{block}{driver GPU en langage C}
+\begin{block}{Driver GPU}
+\begin{itemize}
+\item Langage C
+\item Exécuter c\^oté CPU
+\item Utilisation de la mailbox -- Fonctions Linux bas-niveau
+\end{itemize}
+\end{block}
+
+\begin{block}{Fonctions}
 \begin{itemize}
 \item Initialiser la RAM partagée
-\item Copier en RAM le code à exécuter et les données entrantes (images et FEATURES)
+\item Copier en RAM le code à exécuter et les données entrantes
+	\begin{itemize}
+		\item Images issues de la RaspiCam -- 2 tableaux $(240\times 360)$ floats
+		\item Positions des FEATURES -- tableau contenant 30 $(x,y)$
+		\item Variables à transmettre au GPU -- UNIFORMS
+	\end{itemize}
 \item Transmettre les pointeurs au GPU
 \item Récupérer les résultats en RAM partagée
 \end{itemize}
@@ -629,44 +643,159 @@ Déplacement de ces features entre 2 images consécutives d'une vidéo
 
 %--------------------------------------------------------------------
 
-\begin{frame}[fragile]{Initialiser la RAM partagée}
+\begin{frame}[fragile]{Initialiser la RAM partagée -- Définition du layout}
 
-\begin{block}{driver GPU en langage C}
-\lstset{style=CStyle}
+\lstset{style=CStyle,caption={Extrait de grad.h},label=}
 \begin{lstlisting}
-memcpy(arm\_map->gradXcode, qpu\_code, code\_words * sizeof(unsigned int));
+struct grad_MemLayout
+{
+
+    /* Code-to-Execute */
+    unsigned int gradXcode[MAX_CODE_SIZE];
+    unsigned int gradYcode[MAX_CODE_SIZE];
+    unsigned int gradXYcode[MAX_CODE_SIZE];
+    unsigned int xtrBIP2code[MAX_CODE_SIZE];
+    unsigned int computeBIP2code[MAX_CODE_SIZE];
+    unsigned int dPosXYcode[MAX_CODE_SIZE];
+
+
+    /* Variables Array */
+    unsigned int uniforms[NUM_QPUS][NUM_UNIS];
+
+
+    /* Pointers Array */
+    unsigned int msg[NUM_QPUS][2];
+
+
+    /* Images and FEATURES positions */
+    float firstFrameShared[WIDTH*HEIGHT];           // FIRST FRAME for the QPUs to read into
+    float secondFrameShared[WIDTH*HEIGHT];          // SECOND FRAME for the QPUs to read into
+    unsigned int featureXYshared[NUM_FEATURES*2];   // array containing each FEATURE (x/y) position
+
+
+    /* Results */
+    float gXXshared[NUM_FEATURES];                  // result array containing 30*GXX values
+}
 \end{lstlisting}
-\end{block}
 
 \end{frame}
 
 %--------------------------------------------------------------------
 
-\begin{frame}{Copie du code et des données en RAM}
+\begin{frame}[fragile]{Initialiser la RAM partagée -- Lier les 2 espaces d'adresses}
 
-\begin{block}{driver GPU en langage C}
+\lstset{style=CStyle,caption={Extrait de grad.c},label=}
+\begin{lstlisting}
+void memory_init(){
+    /* Get "vc_ptr" inside VC/CPU BUS Addresses -- mailbox function */
+    vc_ptr = getVCptr();
+
+    /* Get "arm_ptr" pointer inside ARM VIRTUAL Addresses -- mailbox function */
+    arm_ptr = mapmem(BUS_TO_PHYS(vc_ptr + host.mem_map), SIZE);
+    arm_map = (struct grad_MemLayout *)arm_ptr;
+    memset(arm_map, 0x0, sizeof(struct grad_MemLayout));
+}
+\end{lstlisting}
+
+\begin{alertblock}{2 POINTERS sur le m\^eme espace physique}
 \begin{itemize}
-\item Initialiser la RAM partagée
-\item Copier en RAM le code à exécuter et les données entrantes (images et FEATURES)
-\item Transmettre les pointeurs au GPU
-\item Récupérer les résultats en RAM partagée
+\item vc\_ptr : adresse que le GPU comprend
+\item arm\_map : adresse que le CPU comprend
 \end{itemize}
-\end{block}
+\end{alertblock}
 
 \end{frame}
 
 %--------------------------------------------------------------------
 
-\begin{frame}{Transmission des pointeurs}
+\begin{frame}[fragile]{Copie du code et des données en RAM partagée}
 
-\begin{block}{driver GPU en langage C}
+\lstset{style=CStyle,caption={Extrait de grad.c},label=}
+\begin{lstlisting}
+void grad_init()
+{
+    /* Load gradXcode into ARM VIRTUAL Addresses and Copy */
+    code_words = loadShaderCode("../src/gradX.bin", qpu_code, MAX_CODE_SIZE);
+    memcpy(arm_map->gradXcode, qpu_code, code_words * sizeof(unsigned int));
+
+    /* Copy INPUT images and FEATURES array */
+    memcpy(arm_map->firstFrameShared, firstFrameMain, sizeof(float) * WIDTH * HEIGHT);
+    memcpy(arm_map->secondFrameShared, secondFrameMain, sizeof(float) * WIDTH * HEIGHT);
+    memcpy(arm_map->featureXYshared, featureXYarray, sizeof(unsigned int) * 2 * NUM_FEATURES);
+
+    /* Copy variables -- UNIFORMS */
+    //Addresses of first and Second Frames
+    arm_map->uniforms[0] = vc_ptr + offsetof(struct grad_MemLayout, firstFrameShared);
+    arm_map->uniforms[1] = vc_ptr + offsetof(struct grad_MemLayout, secondFrameShared);
+    //Address of FEATURES positions $(x,y)$ array
+    arm_map->uniforms[2] = vc_ptr + offsetof(struct grad_MemLayout, featureXYshared);
+    //Address of results
+    arm_map->uniforms[3] = vc_ptr + offsetof(struct grad_MemLayout, gXXshared);
+}
+\end{lstlisting}
+
+\end{frame}
+
+%--------------------------------------------------------------------
+
+\begin{frame}[fragile]{Transmission des pointeurs au GPU et exécution du code}
+
+\lstset{style=CStyle,caption={Extrait de grad.c},label=}
+\begin{lstlisting}
+void grad_gradXqpu(int toggle)
+{
+    /* Address of UNIFORMS array */
+    vc_uniforms = vc_ptr + offsetof(struct grad_MemLayout, uniforms);
+
+    /* Store POINTERS into MSG array */
+    arm_map->msg[0] = vc_uniforms;
+    arm_map->msg[1] = vc_ptr + offsetof(struct grad_MemLayout, gradXcode);
+
+    /* Address of MSG array */
+    vc_msg = vc_ptr + offsetof(struct grad_MemLayout, msg);
+
+    /* Send POINTERS with execute_qpu -- mailbox function */
+    execute_qpu(mb, NUM_QPUS, vc_msg, GPU_FFT_NO_FLUSH, GPU_FFT_TIMEOUT);
+}
+\end{lstlisting}
+
+\begin{alertblock}{Conclusion, le GPU connait :}
 \begin{itemize}
-\item Initialiser la RAM partagée
-\item Copier en RAM le code à exécuter et les données entrantes (images et FEATURES)
-\item Transmettre les pointeurs au GPU
-\item Récupérer les résultats en RAM partagée
+\item L'adresse où est situé le code à exécuter -- msg[1]
+\item L'adresse où sont stockées les variables -- msg[0]
+	\begin{itemize}
+		\item Première et deuxième images -- firstFrameShared, secondFrameShared
+		\item Tableau contenant la position $(x,y)$ des FEATURES -- featureXYshared
+		\item Adresse où écrire le résultat -- gXXshared
+	\end{itemize}
 \end{itemize}
-\end{block}
+\end{alertblock}
+
+\end{frame}
+
+%--------------------------------------------------------------------
+
+\begin{frame}[fragile]{gradX.asm / qpu-asm -- Assembleur et Parseur}
+
+\lstset{style=customasm,caption={Extrait de gradX.asm},label=}
+\begin{lstlisting}
+# Registers used to hold uniforms
+define(`rFirstFrameAddress', ra0)
+define(`rSecondFrameAddress', ra1)
+define(`rFeaturesAddress', ra2)
+define(`rGXXAddress', ra3)
+
+# Get uniforms values
+or rFirstFrameAddress, raReadUniform, 0; nop
+or rSecondFrameAddress, raReadUniform, 0; nop
+or rFeaturesAddress, raReadUniform, 0; nop
+or rGXXAddress, raReadUniform, 0; nop
+\end{lstlisting}
+
+\lstset{style=customasm,caption={Génération du binaire gradX.bin},label=}
+\begin{lstlisting}
+../asm/qpu-asm -o gradX.bin < gradX.asm
+\end{lstlisting}
 
 \end{frame}
 
