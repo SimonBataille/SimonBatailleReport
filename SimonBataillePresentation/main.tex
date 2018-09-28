@@ -139,6 +139,7 @@
 	\item équipe technique
 	\end{itemize}
 \item Tuteur: Filip Novotny -- responsable de la partie vision
+\item Co-stagiaire: Camille -- en charge de la partie algorithmique
 \item Thibault Anquetil -- ancien élève à l'ESIX
 \end{itemize}
 
@@ -209,7 +210,7 @@
 %--------------------------------------------------------------------
 
 \begin{frame}{Réponse}
-\begin{block}{Flux OPtique}
+\begin{block}{Flux Optique}
 \begin{itemize}
 \item Calcul du Flux Optique
 \begin{itemize}
@@ -223,7 +224,7 @@
 
 \begin{exampleblock}{Tâches}
 \begin{itemize}
-	\item Comprendre l'archtecture du \emph{VideoCore IV 3D}
+	\item Comprendre l'architecture du \emph{VideoCore IV 3D}
 	\item Apprendre à programmer le \emph{VideoCore IV 3D}
 \item Implémenter le calcul du Flux Optique sur Raspberry Pi
 \end{itemize}
@@ -389,15 +390,21 @@ Déplacement des FEATURES entre 2 images consécutives d'une vidéo
 \begin{itemize}
 	\item Première étape dite de Gradient sur la première image
 	\item Deuxième étape du calcul effectif du Flux Optique pour chaque FEATURE
-	\item 30 FEATURES sur l'image -- 1 seule FEATURE
 \end{itemize}
 \end{exampleblock}
 
+\begin{alertblock}{Algorithme de calcul Flux Optique}
+\begin{itemize}
+	\item 30 FEATURES sur l'image -- 1 seule FEATURE
+	\item Collaboration avec Camille -- sélection et détails de l'algorithme
+	\item T\^ache personnelle -- Implémentation sur le \emph{VideoCore IV 3D}
+\end{itemize}
+\end{alertblock}
 \end{frame}
 
 %--------------------------------------------------------------------
 
-\begin{frame}{Gradient sur la première image, pour une FEATURE}
+\begin{frame}{Gradient sur la première image, pour une FEATURE -- Camille}
 
 	\begin{block}{4 Valeurs à calculer}
 \begin{itemize}
@@ -419,7 +426,7 @@ Déplacement des FEATURES entre 2 images consécutives d'une vidéo
 
 %--------------------------------------------------------------------
 
-\begin{frame}{Gradient sur la première image, pour une FEATURE}
+\begin{frame}{Gradient sur la première image, pour une FEATURE -- Camille}
 
 	\begin{block}{Fen\^etre autour de la FEATURE}
  $$grad_{x}[i,j] = \frac{\textcolor{blue}{firstWindow_{i+1,j}} - \textcolor{blue}{firstWindow_{i-1,j}}}{2}$$
@@ -435,7 +442,7 @@ Déplacement des FEATURES entre 2 images consécutives d'une vidéo
 
 %--------------------------------------------------------------------
 
-\begin{frame}{Flux Optique: $d_{x}, d_{y}$}
+\begin{frame}{Flux Optique: $d_{x}, d_{y}$ -- Camille}
 
 	\begin{block}{Algorithme de calcul du déplacement -- Plusieurs itérations -- Valeurs initiales nulles}
 \begin{algorithmic}
@@ -675,8 +682,10 @@ struct grad_MemLayout
 \lstset{style=CStyle,caption={Extrait de grad.c},label=}
 \begin{lstlisting}
 void memory_init(){
+
     /* Get "vc_ptr" inside VC/CPU BUS Addresses -- mailbox function */
     vc_ptr = getVCptr();
+
 
     /* Get "arm_ptr" pointer inside ARM VIRTUAL Addresses -- mailbox function */
     arm_ptr = mapmem(BUS_TO_PHYS(vc_ptr + host.mem_map), SIZE);
@@ -700,23 +709,28 @@ void memory_init(){
 
 \lstset{style=CStyle,caption={Extrait de grad.c},label=}
 \begin{lstlisting}
-void grad_init()
-{
-    /* Load gradXcode into ARM VIRTUAL Addresses and Copy */
+void grad_init(){
+
+    /* Load gradXcode and Copy into ARM VIRTUAL Addresses */
     code_words = loadShaderCode("../src/gradX.bin", qpu_code, MAX_CODE_SIZE);
     memcpy(arm_map->gradXcode, qpu_code, code_words * sizeof(unsigned int));
 
-    /* Copy INPUT images and FEATURES array */
+
+    /* Copy INPUT images and FEATURES array into ARM VIRTUAL Addresses */
     memcpy(arm_map->firstFrameShared, firstFrameMain, sizeof(float) * WIDTH * HEIGHT);
     memcpy(arm_map->secondFrameShared, secondFrameMain, sizeof(float) * WIDTH * HEIGHT);
     memcpy(arm_map->featureXYshared, featureXYarray, sizeof(unsigned int) * 2 * NUM_FEATURES);
 
-    /* Copy variables -- UNIFORMS */
+
+    /* Copy variables -- UNIFORMS -- into ARM VIRTUAL Addresses */
+
     //Addresses of first and Second Frames
     arm_map->uniforms[0] = vc_ptr + offsetof(struct grad_MemLayout, firstFrameShared);
     arm_map->uniforms[1] = vc_ptr + offsetof(struct grad_MemLayout, secondFrameShared);
+
     //Address of FEATURES positions $(x,y)$ array
     arm_map->uniforms[2] = vc_ptr + offsetof(struct grad_MemLayout, featureXYshared);
+
     //Address of results
     arm_map->uniforms[3] = vc_ptr + offsetof(struct grad_MemLayout, gXXshared);
 }
@@ -732,18 +746,18 @@ void grad_init()
 \begin{lstlisting}
 void grad_gradXqpu()
 {
-    /* Address of UNIFORMS array */
+    /* Address of UNIFORMS array inside VC CPU BUS Adresses */
     vc_uniforms = vc_ptr + offsetof(struct grad_MemLayout, uniforms);
 
-    /* Store POINTERS into MSG array */
+    /* Store POINTERS into MSG array inside ARM Virtual Adresses */
     arm_map->msg[0] = vc_uniforms;
     arm_map->msg[1] = vc_ptr + offsetof(struct grad_MemLayout, gradXcode);
 
-    /* Address of MSG array */
+    /* Address of MSG array into ARM VIRTUAL Addresses */
     vc_msg = vc_ptr + offsetof(struct grad_MemLayout, msg);
 
     /* Send POINTERS with execute_qpu -- mailbox function */
-    execute_qpu(mb, NUM_QPUS, vc_msg, GPU_FFT_NO_FLUSH, GPU_FFT_TIMEOUT);
+    execute_qpu(mb, NUM_QPUS, vc_msg, GPU_NO_FLUSH, GPU_TIMEOUT);
 }
 \end{lstlisting}
 
@@ -1052,9 +1066,15 @@ $d_{y}$ & $d_{x}$\\\hline\hline
 %--------------------------------------------------------------------
 
 \begin{frame}{Conclusion}
+
 \boitebleue{
 	Démonstration sur une courte vidéo issue de la RaspiCam de \emph{iBubble}.
 }
+
+\boiteviolette{
+	Merci de votre attention.
+}
+
 \end{frame}
 
 %--------------------------------------------------------------------
